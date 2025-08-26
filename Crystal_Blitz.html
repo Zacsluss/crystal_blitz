@@ -1,0 +1,2976 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crystal Blitz — Arena Shooter</title>
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --fg: #e3e7ef;
+      --muted: #99a2b2;
+      --accent: #5af2c7;
+      --danger: #ff5b6e;
+      --warning: #ffd166;
+      --panel: #12161d;
+      --panel2: #0f1319;
+      --shadow: rgba(0,0,0,0.35);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    #hud {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 6px 14px var(--shadow);
+      font-size: 14px;
+      user-select: none;
+      pointer-events: none;
+      min-width: 220px;
+    }
+    #hud .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+      white-space: nowrap;
+    }
+    #hud .bar {
+      --w: 160px;
+      position: relative;
+      width: var(--w);
+      height: 8px;
+      background: #1a1f29;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #1f2430;
+    }
+    #hud .bar > i {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: linear-gradient(90deg, var(--accent), #34d1ff);
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.25);
+    }
+    #hud .bar.health > i { background: linear-gradient(90deg, #ff6b6b, #ffa5a5); }
+    #hud .bar.stamina > i { background: linear-gradient(90deg, #ffd166, #ffeb99); }
+    #hud .muted { color: var(--muted); }
+    #help {
+      position: fixed;
+      right: 12px;
+      top: 12px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 6px 14px var(--shadow);
+      user-select: none;
+      font-size: 14px;
+      max-width: 360px;
+    }
+    #help kbd {
+      background: #1a1f29;
+      border: 1px solid #293140;
+      border-bottom-width: 2px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+    #crystalLegend {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 6px 14px var(--shadow);
+      user-select: none;
+      font-size: 14px;
+      max-width: 280px;
+      display: none;
+    }
+    #crystalLegend h3 {
+      margin: 0 0 8px 0;
+      color: var(--accent);
+      font-size: 16px;
+    }
+    .crystal-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+    .crystal-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.3);
+      flex-shrink: 0;
+    }
+    .crystal-name {
+      color: var(--fg);
+      font-weight: 500;
+      min-width: 80px;
+    }
+    .crystal-desc {
+      color: var(--muted);
+      font-size: 12px;
+      flex-grow: 1;
+    }
+    #banner {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(1200px 700px at 40% 35%, rgba(90,242,199,0.08), transparent),
+                  linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 24px 28px;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px var(--shadow);
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.5;
+    }
+    #banner h1 {
+      margin: 0 0 10px 0; font-size: 28px; letter-spacing: 0.3px;
+    }
+    #banner .sub { color: var(--muted); margin-bottom: 16px; }
+    #banner button {
+      background: var(--accent);
+      color: #002e24;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(90,242,199,0.25);
+    }
+    #banner button:hover { filter: brightness(1.05); }
+    #gameOver {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px var(--shadow);
+      text-align: center;
+      line-height: 1.4;
+    }
+    #gameOver h2 { margin: 0 0 8px 0; }
+    #gameOver button {
+      margin-top: 10px;
+      background: var(--accent);
+      color: #002e24;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #fps {
+      position: fixed;
+      bottom: 10px; right: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: #0f1319aa;
+      padding: 4px 8px;
+      border-radius: 6px;
+      user-select: none;
+    }
+    #powerupNotification {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(18, 22, 29, 0.7), rgba(15, 19, 25, 0.7));
+      border: 2px solid rgba(90, 242, 199, 0.7);
+      padding: 24px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px var(--shadow);
+      font-size: 36px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(90,242,199,0.6);
+      letter-spacing: 1px;
+      display: none;
+      z-index: 1000;
+      animation: powerupPulse 3s ease-out forwards;
+    }
+    #powerupDialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border: 3px solid var(--accent);
+      padding: 24px 28px;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px var(--shadow);
+      display: none;
+      z-index: 2000;
+      max-width: 600px;
+      text-align: center;
+    }
+    #powerupDialog h2 {
+      margin: 0 0 16px 0;
+      color: var(--accent);
+      font-size: 24px;
+      text-shadow: 0 0 8px rgba(90,242,199,0.6);
+    }
+    .powerup-options {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .powerup-option {
+      background: linear-gradient(180deg, #1a1f29, #0f1319);
+      border: 2px solid #293140;
+      border-radius: 12px;
+      padding: 16px 12px;
+      cursor: pointer;
+      min-width: 160px;
+      transition: all 0.2s ease;
+    }
+    .powerup-option:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(90,242,199,0.3);
+      transform: translateY(-2px);
+    }
+    .powerup-option h3 {
+      margin: 0 0 8px 0;
+      color: var(--accent);
+      font-size: 16px;
+    }
+    .powerup-option p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.3;
+    }
+    @keyframes powerupPulse {
+      0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+      10% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+      20% { transform: translateX(-50%) scale(1); }
+      90% { opacity: 1; transform: translateX(-50%) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0.9); }
+    }
+    canvas { display: block; }
+    .edge-warning {
+      position: fixed;
+      background: rgba(255, 91, 110, 0.5);
+      pointer-events: none;
+      z-index: 100;
+      animation: edgePulse 0.5s ease-in-out infinite alternate;
+    }
+    .edge-warning.top { top: 0; left: 0; right: 0; height: 16px; }
+    .edge-warning.bottom { bottom: 0; left: 0; right: 0; height: 16px; }
+    .edge-warning.left { left: 0; top: 0; bottom: 0; width: 16px; }
+    .edge-warning.right { right: 0; top: 0; bottom: 0; width: 16px; }
+    @keyframes edgePulse {
+      0% { opacity: 0.5; }
+      100% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="hud">
+    <div class="row"><strong>CRYSTAL BLITZ</strong> <span class="muted">— single‑file</span></div>
+    <div class="row">Health
+      <span class="bar health"><i id="healthBar" style="width:100%"></i></span>
+      <span id="hpTxt">100</span>
+    </div>
+    <div class="row">Stamina
+      <span class="bar stamina"><i id="staminaBar" style="width:100%"></i></span>
+      <span id="staminaTxt">100</span>
+    </div>
+    <div class="row">Wave <span id="wave" style="margin-left:4px">1</span> • Kills <span id="kills" style="margin-left:4px">0</span></div>
+  </div>
+  <div id="banner">
+    <h1>Crystal Blitz</h1>
+    <div style="margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;">
+      <div style="margin-bottom: 8px;"><strong>Controls</strong></div>
+      <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move • mouse aim • <kbd>Mouse1</kbd> shoot • <kbd>Shift</kbd> dash • <kbd>Space</kbd> leap • <kbd>P</kbd> pause • <kbd>H</kbd> crystal legend • <kbd>F11</kbd> fullscreen</div>
+      <div class="muted" style="margin-top: 6px;">Mobile: Touch left side to move, right side to aim/shoot</div>
+    </div>
+    <button id="startBtn">Start</button>
+  </div>
+  <div id="gameOver">
+    <h2>Game Over</h2>
+    <div>Wave <span id="goWave">1</span> • Kills <span id="goKills">0</span></div>
+    <button id="restartBtn">Restart</button>
+  </div>
+  <div id="fps">FPS: —</div>
+  <div id="powerupNotification"></div>
+  <div class="edge-warning top" id="edgeTop" style="display:none"></div>
+  <div class="edge-warning bottom" id="edgeBottom" style="display:none"></div>
+  <div class="edge-warning left" id="edgeLeft" style="display:none"></div>
+  <div class="edge-warning right" id="edgeRight" style="display:none"></div>
+  <div id="powerupDialog">
+    <h2>Choose Your Upgrade</h2>
+    <div class="powerup-options">
+      <div class="powerup-option" id="powerupOption1">
+        <h3 id="powerupTitle1">Title</h3>
+        <p id="powerupDesc1">Description</p>
+      </div>
+      <div class="powerup-option" id="powerupOption2">
+        <h3 id="powerupTitle2">Title</h3>
+        <p id="powerupDesc2">Description</p>
+      </div>
+      <div class="powerup-option" id="powerupOption3">
+        <h3 id="powerupTitle3">Title</h3>
+        <p id="powerupDesc3">Description</p>
+      </div>
+    </div>
+  </div>
+  <div id="crystalLegend">
+    <h3>Crystal Types</h3>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #00BFFF;"></div>
+      <div class="crystal-name">Dual Shot</div>
+      <div class="crystal-desc">Front & back bullets</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #32CD32;"></div>
+      <div class="crystal-name">Triple Shot</div>
+      <div class="crystal-desc">3-way spread</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #FF1493;"></div>
+      <div class="crystal-name">Quad Shot</div>
+      <div class="crystal-desc">4-way spread</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #FFD700;"></div>
+      <div class="crystal-name">Homing</div>
+      <div class="crystal-desc">Tracks enemies</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #FF4500;"></div>
+      <div class="crystal-name">Explosive</div>
+      <div class="crystal-desc">Area damage</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #FF69B4;"></div>
+      <div class="crystal-name">Ricochet</div>
+      <div class="crystal-desc">Bounces off walls</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #000080;"></div>
+      <div class="crystal-name">Lightning</div>
+      <div class="crystal-desc">Chains to enemies</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #00CED1;"></div>
+      <div class="crystal-name">Freeze Shot</div>
+      <div class="crystal-desc">Slows enemies</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #8b4513;"></div>
+      <div class="crystal-name">Shotgun</div>
+      <div class="crystal-desc">Spreads on hit</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #ffa500;"></div>
+      <div class="crystal-name">Cluster</div>
+      <div class="crystal-desc">Splits into fragments</div>
+    </div>
+    <div class="crystal-item">
+      <div class="crystal-color" style="background-color: #dc143c;"></div>
+      <div class="crystal-name">Seeking</div>
+      <div class="crystal-desc">Curves to enemies</div>
+    </div>
+  </div>
+
+  <script>
+  'use strict';
+
+  // ===== Canvas & Resize =====
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ===== UI Elements =====
+  const startBtn = document.getElementById('startBtn');
+  const banner = document.getElementById('banner');
+  const hudHpBar = document.getElementById('healthBar');
+  const hudStaminaBar = document.getElementById('staminaBar');
+  const hpTxt = document.getElementById('hpTxt');
+  const staminaTxt = document.getElementById('staminaTxt');
+  const waveTxt = document.getElementById('wave');
+  const killsTxt = document.getElementById('kills');
+  const fpsTxt = document.getElementById('fps');
+  const gameOverPanel = document.getElementById('gameOver');
+  const goWave = document.getElementById('goWave');
+  const goKills = document.getElementById('goKills');
+  const restartBtn = document.getElementById('restartBtn');
+  const powerupNotification = document.getElementById('powerupNotification');
+  const powerupDialog = document.getElementById('powerupDialog');
+  const powerupOption1 = document.getElementById('powerupOption1');
+  const powerupOption2 = document.getElementById('powerupOption2');
+  const powerupOption3 = document.getElementById('powerupOption3');
+  const powerupTitle1 = document.getElementById('powerupTitle1');
+  const powerupTitle2 = document.getElementById('powerupTitle2');
+  const powerupTitle3 = document.getElementById('powerupTitle3');
+  const powerupDesc1 = document.getElementById('powerupDesc1');
+  const powerupDesc2 = document.getElementById('powerupDesc2');
+  const powerupDesc3 = document.getElementById('powerupDesc3');
+  const edgeTop = document.getElementById('edgeTop');
+  const edgeBottom = document.getElementById('edgeBottom');
+  const edgeLeft = document.getElementById('edgeLeft');
+  const edgeRight = document.getElementById('edgeRight');
+  const crystalLegend = document.getElementById('crystalLegend');
+
+  // ===== Math Utils =====
+  const TAU = Math.PI * 2;
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  function len2(x,y){ return x*x + y*y; }
+  function norm(x,y) {
+    const L = Math.hypot(x,y) || 1; return [x/L, y/L];
+  }
+  function randRange(a,b){ return a + Math.random()*(b-a); }
+  function sign(v){ return v<0?-1:1; }
+
+  // ===== Input =====
+  const keys = new Set();
+  let mouseX = 0, mouseY = 0, mouseDown = false;
+  
+  // Mobile touch support
+  let touchMove = {x: 0, y: 0, active: false};
+  let touchShoot = {x: 0, y: 0, active: false};
+  window.addEventListener('keydown', e => {
+    if (e.code === 'KeyP'){ togglePause(); return; }
+    if (e.code === 'KeyH'){ 
+      crystalLegend.style.display = crystalLegend.style.display === 'block' ? 'none' : 'block';
+      return;
+    }
+    if (e.code === 'F11'){ 
+      e.preventDefault();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+      return; 
+    }
+    keys.add(e.code);
+  });
+  window.addEventListener('keyup', e => keys.delete(e.code));
+  canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  canvas.addEventListener('mousedown', () => { mouseDown = true; initAudio(); });
+  window.addEventListener('mouseup', () => mouseDown = false);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  
+  // Touch controls for mobile
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    const touch = e.touches[0];
+    if (touch.clientX < canvas.width / 2) {
+      // Left side - movement
+      touchMove.active = true;
+      touchMove.x = touch.clientX;
+      touchMove.y = touch.clientY;
+    } else {
+      // Right side - shooting/aiming
+      touchShoot.active = true;
+      touchShoot.x = touch.clientX;
+      touchShoot.y = touch.clientY;
+      mouseX = touch.clientX;
+      mouseY = touch.clientY;
+      mouseDown = true;
+    }
+  });
+  
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (touchMove.active && touch.clientX < canvas.width / 2) {
+      touchMove.x = touch.clientX;
+      touchMove.y = touch.clientY;
+    } else if (touchShoot.active && touch.clientX >= canvas.width / 2) {
+      touchShoot.x = touch.clientX;
+      touchShoot.y = touch.clientY;
+      mouseX = touch.clientX;
+      mouseY = touch.clientY;
+    }
+  });
+  
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    touchMove.active = false;
+    touchShoot.active = false;
+    mouseDown = false;
+  });
+
+  // ===== Security & Utility Functions =====
+  function sanitizeText(text) {
+    if (typeof text !== 'string') return '';
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+  }
+
+  function safeParseInt(value, defaultValue = 0) {
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+  }
+
+  function safeParseFloat(value, defaultValue = 0.0) {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  }
+
+  // ===== Performance Optimizations =====
+  
+  // Cache for trigonometric calculations
+  const trigCache = new Map();
+  const TRIG_CACHE_SIZE = 1000;
+  
+  function fastSin(angle) {
+    // Round to nearest thousandth for cache key
+    const key = Math.round(angle * 1000) / 1000;
+    if (!trigCache.has(`sin_${key}`)) {
+      if (trigCache.size > TRIG_CACHE_SIZE) {
+        trigCache.clear(); // Clear cache when it gets too large
+      }
+      trigCache.set(`sin_${key}`, Math.sin(key));
+    }
+    return trigCache.get(`sin_${key}`);
+  }
+  
+  function fastCos(angle) {
+    const key = Math.round(angle * 1000) / 1000;
+    if (!trigCache.has(`cos_${key}`)) {
+      if (trigCache.size > TRIG_CACHE_SIZE) {
+        trigCache.clear();
+      }
+      trigCache.set(`cos_${key}`, Math.cos(key));
+    }
+    return trigCache.get(`cos_${key}`);
+  }
+  
+  // Fast distance comparison using squared distance
+  function fastDistanceCheck(x1, y1, x2, y2, maxDist) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distSq = dx * dx + dy * dy;
+    return distSq <= maxDist * maxDist;
+  }
+  
+  // Batch DOM updates to reduce reflows
+  let domUpdateQueue = [];
+  let domUpdateScheduled = false;
+  
+  function queueDOMUpdate(fn) {
+    domUpdateQueue.push(fn);
+    if (!domUpdateScheduled) {
+      domUpdateScheduled = true;
+      requestAnimationFrame(() => {
+        for (const update of domUpdateQueue) {
+          update();
+        }
+        domUpdateQueue = [];
+        domUpdateScheduled = false;
+      });
+    }
+  }
+  
+  // Rendering optimizations
+  let lastFillStyle = '';
+  let lastStrokeStyle = '';
+  let lastGlobalAlpha = 1;
+  let lastLineWidth = 1;
+  
+  function setFillStyle(style) {
+    if (lastFillStyle !== style) {
+      ctx.fillStyle = style;
+      lastFillStyle = style;
+    }
+  }
+  
+  function setStrokeStyle(style) {
+    if (lastStrokeStyle !== style) {
+      ctx.strokeStyle = style;
+      lastStrokeStyle = style;
+    }
+  }
+  
+  function setGlobalAlpha(alpha) {
+    if (lastGlobalAlpha !== alpha) {
+      ctx.globalAlpha = alpha;
+      lastGlobalAlpha = alpha;
+    }
+  }
+  
+  function setLineWidth(width) {
+    if (lastLineWidth !== width) {
+      ctx.lineWidth = width;
+      lastLineWidth = width;
+    }
+  }
+  
+  function resetRenderState() {
+    lastFillStyle = '';
+    lastStrokeStyle = '';
+    lastGlobalAlpha = 1;
+    lastLineWidth = 1;
+  }
+  
+  // Performance monitoring and adaptive quality
+  let frameTimeHistory = [];
+  let performanceLevel = 1.0; // 1.0 = full quality, 0.5 = reduced quality
+  
+  function updatePerformanceLevel(frameTime) {
+    frameTimeHistory.push(frameTime);
+    if (frameTimeHistory.length > 10) {
+      frameTimeHistory.shift();
+      const avgFrameTime = frameTimeHistory.reduce((a, b) => a + b) / frameTimeHistory.length;
+      const targetFrameTime = 16.67; // 60 FPS
+      
+      if (avgFrameTime > targetFrameTime * 1.5) {
+        performanceLevel = Math.max(0.3, performanceLevel - 0.1);
+      } else if (avgFrameTime < targetFrameTime * 1.1) {
+        performanceLevel = Math.min(1.0, performanceLevel + 0.05);
+      }
+    }
+  }
+  
+  function shouldSpawnParticle() {
+    return Math.random() < performanceLevel;
+  }
+  
+  // Generate upgrades display for pause menu
+  function createUpgradesDisplay() {
+    if (!game || !game.player) return '';
+    
+    const upgrades = [];
+    const player = game.player;
+    
+    // Check static powerup upgrades
+    for (const [upgradeId, count] of player.upgradeCounts) {
+      const powerup = staticPowerups.find(p => p.id === upgradeId);
+      if (powerup && count > 0) {
+        const stackText = count > 1 ? ` (×${count})` : '';
+        upgrades.push(`${powerup.name}${stackText}`);
+      }
+    }
+    
+    // Check temporary effects
+    if (player.activeEffects && player.activeEffects.size > 0) {
+      for (const [effect, shots] of player.activeEffects) {
+        if (shots > 0) {
+          const effectName = effect.charAt(0).toUpperCase() + effect.slice(1);
+          upgrades.push(`${effectName} (${shots} shots)`);
+        }
+      }
+    }
+    
+    // Check pattern multipliers  
+    if (player.patternMultipliers && player.patternMultipliers.size > 0) {
+      for (const [pattern, shots] of player.patternMultipliers) {
+        if (shots > 0) {
+          const patternName = pattern.charAt(0).toUpperCase() + pattern.slice(1);
+          upgrades.push(`${patternName} Pattern (${shots} shots)`);
+        }
+      }
+    }
+    
+    // Check legacy upgrades
+    if (player.upgradeShots > 0) {
+      upgrades.push(`Dual Shot (${player.upgradeShots} shots)`);
+    }
+    
+    return upgrades.length > 0 ? upgrades : ['No upgrades acquired'];
+  }
+
+  // ===== Audio (procedural, no assets) =====
+  let audioCtx = null;
+  function initAudio(){
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // resume on iOS Safari
+        audioCtx.resume && audioCtx.resume();
+      }
+    } catch (audioError) {
+      console.error('Audio initialization failed:', audioError);
+      // Game can continue without audio
+    }
+  }
+  function beep(freq=440, duration=0.05, type='square', gain=0.02){
+    if (!audioCtx) return;
+    try {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      g.gain.value = gain;
+      osc.connect(g).connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch (beepError) {
+      console.error('Audio beep error:', beepError);
+      // Silently fail for audio errors
+    }
+  }
+  function shootSound(){ beep(680, 0.04, 'square', 0.1); }
+  function hitSound(){ beep(220, 0.07, 'sawtooth', 0.15); }
+  function hurtSound(){ beep(120, 0.1, 'sine', 0.2); }
+  function waveSound(){ beep(440, 0.12, 'triangle', 0.1); }
+  function enemyDeathSound(enemy) {
+    // Different death sounds based on enemy type and size
+    const baseFreq = enemy.r > 16 ? 80 :   // Large enemies (tanks, bosses) - deep
+                     enemy.r < 12 ? 180 :  // Small enemies (fast, zerglings) - high  
+                     140;                  // Normal enemies - medium
+    
+    const variation = (Math.random() - 0.5) * 20; // ±10 Hz variation
+    const freq = baseFreq + variation;
+    const duration = enemy.r > 16 ? 0.15 : 0.08; // Longer sound for bigger enemies
+    
+    beep(freq, duration, 'sawtooth', 0.12);
+  }
+
+  // ===== Static Powerups =====
+  const staticPowerups = [
+    {id: 'speedBoost', name: 'Speed Boost', desc: '+12.5% movement speed', apply: (p) => p.speed *= 1.125},
+    {id: 'healthRegen', name: 'Health Regen', desc: '+0.5 HP/sec regeneration', apply: (p) => p.healthRegenRate = (p.healthRegenRate || 0) + 0.5},
+    {id: 'maxHealth', name: 'Max Health', desc: '+30 maximum health', apply: (p) => { p.maxHp += 30; p.hp = Math.min(p.hp + 30, p.maxHp); }},
+    {id: 'staminaBoost', name: 'Stamina Boost', desc: '+25% stamina regeneration', apply: (p) => p.staminaRegen *= 1.25},
+    {id: 'rapidFire', name: 'Rapid Fire', desc: '12.5% faster shooting', apply: (p) => p.fireDelay *= 0.875},
+    {id: 'bulletSize', name: 'Bullet Size', desc: '25% larger bullets', apply: (p) => p.bulletSize = 1.25},
+    {id: 'bulletSpeed', name: 'Bullet Speed', desc: '25% faster bullets', apply: (p) => p.bulletSpeed = 1.25},
+    {id: 'piercingShot', name: 'Piercing Shot', desc: '+1 bullet piercing', apply: (p) => p.piercingCount = (p.piercingCount || 0) + 1},
+    {id: 'shield', name: 'Shield', desc: '+25% damage reduction', apply: (p) => p.damageReduction = Math.min(0.9, p.damageReduction + 0.25)},
+    {id: 'knockbackImmune', name: 'Knockback Resistance', desc: '+50% knockback reduction', apply: (p) => p.knockbackResistance = (p.knockbackResistance || 0) + 0.5},
+    {id: 'magneticCrystals', name: 'Magnetic Crystals', desc: '+80px attraction range', apply: (p) => p.magneticRange = (p.magneticRange || 0) + 80},
+    {id: 'lucky', name: 'Lucky', desc: '+25% crystal drop rate', apply: (p) => p.luckyBonus = (p.luckyBonus || 0) + 0.25},
+    {id: 'dashCooldown', name: 'Dash Cooldown', desc: '-15% dash cooldown', apply: (p) => p.dashCooldownReduction = (p.dashCooldownReduction || 0) + 0.15},
+    {id: 'criticalChance', name: 'Critical Strike', desc: '+10% critical hit chance', apply: (p) => p.criticalChance = Math.min(0.5, (p.criticalChance || 0) + 0.1)},
+    {id: 'vampire', name: 'Vampire', desc: '+0.5 HP per enemy killed', apply: (p) => p.vampiricHealing = (p.vampiricHealing || 0) + 0.5},
+    {id: 'adrenaline', name: 'Adrenaline', desc: '+20% speed for 3s after damage', apply: (p) => p.adrenalineBoost = true},
+    {id: 'efficient', name: 'Efficient', desc: '+5% chance shots don\'t consume ammo', apply: (p) => p.ammoEfficiency = Math.min(0.50, (p.ammoEfficiency || 0) + 0.05)}
+  ];
+
+  // ===== Powerup Notification =====
+  function showPowerupNotification(powerupName) {
+    powerupNotification.textContent = powerupName.toUpperCase();
+    powerupNotification.style.display = 'block';
+    powerupNotification.style.animation = 'none';
+    // Force reflow to restart animation
+    powerupNotification.offsetHeight;
+    powerupNotification.style.animation = 'powerupPulse 3s ease-out forwards';
+    
+    // Hide after animation completes
+    setTimeout(() => {
+      powerupNotification.style.display = 'none';
+    }, 3000);
+  }
+
+  // ===== Powerup Selection =====
+  function showPowerupDialog() {
+    // Pause game
+    if (game && game.state === STATE.RUN) {
+      game.state = STATE.PAUSE;
+    }
+    
+    // Filter out maxed upgrades
+    const p = game.player;
+    const availablePowerups = staticPowerups.filter(powerup => {
+      // Shield maxed at 90%
+      if (powerup.id === 'shield' && (p.damageReduction || 0) >= 0.9) {
+        return false;
+      }
+      // Knockback resistance maxed at 100%
+      if (powerup.id === 'knockbackImmune' && (p.knockbackResistance || 0) >= 1.0) {
+        return false;
+      }
+      // Critical chance maxed at 50%
+      if (powerup.id === 'criticalChance' && (p.criticalChance || 0) >= 0.5) {
+        return false;
+      }
+      // Ammo efficiency maxed at 50% (15 stacks of 5% - reasonable cap)
+      if (powerup.id === 'efficient' && (p.ammoEfficiency || 0) >= 0.50) {
+        return false;
+      }
+      return true;
+    });
+    
+    // Select 3 unique random powerups (no duplicates in same selection)
+    const selected = [];
+    const availableIndices = [...Array(availablePowerups.length).keys()]; // [0,1,2,3,4,...]
+    
+    while (selected.length < 3 && availableIndices.length > 0) {
+      const randomIndex = Math.floor(Math.random() * availableIndices.length);
+      const powerupIndex = availableIndices.splice(randomIndex, 1)[0];
+      selected.push(availablePowerups[powerupIndex]);
+    }
+    
+    // Populate dialog
+    powerupTitle1.textContent = selected[0]?.name || 'None';
+    powerupDesc1.textContent = selected[0]?.desc || 'No more powerups';
+    powerupTitle2.textContent = selected[1]?.name || 'None';
+    powerupDesc2.textContent = selected[1]?.desc || 'No more powerups';
+    powerupTitle3.textContent = selected[2]?.name || 'None';
+    powerupDesc3.textContent = selected[2]?.desc || 'No more powerups';
+    
+    powerupDialog.style.display = 'block';
+    
+    // Add click handlers
+    const handleChoice = (choice) => {
+      const powerup = selected[choice];
+      if (powerup) {
+        // Apply powerup (stackable)
+        powerup.apply(game.player);
+        
+        // Track upgrade count for pause menu display
+        const currentCount = game.player.upgradeCounts.get(powerup.id) || 0;
+        game.player.upgradeCounts.set(powerup.id, currentCount + 1);
+        
+        showPowerupNotification(powerup.name);
+      }
+      
+      // Hide dialog and resume game
+      powerupDialog.style.display = 'none';
+      if (game && game.state === STATE.PAUSE) {
+        game.state = STATE.RUN;
+      }
+    };
+    
+    powerupOption1.onclick = () => handleChoice(0);
+    powerupOption2.onclick = () => handleChoice(1);
+    powerupOption3.onclick = () => handleChoice(2);
+  }
+
+  // ===== Random Seeded? (not needed here) =====
+
+  // ===== Game State =====
+  const STATE = { MENU:0, RUN:1, PAUSE:2, OVER:3 };
+  let game = null;
+  function newGame(){
+    return {
+      state: STATE.MENU,
+      width: () => canvas.width,
+      height: () => canvas.height,
+      t: 0,
+      wave: 1,
+      kills: 0,
+      player: makePlayer(canvas.width/2, canvas.height/2),
+      spawnTimer: 0,
+      waveActive: false, // Wave in progress
+      waveEnemiesSpawned: 0, // Enemies spawned this wave
+      waveEnemiesTarget: 15, // Total enemies for current wave
+      waveBossesSpawned: 0, // Bosses spawned this wave
+      waveBossesTarget: 0, // Target bosses for this wave
+      maxEnemies: 30, // Base cap, dynamically scaled
+      grid: makeSpatialHash(64),
+      difficulty: 1,
+      paused: false,
+      fpsSamples: [],
+      invulTime: 0,
+      damageFlash: 0, // Red vignette flash timer
+    };
+  }
+
+  // ===== Spatial Hash (for enemy lookup) =====
+  function makeSpatialHash(cell){
+    return {
+      cell: cell,
+      map: new Map(),
+      key(ix,iy){ return ix + ',' + iy; },
+      reset(){ this.map.clear(); },
+      insert(e){
+        const ix = (e.x / this.cell) | 0;
+        const iy = (e.y / this.cell) | 0;
+        const k = this.key(ix,iy);
+        let arr = this.map.get(k);
+        if (!arr){ arr = []; this.map.set(k, arr); }
+        arr.push(e);
+        e._cellX = ix; e._cellY = iy;
+      },
+      near(x,y){
+        const ix = (x / this.cell) | 0;
+        const iy = (y / this.cell) | 0;
+        const out = [];
+        for (let dx = -1; dx <= 1; dx++){
+          for (let dy = -1; dy <= 1; dy++){
+            const k = this.key(ix+dx, iy+dy);
+            const arr = this.map.get(k);
+            if (arr) out.push(...arr);
+          }
+        }
+        return out;
+      }
+    };
+  }
+
+  // ===== Object Pools =====
+  function makePool(createFn, initial=0){
+    const items = [];
+    for (let i=0;i<initial;i++) items.push(createFn());
+    return {
+      items,
+      spawn(initFn){
+        for (let i=0;i<items.length;i++){
+          const it = items[i];
+          if (!it.alive){
+            initFn(it); it.alive = true; return it;
+          }
+        }
+        const it = createFn();
+        initFn(it); it.alive = true;
+        items.push(it);
+        return it;
+      }
+    };
+  }
+
+  // ===== Entities =====
+  function makePlayer(x,y){
+    return {
+      x, y,
+      vx:0, vy:0,
+      speed: 260,
+      radius: 12,
+      color: '#00ff00',
+      hp: 100,
+      maxHp: 100,
+      stamina: 100,
+      exhausted: 0, // Exhaustion cooldown timer
+      ammo: Infinity,
+      upgradeShots: 0, // V-formation upgrade shots remaining
+      bulletType: 'normal', // Legacy - kept for compatibility 
+      bulletTimer: 0, // Legacy - kept for compatibility
+      bulletPattern: 'single', // Legacy - kept for compatibility
+      patternTimer: 0, // Legacy - kept for compatibility
+      // New modular effects system
+      activeEffects: new Map(), // Map of effect type -> remaining shots
+      // New multiplicative pattern system
+      patternMultipliers: new Map(), // Map of pattern type -> remaining shots
+      fireDelay: 0.12,
+      fireTimer: 0,
+      dashCd: 0, dashReady: true,
+      // Emergency leap system
+      leapCd: 0, leapReady: true,
+      leapDistance: 120, // Distance of leap
+      leapSpeed: 1200, // Speed during leap
+      // Static powerups
+      staticPowerups: [],
+      // Upgrade tracking for pause menu display
+      upgradeCounts: new Map(),
+      healthRegen: false,
+      staminaRegen: 1.0,
+      bulletSize: 1.0,
+      bulletSpeed: 1.0,
+      piercingShot: false,
+      damageReduction: 0,
+      knockbackImmune: false,
+      magneticCrystals: false,
+      lucky: false,
+      healthRegenTimer: 0,
+    };
+  }
+
+  const bullets = makePool(() => ({
+    alive:false, x:0, y:0, vx:0, vy:0, r:4, life:0, maxLife: 1.0, 
+    type:'normal', pierces:0, bounces:0, homingTarget:null, hitEnemies: new Set()
+  }));
+
+  const enemies = makePool(() => ({
+    alive:false, x:0, y:0, vx:0, vy:0, r:14, hp:2, speed: 90, touchDmg: 12, color:'#ff5b6e',
+    deathTimer: 0, dying: false, originalColor: '#ff5b6e'
+  }));
+
+  const particles = makePool(() => ({
+    alive:false, x:0, y:0, vx:0, vy:0, life:0, maxLife:0.3, size:2, color:'#ffffff'
+  }));
+
+  const pickups = makePool(() => ({
+    alive:false, x:0, y:0, vx:0, vy:0, type:'upgrade', bounceTimer:0, collected:false
+  }));
+
+  const bloodStains = makePool(() => ({
+    alive:false, x:0, y:0, life:0, maxLife:15.0, size:2, alpha:1.0, vx:0, vy:0, settled:false
+  }));
+
+  const enemyBullets = makePool(() => ({
+    alive:false, x:0, y:0, vx:0, vy:0, r:3, life:0, maxLife:3.0
+  }));
+
+  // Bullet powerup types
+  const bulletPowerups = [
+    {type: 'upgrade', color: '#00BFFF', shots: 50, name: 'Dual Shot'},
+    {type: 'triple', color: '#32CD32', shots: 50, name: 'Triple Shot'},
+    {type: 'quad', color: '#FF1493', shots: 50, name: 'Quad Shot'},
+    {type: 'homing', color: '#FFD700', shots: 50, name: 'Homing'},
+    {type: 'explosive', color: '#FF4500', shots: 50, name: 'Explosive'},
+    {type: 'ricochet', color: '#FF69B4', shots: 50, name: 'Ricochet'},
+    {type: 'lightning', color: '#000080', shots: 50, name: 'Lightning'},
+    {type: 'freeze', color: '#00CED1', shots: 50, name: 'Freeze Shot'},
+    {type: 'shotgun', color: '#8B4513', shots: 50, name: 'Shotgun'},
+    {type: 'cluster', color: '#FFA500', shots: 50, name: 'Cluster'},
+    {type: 'seeking', color: '#DC143C', shots: 50, name: 'Seeking'}
+  ];
+
+  // Enemy types for variety
+  const enemyTypes = [
+    {r:14, hp:2, speed:90, dmg:12, color:'#ff4444', name:'normal'}, // red
+    {r:10, hp:1, speed:140, dmg:8, color:'#ffaa00', name:'fast'}, // orange
+    {r:18, hp:4, speed:60, dmg:18, color:'#ff6600', name:'tank'}, // dark orange
+    {r:12, hp:3, speed:200, dmg:6, color:'#cccc00', name:'zergling'}, // dark yellow rushers
+  ];
+
+  // Behavior pools - unlock new behaviors every 2 waves
+  const behaviorPools = [
+    // Waves 1-2: Basic behaviors
+    ['normal', 'zigzag', 'zerglingRush'],
+    // Waves 3-4: Add flanking
+    ['normal', 'zigzag', 'flank', 'zerglingRush'],
+    // Waves 5-6: Add charging
+    ['normal', 'zigzag', 'flank', 'charge', 'zerglingRush'],
+    // Waves 7+: All behaviors including erratic (no more zerglings)
+    ['normal', 'zigzag', 'flank', 'charge', 'erratic']
+  ];
+
+  function spawnEnemy(g){
+    const w = g.width(), h = g.height();
+    const margin = 20;
+    // spawn at edges
+    const side = Math.floor(Math.random()*4);
+    let x=0,y=0;
+    if (side===0){ x=randRange(margin, w-margin); y=-margin; }
+    else if (side===1){ x=randRange(margin, w-margin); y=h+margin; }
+    else if (side===2){ x=-margin; y=randRange(margin, h-margin); }
+    else { x=w+margin; y=randRange(margin, h-margin); }
+    enemies.spawn(e => {
+      e.x = x; e.y = y;
+      e.vx = 0; e.vy = 0;
+      
+      // Select enemy type based on wave with zergling replacement logic
+      let type;
+      if (g.wave <= 12 && Math.random() < 0.4) {
+        // 40% chance for zerglings in waves 1-12
+        type = enemyTypes.find(t => t.name === 'zergling');
+      } else {
+        // Normal enemy type selection (excluding zerglings for waves 13+)
+        const baseTypes = g.wave <= 12 ? 
+          enemyTypes.filter(t => t.name !== 'zergling') : // Exclude zerglings from normal pool in waves 1-12
+          enemyTypes.filter(t => t.name !== 'zergling');  // No zerglings after wave 12
+        const availableTypes = Math.min(baseTypes.length, 1 + Math.floor(g.wave/3));
+        type = baseTypes[Math.floor(Math.random() * availableTypes)];
+      }
+      
+      // Apply type stats with difficulty scaling
+      const diff = 1 + g.wave * 0.15;
+      e.r = type.r;
+      e.hp = Math.ceil(type.hp * diff);
+      e.speed = type.speed * diff;
+      e.touchDmg = Math.ceil(type.dmg * diff);
+      // Add slight color variation within red-orange-yellow spectrum
+      const colorVariations = {
+        '#ff4444': ['#ff3333', '#ff5555', '#ff4444', '#ff6666'],
+        '#ffaa00': ['#ff9900', '#ffbb00', '#ffaa00', '#ffcc00'],
+        '#ff6600': ['#ff5500', '#ff7700', '#ff6600', '#ff8800'],
+        '#cccc00': ['#cccc00', '#dddd00', '#bbbb00', '#aaaa00'] // dark yellow variations
+      };
+      const baseColor = type.color;
+      const variations = colorVariations[baseColor] || [baseColor];
+      e.color = variations[Math.floor(Math.random() * variations.length)];
+      e.originalColor = e.color;
+      e.deathTimer = 0;
+      e.dying = false;
+      
+      // Initialize shooter properties
+      e.isShooter = false;
+      e.shootTimer = 0;
+      
+      // Boss spawning logic - limited per wave
+      if (g.wave % 10 === 0 && g.waveBossesSpawned < g.waveBossesTarget) {
+        // Super boss spawn (limited quantity per wave)
+        e.r *= 4; e.hp *= 4; e.touchDmg *= 2;
+        e.color = '#800080'; e.originalColor = '#800080'; e.behavior = 'superboss';
+        e.phaseTimer = 0; // Timer for behavior changes
+        e.currentPhase = 0; // Current movement phase
+        g.waveBossesSpawned++;
+      } else if (g.wave % 5 === 0 && g.wave % 10 !== 0 && Math.random() < 0.1) {
+        // Mini-boss every 5 waves (10% chance)
+        e.r *= 1.5; e.hp *= 2.5; e.touchDmg *= 1.5;
+        e.color = '#cc0000'; e.originalColor = '#cc0000'; e.behavior = 'boss';
+      } else {
+        // Check if this is a slow enemy (90 speed or less) that becomes a shooter (25% chance)
+        if (type.speed <= 90 && Math.random() < 0.25) {
+          e.isShooter = true;
+          e.shootTimer = Math.random() * 1.8; // Random initial delay
+          e.color = '#aa4400'; e.originalColor = '#aa4400'; // Darker color for shooters
+        }
+        
+        // Select behavior from available pool based on current wave
+        const poolIndex = Math.min(Math.floor((g.wave - 1) / 2), behaviorPools.length - 1);
+        const availableBehaviors = behaviorPools[poolIndex];
+        e.behavior = availableBehaviors[Math.floor(Math.random() * availableBehaviors.length)];
+      }
+      
+      e.alive = true;
+    });
+  }
+
+  // Calculate bullet count and directions from active pattern multipliers
+  // Handle enemy death and crystal drops consistently
+  function handleEnemyDeath(enemy, game) {
+    if (enemy.hp <= 0 && !enemy.dying) {
+      // Start death animation instead of immediate removal
+      enemy.dying = true;
+      enemy.deathTimer = 0.2; // 0.2 second death animation
+      
+      // Enemy death sound based on type/size
+      enemyDeathSound(enemy);
+      
+      // Large blood burst on death
+      spawnBlood(enemy.x, enemy.y, 0, 0, 'death');
+      
+      // Enemy pop/burst effect - satisfying explosion
+      const popParticles = 15;
+      for (let i = 0; i < popParticles; i++) {
+        particles.spawn(p => {
+          const angle = (i / popParticles) * TAU + Math.random() * 0.3; // Even spread with variance
+          const speed = randRange(150, 300);
+          p.x = enemy.x; p.y = enemy.y;
+          p.vx = fastCos(angle) * speed;
+          p.vy = fastSin(angle) * speed;
+          p.life = 0; p.maxLife = randRange(0.4, 0.8);
+          p.size = randRange(3, 6);
+          p.color = enemy.originalColor; // Match enemy color
+          p.hasGravity = false; // Pure radial burst
+          p.alive = true;
+        });
+      }
+      
+      // Create realistic blood spray stains
+      const numStains = randRange(15, 25);
+      for (let i = 0; i < numStains; i++) {
+        bloodStains.spawn(stain => {
+          // Spray pattern - blood lands in burst around death point
+          const angle = Math.random() * TAU;
+          const distance = randRange(5, 35);
+          stain.x = enemy.x + Math.cos(angle) * distance;
+          stain.y = enemy.y + Math.sin(angle) * distance;
+          
+          // Initial movement (blood droplets still traveling)
+          stain.vx = Math.cos(angle) * randRange(20, 80);
+          stain.vy = Math.sin(angle) * randRange(20, 80);
+          
+          stain.life = 0;
+          stain.maxLife = 15.0;
+          stain.size = randRange(1, 4); // Smaller individual droplets
+          stain.alpha = 1.0;
+          stain.settled = false;
+          stain.alive = true;
+        });
+      }
+      
+      // Crystal drop logic - bosses get special treatment
+      const p = game.player;
+      if (enemy.behavior === 'boss' || enemy.behavior === 'superboss') {
+        // Bosses: 15% chance to drop homing crystal
+        if (Math.random() < 0.15) {
+          spawnBossPickup(enemy.x, enemy.y);
+        }
+      } else {
+        // Regular enemies: 4% chance to drop any crystal (+25% per lucky upgrade)
+        const baseRate = 0.04;
+        const luckyMultiplier = 1 + (p.luckyBonus || 0);
+        const dropRate = baseRate * luckyMultiplier;
+        const roll = Math.random();
+        if (roll < dropRate) {
+          spawnBulletPickup(enemy.x, enemy.y);
+        }
+      }
+      
+      game.kills++;
+      
+      // Vampiric healing
+      const player = game.player;
+      if (player && player.vampiricHealing) {
+        player.hp = Math.min(player.maxHp, player.hp + player.vampiricHealing);
+      }
+      
+      // Check if wave is complete (half of enemies killed)
+      const aliveEnemies = enemies.items.filter(e => e.alive && !e.dying).length;
+      const enemiesKilledThisWave = game.waveEnemiesSpawned - aliveEnemies;
+      if (game.waveActive && enemiesKilledThisWave >= Math.floor(game.waveEnemiesTarget * 0.5)) {
+        // Wave complete! Start next wave after brief delay
+        game.waveActive = false;
+        setTimeout(() => {
+          game.wave++;
+          game.waveEnemiesSpawned = 0;
+          game.waveBossesSpawned = 0;
+          // Proper enemy scaling: Wave 1=15, Wave 10=30, Wave 50=60, Wave 100=90
+          // Using a square root-based scaling for gradual increase
+          if (game.wave <= 50) {
+            // From wave 1-50: 15 to 60 enemies
+            // Formula: 15 + 45 * sqrt((wave-1)/49)
+            const progress = (game.wave - 1) / 49; // 0 to 1
+            game.waveEnemiesTarget = Math.floor(15 + 45 * Math.sqrt(progress));
+          } else {
+            // From wave 51-100: 60 to 90 enemies
+            // Formula: 60 + 30 * ((wave-50)/50)
+            const progress = Math.min(1, (game.wave - 50) / 50); // 0 to 1, capped
+            game.waveEnemiesTarget = Math.floor(60 + 30 * progress);
+          }
+          // Set boss target for this wave
+          if (game.wave % 10 === 0) {
+            game.waveBossesTarget = Math.floor(Math.random() * 10) + 1; // 1-10 bosses
+          } else {
+            game.waveBossesTarget = 0;
+          }
+          waveSound();
+          if (game.wave % 10 === 0) {
+            showPowerupNotification(`WAVE ${game.wave} - SUPER BOSS INCOMING!`);
+          } else {
+            showPowerupNotification(`WAVE ${game.wave} INCOMING`);
+          }
+          game.waveActive = true;
+          
+          // Spawn all enemies within 2-4 seconds
+          const spawnDuration = 2000 + Math.random() * 2000; // 2-4 seconds
+          const spawnInterval = spawnDuration / game.waveEnemiesTarget;
+          
+          for (let i = 0; i < game.waveEnemiesTarget; i++) {
+            setTimeout(() => {
+              if (game.waveActive) {
+                spawnEnemy(game);
+                game.waveEnemiesSpawned++;
+              }
+            }, i * spawnInterval);
+          }
+        }, 1500); // 1.5 second breathing room between waves
+      }
+      
+      // Powerup selection - linear progression: level 1 at 50 kills, then +50 each level
+      if (!game.level) game.level = 0;
+      if (!game.nextLevelup) game.nextLevelup = 50; // First level at 50 kills
+      
+      if (game.kills >= game.nextLevelup) {
+        showPowerupDialog();
+        game.level++;
+        // Linear progression: each level needs 50 more kills than the previous
+        // Level 1: 50 kills, Level 2: 100 more (150 total), Level 3: 150 more (300 total), etc.
+        const killsForNextLevel = 50 * (game.level + 1);
+        game.nextLevelup += killsForNextLevel;
+      }
+    }
+  }
+
+  // Calculate bullet count and directions from active pattern multipliers
+  function calculateBulletPattern(player) {
+    let totalBullets = 1; // Base single bullet
+    
+    // Apply all pattern multipliers
+    for (const [pattern, shots] of player.patternMultipliers) {
+      if (shots > 0) {
+        if (pattern === 'triple') totalBullets *= 3;
+        else if (pattern === 'quad') totalBullets *= 4;
+      }
+    }
+    
+    // Cap at 16 bullets maximum
+    totalBullets = Math.min(totalBullets, 16);
+    
+    // Get mouse direction as the center of the pattern
+    const [baseDx, baseDy] = norm(mouseX - player.x, mouseY - player.y);
+    const baseAngle = Math.atan2(baseDy, baseDx);
+    
+    // Calculate evenly spaced angles CENTERED on mouse direction
+    const directions = [];
+    if (totalBullets === 1) {
+      // Single bullet - use mouse direction exactly
+      directions.push({dx: baseDx, dy: baseDy});
+    } else {
+      // Multiple bullets - one ALWAYS points to mouse, others evenly spaced around it
+      const angleStep = (Math.PI * 2) / totalBullets;
+      
+      for (let i = 0; i < totalBullets; i++) {
+        const angle = baseAngle + (angleStep * i);
+        const dx = Math.cos(angle);
+        const dy = Math.sin(angle);
+        directions.push({dx, dy});
+      }
+      
+      // First bullet always goes exactly toward mouse
+      directions[0] = {dx: baseDx, dy: baseDy};
+    }
+    
+    return {totalBullets, directions};
+  }
+
+  function spawnBullet(x,y,dirX,dirY,effects=[]){
+    const baseSpeed = 720;
+    const player = game?.player;
+    const speed = baseSpeed * (player?.bulletSpeed || 1.0);
+    const size = 4 * (player?.bulletSize || 1.0);
+    
+    // Critical hit calculation
+    const critChance = player?.criticalChance || 0;
+    const isCritical = Math.random() < critChance;
+    
+    bullets.spawn(b => {
+      b.x = x; b.y = y;
+      b.vx = dirX * speed;
+      b.vy = dirY * speed;
+      b.r = size;
+      b.life = 0; 
+      b.maxLife = effects.includes('ricochet') ? 4.0 : 2.0;
+      b.type = effects.length > 0 ? effects[0] : 'normal'; // Legacy compatibility
+      b.effects = [...effects]; // Store all active effects
+      b.pierces = (player?.piercingCount || 0);
+      b.bounces = effects.includes('ricochet') ? 3 : 0;
+      b.homingTarget = null;
+      b.hitEnemies.clear(); // Reset hit enemies for this bullet
+      b.critical = isCritical;
+      b.alive = true;
+    });
+  }
+
+
+  function spawnEnemyBullet(x, y, targetX, targetY) {
+    const [dx, dy] = norm(targetX - x, targetY - y);
+    const speed = 300; // Enemy bullet speed
+    
+    enemyBullets.spawn(b => {
+      b.x = x;
+      b.y = y;
+      b.vx = dx * speed;
+      b.vy = dy * speed;
+      b.r = 3;
+      b.life = 0;
+      b.maxLife = 3.0;
+      b.alive = true;
+    });
+  }
+
+  function spawnBulletPickup(x, y){
+    pickups.spawn(p => {
+      p.x = x; p.y = y;
+      p.vx = (Math.random() - 0.5) * 100;
+      p.vy = -Math.random() * 150 - 50;
+      // Weighted crystal selection - homing is 0.5% chance
+      let selectedPowerup;
+      if (Math.random() < 0.005) { // 0.5% chance for homing
+        selectedPowerup = bulletPowerups.find(bp => bp.type === 'homing');
+      } else {
+        // Choose from non-homing crystals
+        const nonHomingPowerups = bulletPowerups.filter(bp => bp.type !== 'homing');
+        selectedPowerup = nonHomingPowerups[Math.floor(Math.random() * nonHomingPowerups.length)];
+      }
+      const randomPowerup = selectedPowerup;
+      p.type = randomPowerup.type;
+      p.bounceTimer = 0;
+      p.collected = false;
+      p.alive = true;
+    });
+  }
+
+  function spawnBossPickup(x, y){
+    pickups.spawn(p => {
+      p.x = x; p.y = y;
+      p.vx = (Math.random() - 0.5) * 100;
+      p.vy = -Math.random() * 150 - 50;
+      // Boss always drops homing crystal
+      const homingPowerup = bulletPowerups.find(bp => bp.type === 'homing');
+      p.type = homingPowerup.type;
+      p.bounceTimer = 0;
+      p.collected = false;
+      p.alive = true;
+    });
+  }
+
+  function spawnBurst(x,y, n=10, color='#ffffff'){
+    const adaptiveN = Math.floor(n * performanceLevel);
+    for (let i=0;i<adaptiveN;i++){
+      if (shouldSpawnParticle()) {
+        particles.spawn(p => {
+          const a = Math.random()*TAU;
+          const s = randRange(40, 160);
+          p.x = x; p.y = y;
+          p.vx = Math.cos(a)*s;
+          p.vy = Math.sin(a)*s;
+          p.life = 0; 
+          // Longer lifespan for explosions
+          p.maxLife = color.includes('ff8000') || color.includes('ff4000') || color.includes('ffff00') ? 
+                      randRange(0.8, 1.2) : randRange(0.2, 0.5);
+          p.size = color.includes('ff8000') || color.includes('ff4000') || color.includes('ffff00') ? 
+                   randRange(2, 6) : randRange(1.5, 3.5);
+          p.color = color;
+          p.hasGravity = false;
+          p.alive = true;
+        });
+      }
+    }
+  }
+
+  function spawnBlood(x, y, dirX=0, dirY=0, type='impact'){
+    const bloodColors = ['#ff0000', '#cc0000', '#800000', '#990000'];
+    
+    if (type === 'impact') {
+      // Small blood spray from bullet impact
+      for (let i=0; i<8; i++){
+        particles.spawn(p => {
+          const spread = 0.6;
+          const angle = Math.atan2(dirY, dirX) + (Math.random()-0.5)*spread;
+          const speed = randRange(80, 180);
+          p.x = x; p.y = y;
+          p.vx = fastCos(angle) * speed;
+          p.vy = fastSin(angle) * speed;
+          p.life = 0; p.maxLife = randRange(0.3, 0.8);
+          p.size = randRange(1, 3);
+          p.color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+          p.hasGravity = true;
+          p.alive = true;
+        });
+      }
+    } else if (type === 'death') {
+      // Large blood burst when enemy dies
+      for (let i=0; i<20; i++){
+        particles.spawn(p => {
+          const angle = Math.random() * TAU;
+          const speed = randRange(60, 250);
+          p.x = x; p.y = y;
+          p.vx = fastCos(angle) * speed;
+          p.vy = fastSin(angle) * speed;
+          p.life = 0; p.maxLife = randRange(0.8, 1.5);
+          p.size = randRange(2, 6);
+          p.color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+          p.hasGravity = true;
+          p.alive = true;
+        });
+      }
+    } else if (type === 'player') {
+      // Player damage - red particles flying outward
+      for (let i=0; i<15; i++){
+        particles.spawn(p => {
+          const angle = Math.random() * TAU;
+          const speed = randRange(100, 200);
+          p.x = x; p.y = y;
+          p.vx = fastCos(angle) * speed;
+          p.vy = fastSin(angle) * speed;
+          p.life = 0; p.maxLife = randRange(0.4, 0.7);
+          p.size = randRange(2, 4);
+          p.color = '#ff0000';
+          p.hasGravity = true;
+          p.alive = true;
+        });
+      }
+    }
+  }
+
+  // ===== Update & Draw =====
+  function update(g, dt){
+    g.t += dt;
+    if (g.invulTime > 0) g.invulTime -= dt;
+    if (g.damageFlash > 0) g.damageFlash -= dt;
+
+    // Static powerup effects
+    const p = g.player;
+    if (p.healthRegenRate > 0) {
+      p.healthRegenTimer = (p.healthRegenTimer || 0) - dt;
+      if (p.healthRegenTimer <= 0) {
+        p.hp = Math.min(p.hp + p.healthRegenRate, p.maxHp);
+        p.healthRegenTimer = 1.0; // Check every second
+      }
+    }
+
+    // Input -> movement (keyboard + touch)
+    let ax=0, ay=0;
+    if (keys.has('KeyW')) ay -= 1;
+    if (keys.has('KeyS')) ay += 1;
+    if (keys.has('KeyA')) ax -= 1;
+    if (keys.has('KeyD')) ax += 1;
+    
+    // Touch movement (left side of screen)
+    if (touchMove.active) {
+      const centerX = canvas.width / 4; // Center of left half
+      const centerY = canvas.height / 2;
+      const deadZone = 30; // Minimum touch distance to register movement
+      const touchDx = touchMove.x - centerX;
+      const touchDy = touchMove.y - centerY;
+      const touchDist = Math.hypot(touchDx, touchDy);
+      
+      if (touchDist > deadZone) {
+        ax += touchDx / 100; // Convert to movement direction
+        ay += touchDy / 100;
+      }
+    }
+    
+    // Exhaustion cooldown
+    if (p.exhausted > 0) p.exhausted -= dt;
+    
+    // Adrenaline timer countdown
+    if (p.adrenalineTimer > 0) p.adrenalineTimer -= dt;
+    
+    // Leap cooldown
+    if (p.leapCd > 0) {
+      p.leapCd -= dt;
+      if (p.leapCd <= 0) p.leapReady = true;
+    }
+    
+    // Emergency leap (Space key)
+    if (keys.has('Space') && p.leapReady && (ax || ay)) {
+      const [leapX, leapY] = norm(ax, ay);
+      p.vx += leapX * p.leapSpeed;
+      p.vy += leapY * p.leapSpeed;
+      p.leapCd = 3.0; // 3 second cooldown
+      p.leapReady = false;
+      beep(400, 0.08, 'triangle', 0.03); // Leap sound effect
+    }
+    
+    // Stamina system
+    const wantsToSprint = keys.has('ShiftLeft') || keys.has('ShiftRight');
+    const canSprint = p.stamina > 0 && p.exhausted <= 0;
+    const isSprinting = wantsToSprint && canSprint && (ax || ay);
+    
+    if (isSprinting) {
+      // Drain stamina: 20% per second (100% in 5 seconds)
+      const oldStamina = p.stamina;
+      p.stamina = Math.max(0, p.stamina - 20 * dt);
+      
+      // If stamina just hit 0, trigger exhaustion
+      if (oldStamina > 0 && p.stamina <= 0) {
+        const baseExhaustion = 2.0; // 2 second cooldown
+        const reduction = p.dashCooldownReduction || 0;
+        p.exhausted = baseExhaustion * (1 - reduction);
+      }
+    } else {
+      // Regenerate stamina: 12.5% per second (0% to 100% in 8 seconds) + stamina boost
+      p.stamina = Math.min(100, p.stamina + 12.5 * dt * p.staminaRegen);
+    }
+    
+    if (ax || ay){
+      const [nx,ny] = norm(ax,ay);
+      const waveSpeedBonus = g.wave * 0.2; // +0.2 speed per wave
+      const adrenalineBonus = (p.adrenalineTimer > 0) ? 1.2 : 1.0; // +20% speed during adrenaline
+      const baseSpeed = (p.speed + waveSpeedBonus) * adrenalineBonus;
+      const speed = isSprinting ? baseSpeed*1.6 : baseSpeed;
+      p.vx += nx * speed * dt * 4;
+      p.vy += ny * speed * dt * 4;
+    }
+    // friction
+    p.vx *= (1 - 6*dt);
+    p.vy *= (1 - 6*dt);
+    // integrate
+    p.x = clamp(p.x + p.vx*dt, p.radius, g.width()-p.radius);
+    p.y = clamp(p.y + p.vy*dt, p.radius, g.height()-p.radius);
+
+    // shooting
+    if (p.fireTimer > 0) p.fireTimer -= dt;
+    if (mouseDown && p.fireTimer <= 0){
+      const [dx,dy] = norm(mouseX - p.x, mouseY - p.y);
+      
+      // Gather all active effects (new modular system)
+      const activeEffects = [];
+      for (const [effect, shots] of p.activeEffects) {
+        if (shots > 0) activeEffects.push(effect);
+      }
+      
+      // Calculate bullet pattern (multiplicative system)
+      const {totalBullets, directions} = calculateBulletPattern(p);
+      const hasUpgrade = p.upgradeShots > 0;
+      
+      // New unified shooting system - handle all patterns/upgrades
+      if (hasUpgrade && totalBullets === 1) {
+        // Special case: Front + Back shot with single bullet
+        const {dx, dy} = directions[0]; // Use the single calculated direction
+        spawnBullet(p.x + dx*p.radius*1.1, p.y + dy*p.radius*1.1, dx, dy, activeEffects); // Front
+        spawnBullet(p.x - dx*p.radius*1.1, p.y - dy*p.radius*1.1, -dx, -dy, activeEffects); // Back
+        // Check for ammo efficiency (chance to not consume ammo)
+        const efficiencyChance = p.ammoEfficiency || 0;
+        if (Math.random() >= efficiencyChance) {
+          p.upgradeShots--;
+        }
+      } else if (hasUpgrade && totalBullets > 1) {
+        // V-formation applied to each bullet direction (double the bullets)
+        const vAngle = 0.15; // Smaller angle for multi-bullet spread
+        const cs1 = Math.cos(vAngle), sn1 = Math.sin(vAngle);
+        const cs2 = Math.cos(-vAngle), sn2 = Math.sin(-vAngle);
+        
+        for (const {dx, dy} of directions) {
+          const sx1 = dx*cs1 - dy*sn1, sy1 = dx*sn1 + dy*cs1;
+          const sx2 = dx*cs2 - dy*sn2, sy2 = dx*sn2 + dy*cs2;
+          spawnBullet(p.x + sx1*p.radius*1.1, p.y + sy1*p.radius*1.1, sx1, sy1, activeEffects);
+          spawnBullet(p.x + sx2*p.radius*1.1, p.y + sy2*p.radius*1.1, sx2, sy2, activeEffects);
+        }
+        // Check for ammo efficiency (chance to not consume ammo)
+        const efficiencyChance = p.ammoEfficiency || 0;
+        if (Math.random() >= efficiencyChance) {
+          p.upgradeShots--;
+        }
+      } else {
+        // Normal pattern shooting - spawn bullet for each direction
+        for (const {dx, dy} of directions) {
+          if (totalBullets === 1) {
+            // Single bullet - add slight spread when sprinting
+            const spread = (keys.has('ShiftLeft')||keys.has('ShiftRight')) ? 0.08 : 0.02;
+            const s = (Math.random()-0.5)*spread;
+            const cs = Math.cos(s), sn = Math.sin(s);
+            const sx = dx*cs - dy*sn, sy = dx*sn + dy*cs;
+            spawnBullet(p.x + sx*p.radius*1.1, p.y + sy*p.radius*1.1, sx, sy, activeEffects);
+          } else {
+            // Multiple bullets - no spread, perfect circle
+            spawnBullet(p.x + dx*p.radius*1.1, p.y + dy*p.radius*1.1, dx, dy, activeEffects);
+          }
+        }
+      }
+      
+      // Decrement all active effects and pattern multipliers after shooting
+      // Check for ammo efficiency (chance to not consume ammo)
+      const efficiencyChance = p.ammoEfficiency || 0;
+      if (Math.random() >= efficiencyChance) {
+        for (const [effect, shots] of p.activeEffects) {
+          if (shots > 0) p.activeEffects.set(effect, shots - 1);
+        }
+        for (const [pattern, shots] of p.patternMultipliers) {
+          if (shots > 0) p.patternMultipliers.set(pattern, shots - 1);
+        }
+      }
+      
+      p.fireTimer = p.fireDelay;
+      shootSound();
+    }
+
+    // Enemy spawning now handled by setTimeout in wave completion logic
+    // (All enemies spawn within 2-4 seconds at wave start)
+
+    // Build spatial grid of enemies
+    g.grid.reset();
+    
+    // Check for enemies near screen edges
+    let nearTop = false, nearBottom = false, nearLeft = false, nearRight = false;
+    const edgeThreshold = 100;
+    
+    for (const e of enemies.items){
+      if (!e.alive) continue;
+      
+      // Handle death animation
+      if (e.dying) {
+        e.deathTimer -= dt;
+        // Death animation: white flash → red flash → fade
+        const progress = 1 - (e.deathTimer / 0.2);
+        if (progress < 0.3) {
+          e.color = '#ffffff'; // White flash
+        } else if (progress < 0.7) {
+          e.color = '#ff0000'; // Red flash
+        } else {
+          e.color = e.originalColor; // Fade back to original
+        }
+        
+        if (e.deathTimer <= 0) {
+          e.alive = false; // Actually remove enemy
+          continue;
+        }
+        // Don't do normal movement/behavior during death animation
+        g.grid.insert(e);
+        continue;
+      }
+      
+      // Check edge proximity
+      if (e.y < edgeThreshold) nearTop = true;
+      if (e.y > g.height() - edgeThreshold) nearBottom = true;
+      if (e.x < edgeThreshold) nearLeft = true;
+      if (e.x > g.width() - edgeThreshold) nearRight = true;
+      
+      // Handle freeze effect
+      if (e.frozen > 0) e.frozen -= dt;
+      const freezeMultiplier = e.frozen > 0 ? 0.5 : 1.0; // 50% speed when frozen
+      
+      // Apply behavior-specific movement (replaces old generic movement)
+      const [dx,dy] = norm(p.x - e.x, p.y - e.y);
+      
+      // Add human-like walking cadence to all enemies
+      if (!e.cadence) e.cadence = Math.random() * Math.PI * 2; // Random starting phase
+      e.cadence += dt * 4; // Walking rhythm frequency
+      const walkRhythm = 0.8 + 0.2 * Math.sin(e.cadence); // 0.6 to 1.0 speed multiplier
+      
+      if (e.behavior === 'normal') {
+        // Improved gait-like movement toward player
+        const gaitPattern = 0.7 + 0.4 * Math.sin(e.cadence) + 0.1 * Math.sin(e.cadence * 2); // More realistic gait
+        const stepSway = Math.sin(e.cadence + Math.PI/4) * 8; // Slight left-right sway while walking
+        const perpX = -dy; // Perpendicular to movement direction
+        const perpY = dx;
+        
+        e.vx += dx * e.speed * dt * 2.6 * gaitPattern * freezeMultiplier; // Increased 30% from 2.0 to 2.6
+        e.vy += dy * e.speed * dt * 2.6 * gaitPattern * freezeMultiplier;
+        e.vx += perpX * stepSway * dt * freezeMultiplier; // Add subtle sway
+        e.vy += perpY * stepSway * dt * freezeMultiplier;
+      } else if (e.behavior === 'zigzag') {
+        // Zigzag movement with player attraction and cadence
+        e.vx += dx * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
+        e.vx += Math.sin(g.t * 8 + e.x * 0.01) * 120 * dt * freezeMultiplier;
+        e.vy += Math.cos(g.t * 6 + e.y * 0.01) * 100 * dt * freezeMultiplier;
+      } else if (e.behavior === 'flank') {
+        // Try to approach from sides/behind player
+        const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
+        const flankAngle = playerAngle + Math.sin(g.t * 2 + e.x * 0.005) * Math.PI/3;
+        const fx = Math.cos(flankAngle);
+        const fy = Math.sin(flankAngle);
+        e.vx += fx * e.speed * dt * 1.3 * walkRhythm * freezeMultiplier;
+        e.vy += fy * e.speed * dt * 1.3 * walkRhythm * freezeMultiplier;
+        // Still some direct attraction
+        e.vx += dx * e.speed * dt * 0.3 * freezeMultiplier;
+        e.vy += dy * e.speed * dt * 0.3 * freezeMultiplier;
+      } else if (e.behavior === 'charge') {
+        // Periodic charging behavior with cadence
+        if (!e.chargeTimer) e.chargeTimer = Math.random() * 2 + 1;
+        e.chargeTimer -= dt;
+        if (e.chargeTimer <= 0) {
+          e.vx += dx * e.speed * 5 * dt; // Strong charge (no cadence during charge)
+          e.vy += dy * e.speed * 5 * dt;
+          e.chargeTimer = 2 + Math.random() * 3;
+        } else {
+          // Normal movement between charges with cadence
+          e.vx += dx * e.speed * 1.2 * dt * walkRhythm;
+          e.vy += dy * e.speed * 1.2 * dt * walkRhythm;
+        }
+      } else if (e.behavior === 'erratic') {
+        // Chaotic movement with some player attraction and subtle cadence
+        const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 2); // Faster, more panicked rhythm
+        e.vx += (Math.random() - 0.5) * 300 * dt * panicRhythm;
+        e.vy += (Math.random() - 0.5) * 300 * dt * panicRhythm;
+        e.vx += dx * e.speed * 1.0 * dt;
+        e.vy += dy * e.speed * 1.0 * dt;
+      } else if (e.behavior === 'superboss') {
+        // Super boss with changing movement phases every 20 seconds
+        e.phaseTimer = (e.phaseTimer || 0) + dt;
+        if (e.phaseTimer >= 20) {
+          e.phaseTimer = 0;
+          e.currentPhase = (e.currentPhase + 1) % 4; // Cycle through 4 phases
+        }
+        
+        const phase = e.currentPhase || 0;
+        const heavyStep = 0.8 + 0.4 * Math.sin(e.cadence * 0.3); // Powerful rhythm
+        
+        if (phase === 0) {
+          // Phase 0: Relentless pursuit - direct aggressive chase
+          e.vx += dx * e.speed * dt * 2.0 * heavyStep;
+          e.vy += dy * e.speed * dt * 2.0 * heavyStep;
+        } else if (phase === 1) {
+          // Phase 1: Circling predator - orbits around player
+          const orbitSpeed = 1.8;
+          const perp_dx = -dy; // Perpendicular to player direction
+          const perp_dy = dx;
+          e.vx += (dx * 0.8 + perp_dx * orbitSpeed) * e.speed * dt * heavyStep;
+          e.vy += (dy * 0.8 + perp_dy * orbitSpeed) * e.speed * dt * heavyStep;
+        } else if (phase === 2) {
+          // Phase 2: Erratic berserker - unpredictable bursts
+          const chaos = 0.7 + 0.6 * Math.sin(e.cadence * 4); // Chaotic rhythm
+          e.vx += ((Math.random() - 0.5) * 400 + dx * 150) * dt * chaos;
+          e.vy += ((Math.random() - 0.5) * 400 + dy * 150) * dt * chaos;
+        } else {
+          // Phase 3: Charging bull - periodic devastating rushes
+          if (!e.rushPhase) e.rushPhase = { timer: 0, charging: false };
+          e.rushPhase.timer += dt;
+          
+          if (!e.rushPhase.charging && e.rushPhase.timer >= 2) {
+            e.rushPhase.charging = true;
+            e.rushPhase.timer = 0;
+            e.rushDirection = { x: dx, y: dy }; // Lock rush direction
+          }
+          
+          if (e.rushPhase.charging) {
+            if (e.rushPhase.timer < 1.5) {
+              // Charging for 1.5 seconds
+              const rushPower = 3.0 + Math.sin(e.rushPhase.timer * 8) * 0.5;
+              e.vx += e.rushDirection.x * e.speed * dt * rushPower;
+              e.vy += e.rushDirection.y * e.speed * dt * rushPower;
+            } else {
+              // Reset for next cycle
+              e.rushPhase.charging = false;
+              e.rushPhase.timer = 0;
+            }
+          } else {
+            // Slow stalking between charges
+            e.vx += dx * e.speed * dt * 0.3 * heavyStep;
+            e.vy += dy * e.speed * dt * 0.3 * heavyStep;
+          }
+        }
+      } else if (e.behavior === 'boss') {
+        // Boss moves deliberately with heavy footsteps
+        const heavyStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.5); // Still rhythmic but faster
+        e.vx += dx * e.speed * dt * 1.2 * heavyStep;
+        e.vy += dy * e.speed * dt * 1.2 * heavyStep;
+      } else if (e.behavior === 'zerglingRush') {
+        // Zergling rush behavior - quick leap attacks like player emergency dash
+        if (!e.rushTimer) e.rushTimer = Math.random() * 1.5 + 0.5; // Initial delay
+        e.rushTimer -= dt;
+        
+        if (e.rushTimer <= 0) {
+          // Perform rush leap toward player
+          const rushSpeed = e.speed * 3; // 3x speed burst
+          e.vx += dx * rushSpeed * dt * 8; // Strong impulse
+          e.vy += dy * rushSpeed * dt * 8;
+          e.rushTimer = 1.5 + Math.random() * 2; // 1.5-3.5 second cooldown
+        } else {
+          // Normal movement between rushes (slower)
+          e.vx += dx * e.speed * dt * 0.8 * walkRhythm;
+          e.vy += dy * e.speed * dt * 0.8 * walkRhythm;
+        }
+      }
+      
+      // Shooter enemy logic - fire at player every 1.8 seconds
+      if (e.isShooter) {
+        e.shootTimer -= dt;
+        if (e.shootTimer <= 0) {
+          spawnEnemyBullet(e.x, e.y, p.x, p.y);
+          e.shootTimer = 1.8; // Reset timer
+          beep(300, 0.06, 'sine', 0.08); // Enemy shooting sound
+        }
+      }
+      
+      // damp
+      e.vx *= (1 - 3*dt);
+      e.vy *= (1 - 3*dt);
+      e.x += e.vx*dt;
+      e.y += e.vy*dt;
+      // clamp bounds
+      e.x = clamp(e.x, e.r, g.width()-e.r);
+      e.y = clamp(e.y, e.r, g.height()-e.r);
+      g.grid.insert(e);
+    }
+    
+    // Update edge warnings
+    edgeTop.style.display = nearTop ? 'block' : 'none';
+    edgeBottom.style.display = nearBottom ? 'block' : 'none';
+    edgeLeft.style.display = nearLeft ? 'block' : 'none';
+    edgeRight.style.display = nearRight ? 'block' : 'none';
+
+    // bullets
+    for (const b of bullets.items){
+      if (!b.alive) continue;
+      
+      // Homing bullets
+      const effects = b.effects || [];
+      if (effects.includes('homing')) {
+        // Find new target if current target is dead/dying or we don't have one
+        if (!b.homingTarget || !b.homingTarget.alive || b.homingTarget.dying || b.hitEnemies.has(b.homingTarget)) {
+          let closest = null, closestDist = Infinity;
+          for (const e of enemies.items) {
+            if (!e.alive || e.dying || b.hitEnemies.has(e)) continue; // Skip dead/dying/already hit enemies
+            const dist = Math.hypot(e.x - b.x, e.y - b.y);
+            if (dist < closestDist) { closest = e; closestDist = dist; }
+          }
+          b.homingTarget = closest;
+        }
+      }
+      
+      if (effects.includes('homing') && b.homingTarget && b.homingTarget.alive && !b.homingTarget.dying) {
+        const [hx, hy] = norm(b.homingTarget.x - b.x, b.homingTarget.y - b.y);
+        
+        // Use consistent target speed instead of current speed
+        const baseSpeed = 720 * (game?.player?.bulletSpeed || 1.0);
+        const homingStrength = 0.3; // Even stronger homing
+        
+        b.vx = (b.vx * (1-homingStrength) + hx * baseSpeed * homingStrength);
+        b.vy = (b.vy * (1-homingStrength) + hy * baseSpeed * homingStrength);
+      }
+      
+      // Seeking bullets - curve toward nearest enemy without needing a specific target
+      if (effects.includes('seeking')) {
+        let closest = null, closestDist = Infinity;
+        for (const e of enemies.items) {
+          if (!e.alive || e.dying) continue;
+          const dist = Math.hypot(e.x - b.x, e.y - b.y);
+          if (dist < closestDist && dist < 200) { // Seeking range
+            closest = e; closestDist = dist;
+          }
+        }
+        if (closest) {
+          const [sx, sy] = norm(closest.x - b.x, closest.y - b.y);
+          const baseSpeed = 720 * (game?.player?.bulletSpeed || 1.0);
+          const seekingStrength = 0.2; // Lighter curve than homing
+          
+          // Gradually curve toward target
+          const currentSpeed = Math.hypot(b.vx, b.vy);
+          const [currentDx, currentDy] = norm(b.vx, b.vy);
+          const newDx = currentDx + sx * seekingStrength;
+          const newDy = currentDy + sy * seekingStrength;
+          const [finalDx, finalDy] = norm(newDx, newDy);
+          
+          b.vx = finalDx * currentSpeed;
+          b.vy = finalDy * currentSpeed;
+        }
+      }
+      
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.life += dt;
+      
+      // Ricochet bullets
+      if (effects.includes('ricochet') && b.bounces > 0) {
+        if (b.x <= 0 || b.x >= g.width()) { b.vx *= -1; b.bounces--; }
+        if (b.y <= 0 || b.y >= g.height()) { b.vy *= -1; b.bounces--; }
+        b.x = clamp(b.x, 0, g.width());
+        b.y = clamp(b.y, 0, g.height());
+      } else if (b.life > b.maxLife || b.x< -10 || b.y< -10 || b.x>g.width()+10 || b.y>g.height()+10){
+        b.alive = false; continue;
+      }
+      // collide with enemies via spatial hash - piercing bullets track hit enemies
+      const nearby = g.grid.near(b.x,b.y);
+      for (const e of nearby){
+        if (!e.alive || e.dying) continue;
+        if (b.hitEnemies.has(e)) continue; // Skip enemies already hit by this bullet
+        const rr = (b.r+e.r);
+        if (fastDistanceCheck(b.x, b.y, e.x, e.y, rr)){
+          // hit
+          const damage = b.critical ? 2 : 1; // Critical hits deal double damage
+          e.hp -= damage;
+          b.hitEnemies.add(e); // Mark this enemy as hit by this bullet
+          
+          // Apply all special bullet effects
+          const effects = b.effects || [];
+          
+          if (effects.includes('explosive')) {
+            // Explosive bullets damage nearby enemies
+            for (const e2 of enemies.items) {
+              if (!e2.alive || e2 === e) continue;
+              const dist = Math.hypot(e2.x - b.x, e2.y - b.y);
+              if (dist < 60) {
+                e2.hp -= 1; // Increased from 40 to 60
+                handleEnemyDeath(e2, g); // Handle death and crystal drops
+              }
+            }
+            // Much more obvious explosion effect
+            spawnBurst(b.x, b.y, 25, '#ff8000'); // More particles
+            spawnBurst(b.x, b.y, 15, '#ff4000'); // Secondary burst
+            spawnBurst(b.x, b.y, 10, '#ffff00'); // Yellow core
+          }
+          
+          if (effects.includes('lightning')) {
+            // Lightning chains to nearby enemies (limit to prevent infinite chaining)
+            let chainCount = 0;
+            const maxChains = 3; // Limit chains per bullet
+            
+            for (const e2 of enemies.items) {
+              if (!e2.alive || e2 === e || e2.dying) continue; // Skip dying enemies
+              if (chainCount >= maxChains) break; // Limit total chains
+              
+              const dist = Math.hypot(e2.x - b.x, e2.y - b.y);
+              if (dist < 120) { // Chain range
+                e2.hp -= 1; // Chain damage
+                chainCount++;
+                handleEnemyDeath(e2, g); // Handle death and crystal drops
+                
+                // More obvious lightning effect
+                spawnBurst(e2.x, e2.y, 12, '#ffff00');
+                spawnBurst(e2.x, e2.y, 8, '#ffffff'); 
+                spawnBurst(e2.x, e2.y, 4, '#00ffff');
+                
+                // Create lightning bolt line effect
+                const steps = 5;
+                for (let i = 0; i < steps; i++) {
+                  const t = i / (steps - 1);
+                  const lx = b.x + (e2.x - b.x) * t;
+                  const ly = b.y + (e2.y - b.y) * t;
+                  spawnBurst(lx, ly, 2, '#ffffff');
+                }
+              }
+            }
+          }
+          
+          if (effects.includes('freeze')) {
+            // Freeze shot slows enemies
+            if (!e.frozen) e.frozen = 0;
+            e.frozen = Math.max(e.frozen, 2.0); // 2 seconds of slowness
+            spawnBurst(e.x, e.y, 8, '#00ffff');
+          }
+          
+          if (effects.includes('shotgun')) {
+            // Shotgun effect - spawn additional bullets in spread
+            const spreadCount = 4;
+            const spreadAngle = 0.5;
+            for (let i = 0; i < spreadCount; i++) {
+              const angle = (i / (spreadCount - 1) - 0.5) * spreadAngle;
+              const cos = Math.cos(angle), sin = Math.sin(angle);
+              const newDx = b.vx * cos - b.vy * sin;
+              const newDy = b.vx * sin + b.vy * cos;
+              const speed = Math.hypot(newDx, newDy);
+              spawnBullet(b.x, b.y, newDx/speed, newDy/speed, []);
+            }
+          }
+          
+          if (effects.includes('cluster')) {
+            // Cluster shot - bullets split into smaller bullets on impact
+            const fragments = 3;
+            for (let i = 0; i < fragments; i++) {
+              const angle = (Math.PI * 2 * i) / fragments;
+              const dx = Math.cos(angle);
+              const dy = Math.sin(angle);
+              spawnBullet(b.x, b.y, dx, dy, []);
+            }
+            spawnBurst(b.x, b.y, 12, '#ffa500');
+          }
+          
+          if (effects.includes('seeking')) {
+            // Seeking bullets curve toward enemies (enhanced homing)
+            // This is implemented in the bullet update loop above, similar to homing
+            // but with different behavior - seeking bullets don't need a specific target
+          }
+          
+          // Handle enemy death and effects
+          handleEnemyDeath(e, g);
+          
+          // Blood spray from bullet impact
+          spawnBlood(b.x, b.y, b.vx, b.vy, 'impact');
+          hitSound();
+          
+          // Piercing check - reduce pierces and destroy bullet if none left
+          if (b.pierces > 0) {
+            b.pierces--;
+            // Bullet continues moving and can hit more enemies
+          } else {
+            // No pierces left, bullet is destroyed
+            b.alive = false;
+            break;
+          }
+          
+          // Don't break - piercing bullets can hit multiple enemies in one frame
+          // but each enemy can only be hit once per bullet (tracked by hitEnemies set)
+        }
+      }
+    }
+
+    // enemy bullets
+    for (const eb of enemyBullets.items) {
+      if (!eb.alive) continue;
+      
+      eb.x += eb.vx * dt;
+      eb.y += eb.vy * dt;
+      eb.life += dt;
+      
+      // Remove bullets that go off screen or expire
+      if (eb.life > eb.maxLife || eb.x < -20 || eb.y < -20 || eb.x > g.width() + 20 || eb.y > g.height() + 20) {
+        eb.alive = false;
+        continue;
+      }
+      
+      // Collision with player only
+      const dist = Math.hypot(eb.x - p.x, eb.y - p.y);
+      if (dist < eb.r + p.radius) {
+        eb.alive = false; // Destroy bullet
+        
+        if (g.invulTime <= 0) {
+          // Player takes damage from enemy bullet
+          const damage = 8; // Fixed enemy bullet damage
+          const actualDamage = Math.ceil(damage * (1 - p.damageReduction));
+          p.hp -= actualDamage;
+          g.invulTime = 0.35;
+          g.damageFlash = 0.3;
+          hurtSound();
+          
+          // Knockback effect - push player away from bullet
+          const [kx, ky] = norm(eb.vx, eb.vy);
+          p.vx += kx * 300; // Strong knockback
+          p.vy += ky * 300;
+          
+          // Player blood effect
+          spawnBlood(p.x, p.y, 0, 0, 'player');
+          
+          if (p.hp <= 0) {
+            g.state = STATE.OVER;
+            goWave.textContent = g.wave.toString();
+            goKills.textContent = g.kills.toString();
+            gameOverPanel.style.display = 'block';
+          }
+        }
+      }
+    }
+
+    // enemy -> player collision
+    const nearP = g.grid.near(p.x, p.y);
+    for (const e of nearP){
+      if (!e.alive || e.dying) continue;
+      const rr = (p.radius + e.r);
+      if (fastDistanceCheck(p.x, p.y, e.x, e.y, rr)){
+        if (g.invulTime <= 0){
+          const damage = Math.ceil(e.touchDmg * (1 - p.damageReduction));
+          p.hp -= damage;
+          g.invulTime = 0.35;
+          g.damageFlash = 0.3; // Red vignette flash for 0.3 seconds
+          hurtSound();
+          
+          // Adrenaline boost trigger
+          if (p.adrenalineBoost) {
+            p.adrenalineTimer = 3.0; // 3 seconds of speed boost
+          }
+          // Player blood effect
+          spawnBlood(p.x, p.y, 0, 0, 'player');
+          if (p.hp <= 0){
+            // game over
+            g.state = STATE.OVER;
+            goWave.textContent = g.wave.toString();
+            goKills.textContent = g.kills.toString();
+            gameOverPanel.style.display = 'block';
+          }
+        }
+        // Knockback (reduced by resistance)
+        const knockbackReduction = Math.min(1.0, p.knockbackResistance || 0);
+        const knockbackForce = 200 * (1 - knockbackReduction);
+        if (knockbackForce > 0) {
+          const [nx,ny] = norm(p.x - e.x, p.y - e.y);
+          p.vx += nx * knockbackForce;
+          p.vy += ny * knockbackForce;
+        }
+      }
+    }
+
+    // pickups
+    for (const pickup of pickups.items){
+      if (!pickup.alive) continue;
+      
+      // Physics - top-down view
+      pickup.x += pickup.vx * dt;
+      pickup.y += pickup.vy * dt;
+      pickup.vy += 200 * dt; // Reduced gravity for top-down
+      pickup.bounceTimer += dt;
+      
+      // Keep crystals on screen - clamp to bounds
+      pickup.x = clamp(pickup.x, 10, g.width() - 10);
+      pickup.y = clamp(pickup.y, 10, g.height() - 10);
+      
+      // Ground collision
+      if (pickup.y >= g.height() - 20) {
+        pickup.y = g.height() - 20;
+        pickup.vy = Math.min(pickup.vy, 0); // Stop downward movement
+      }
+      
+      // Add friction to slow horizontal movement
+      pickup.vx *= (1 - 3*dt);
+      
+      // Gentle settle instead of hard ground bounce
+      if (pickup.vy > 0 && pickup.bounceTimer > 0.3) {
+        pickup.vy *= (1 - 4*dt); // Slow down vertical movement
+        if (Math.abs(pickup.vy) < 20) pickup.vy = 0; // Stop when slow enough
+      }
+      
+      // Magnetic crystals effect
+      if (p.magneticRange > 0) {
+        const dist = Math.hypot(pickup.x - p.x, pickup.y - p.y);
+        if (dist < p.magneticRange && dist > 20) {
+          const [mx, my] = norm(p.x - pickup.x, p.y - pickup.y);
+          pickup.vx += mx * 750 * dt;
+          pickup.vy += my * 750 * dt;
+        }
+      }
+      
+      // Player collision
+      const dist = Math.hypot(pickup.x - p.x, pickup.y - p.y);
+      if (dist < 20) {
+        pickup.alive = false;
+        
+        // All crystals now use unified bullet powerup system
+        const powerup = bulletPowerups.find(bp => bp.type === pickup.type);
+        if (powerup) {
+          if (powerup.type === 'upgrade') {
+            // Dual shot upgrade
+            p.upgradeShots += powerup.shots;
+            beep(800, 0.1, 'triangle', 0.03);
+          } else if (powerup.type === 'triple' || powerup.type === 'quad') {
+            // Pattern powerup - add multiplier instead of replacing
+            p.patternMultipliers.set(powerup.type, powerup.shots);
+            // Legacy support
+            p.bulletPattern = powerup.type;
+            p.patternTimer = powerup.shots;
+            beep(600, 0.15, 'sawtooth', 0.04);
+          } else {
+            // Effect powerup - add to active effects instead of replacing
+            p.activeEffects.set(powerup.type, powerup.shots);
+            // Legacy support
+            p.bulletType = powerup.type;
+            p.bulletTimer = powerup.shots;
+            beep(600, 0.15, 'sawtooth', 0.04);
+          }
+          showPowerupNotification(powerup.name);
+        }
+      }
+    }
+
+    // blood stains - realistic droplet physics
+    for (const stain of bloodStains.items){
+      if (!stain.alive) continue;
+      
+      if (!stain.settled) {
+        // Blood droplets still in motion
+        stain.x += stain.vx * dt;
+        stain.y += stain.vy * dt;
+        stain.vx *= (1 - 8*dt); // Strong friction
+        stain.vy *= (1 - 8*dt);
+        
+        // Settle when slow enough
+        if (Math.hypot(stain.vx, stain.vy) < 10) {
+          stain.settled = true;
+          stain.vx = 0;
+          stain.vy = 0;
+        }
+      }
+      
+      stain.life += dt;
+      // Start fading after 3 seconds, fully gone at 15 seconds
+      stain.alpha = stain.life > 3 ? 1.0 - ((stain.life - 3) / 12) : 1.0;
+      if (stain.life >= stain.maxLife) stain.alive = false;
+    }
+
+    // particles
+    for (const p2 of particles.items){
+      if (!p2.alive) continue;
+      p2.x += p2.vx*dt;
+      p2.y += p2.vy*dt;
+      // Add gravity to blood particles
+      if (p2.hasGravity) {
+        p2.vy += 150 * dt; // Gravity effect
+      }
+      p2.life += dt;
+      if (p2.life >= p2.maxLife) p2.alive = false;
+    }
+
+    // HUD - batch updates to prevent layout thrashing
+    queueDOMUpdate(() => {
+      hpTxt.textContent = Math.max(0, Math.floor(p.hp)).toString();
+      hudHpBar.style.width = clamp(p.hp/p.maxHp,0,1)*100 + '%';
+      staminaTxt.textContent = Math.floor(p.stamina).toString();
+      hudStaminaBar.style.width = clamp(p.stamina/100,0,1)*100 + '%';
+      waveTxt.textContent = g.wave.toString();
+      killsTxt.textContent = g.kills.toString();
+    });
+    
+    // Clean up expired effects and patterns (no display needed)
+    for (const [effect, shots] of p.activeEffects) {
+      if (shots <= 0) p.activeEffects.delete(effect);
+    }
+    for (const [pattern, shots] of p.patternMultipliers) {
+      if (shots <= 0) p.patternMultipliers.delete(pattern);
+    }
+  }
+
+  function draw(g, alpha){
+    // Reset render state for new frame
+    resetRenderState();
+    
+    // clear
+    setFillStyle('#0b0d10');
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // subtle grid background
+    ctx.save();
+    ctx.globalAlpha = 0.07;
+    ctx.strokeStyle = '#1a1f29';
+    ctx.lineWidth = 1;
+    const step = 64;
+    for (let x= (canvas.width%step); x<canvas.width; x+=step){
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+    }
+    for (let y= (canvas.height%step); y<canvas.height; y+=step){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+    }
+    ctx.restore();
+
+    // blood stains - realistic droplet spray
+    for (const stain of bloodStains.items){
+      if (!stain.alive) continue;
+      ctx.save();
+      
+      // Different appearance based on whether still moving or settled
+      if (stain.settled) {
+        // Settled blood stain - darker, more spread out
+        ctx.globalAlpha = stain.alpha * 0.8;
+        ctx.fillStyle = '#600000';
+        ctx.beginPath();
+        ctx.arc(stain.x, stain.y, stain.size * 1.5, 0, TAU);
+        ctx.fill();
+      } else {
+        // Moving blood droplet - brighter, smaller
+        ctx.globalAlpha = stain.alpha * 0.9;
+        ctx.fillStyle = '#cc0000';
+        ctx.beginPath();
+        ctx.arc(stain.x, stain.y, stain.size, 0, TAU);
+        ctx.fill();
+      }
+      
+      ctx.restore();
+    }
+
+    // draw player with leap glow
+    const p = g.player;
+    ctx.save();
+    
+    // Leap ready glow effect
+    if (p.leapReady) {
+      const glowIntensity = 0.7 + 0.3 * Math.sin(g.t * 6); // Pulsing glow
+      const glowRadius = p.radius + 8;
+      
+      // Outer glow
+      const outerGradient = ctx.createRadialGradient(p.x, p.y, p.radius, p.x, p.y, glowRadius);
+      outerGradient.addColorStop(0, `rgba(0, 255, 255, ${glowIntensity * 0.3})`);
+      outerGradient.addColorStop(0.7, `rgba(0, 255, 255, ${glowIntensity * 0.2})`);
+      outerGradient.addColorStop(1, `rgba(0, 255, 255, 0)`);
+      ctx.fillStyle = outerGradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, glowRadius, 0, TAU);
+      ctx.fill();
+      
+      // Inner rim glow
+      ctx.strokeStyle = `rgba(0, 255, 255, ${glowIntensity * 0.8})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius + 2, 0, TAU);
+      ctx.stroke();
+    }
+    
+    // Player invulnerability flash
+    if (g.invulTime > 0){
+      ctx.globalAlpha = 0.6 + 0.4*Math.sin(g.t*40);
+    }
+    
+    // Main player body
+    ctx.fillStyle = '#00ff00';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    // crosshair
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = '#34d1ff';
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, 10, 0, TAU);
+    ctx.moveTo(mouseX-14, mouseY); ctx.lineTo(mouseX-4, mouseY);
+    ctx.moveTo(mouseX+14, mouseY); ctx.lineTo(mouseX+4, mouseY);
+    ctx.moveTo(mouseX, mouseY-14); ctx.lineTo(mouseX, mouseY-4);
+    ctx.moveTo(mouseX, mouseY+14); ctx.lineTo(mouseX, mouseY+4);
+    ctx.stroke();
+    ctx.restore();
+
+    // enemies
+    for (const e of enemies.items){
+      if (!e.alive) continue;
+      
+      // Super boss phase-based visual effects
+      if (e.behavior === 'superboss') {
+        ctx.save();
+        
+        // Phase-based color modulation
+        const phase = e.currentPhase || 0;
+        const phaseColors = ['#800080', '#ff0080', '#ff8000', '#8000ff'];
+        const pulseIntensity = 0.7 + 0.3 * Math.sin(g.t * 6);
+        
+        // Intimidating aura
+        const auraRadius = e.r + 20;
+        const auraGradient = ctx.createRadialGradient(e.x, e.y, e.r, e.x, e.y, auraRadius);
+        auraGradient.addColorStop(0, `${phaseColors[phase]}80`);
+        auraGradient.addColorStop(1, `${phaseColors[phase]}00`);
+        ctx.fillStyle = auraGradient;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, auraRadius, 0, TAU);
+        ctx.fill();
+        
+        // Main boss body with phase color
+        ctx.fillStyle = phaseColors[phase];
+        ctx.globalAlpha = pulseIntensity;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r, 0, TAU);
+        ctx.fill();
+        
+        // Phase indicator ring
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r + 8, 0, TAU);
+        ctx.stroke();
+        
+        ctx.restore();
+      } else {
+        // Normal enemy rendering
+        ctx.fillStyle = e.color;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r, 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    // player bullets
+    ctx.fillStyle = '#e3e7ef';
+    for (const b of bullets.items){
+      if (!b.alive) continue;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, TAU);
+      ctx.fill();
+    }
+
+    // enemy bullets
+    ctx.fillStyle = '#ff4444';
+    for (const eb of enemyBullets.items){
+      if (!eb.alive) continue;
+      ctx.beginPath();
+      ctx.arc(eb.x, eb.y, eb.r, 0, TAU);
+      ctx.fill();
+    }
+
+    // pickups
+    for (const pickup of pickups.items){
+      if (!pickup.alive) continue;
+      ctx.save();
+      
+      // Animated diamond with sparkle effect
+      const sparkle = 0.8 + 0.2 * Math.sin(g.t * 8 + pickup.bounceTimer * 3);
+      ctx.globalAlpha = sparkle;
+      
+      // Color based on pickup type
+      const powerup = bulletPowerups.find(bp => bp.type === pickup.type);
+      
+      // Special glow effects for homing crystals (gold)
+      if (pickup.type === 'homing') {
+        // Golden glow aura
+        const glowIntensity = 0.6 + 0.4 * Math.sin(g.t * 12 + pickup.bounceTimer * 5);
+        const glowSize = 16 + 8 * Math.sin(g.t * 6);
+        
+        // Outer golden glow
+        const outerGlow = ctx.createRadialGradient(pickup.x, pickup.y, 8, pickup.x, pickup.y, glowSize);
+        outerGlow.addColorStop(0, `rgba(255, 215, 0, ${glowIntensity * 0.8})`);
+        outerGlow.addColorStop(0.5, `rgba(255, 215, 0, ${glowIntensity * 0.4})`);
+        outerGlow.addColorStop(1, `rgba(255, 215, 0, 0)`);
+        ctx.fillStyle = outerGlow;
+        ctx.beginPath();
+        ctx.arc(pickup.x, pickup.y, glowSize, 0, TAU);
+        ctx.fill();
+        
+        // Inner bright core
+        const coreGlow = ctx.createRadialGradient(pickup.x, pickup.y, 0, pickup.x, pickup.y, 12);
+        coreGlow.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity * 0.9})`);
+        coreGlow.addColorStop(0.3, `rgba(255, 235, 59, ${glowIntensity * 0.7})`);
+        coreGlow.addColorStop(1, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
+        ctx.fillStyle = coreGlow;
+        ctx.beginPath();
+        ctx.arc(pickup.x, pickup.y, 12, 0, TAU);
+        ctx.fill();
+      }
+      
+      ctx.fillStyle = powerup ? powerup.color : '#ffffff';
+      ctx.strokeStyle = pickup.type === 'homing' ? '#FFFFFF' : '#ffffff';
+      ctx.lineWidth = pickup.type === 'homing' ? 2 : 1;
+      
+      // Draw diamond shape (larger for homing)
+      ctx.beginPath();
+      const size = pickup.type === 'homing' ? 10 : 8;
+      ctx.moveTo(pickup.x, pickup.y - size);
+      ctx.lineTo(pickup.x + size, pickup.y);
+      ctx.lineTo(pickup.x, pickup.y + size);
+      ctx.lineTo(pickup.x - size, pickup.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+
+    // particles
+    for (const p2 of particles.items){
+      if (!p2.alive) continue;
+      const a = 1 - p2.life/p2.maxLife;
+      ctx.globalAlpha = a*0.9;
+      ctx.fillStyle = p2.color;
+      ctx.fillRect(p2.x, p2.y, p2.size, p2.size);
+      ctx.globalAlpha = 1;
+    }
+
+    // Red damage vignette
+    if (g.damageFlash > 0) {
+      const intensity = g.damageFlash / 0.3; // Fade from 1 to 0
+      const gradient = ctx.createRadialGradient(
+        canvas.width/2, canvas.height/2, 0,
+        canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height)
+      );
+      gradient.addColorStop(0, `rgba(255, 0, 0, 0)`);
+      gradient.addColorStop(0.7, `rgba(255, 0, 0, ${intensity * 0.1})`);
+      gradient.addColorStop(1, `rgba(255, 0, 0, ${intensity * 0.4})`);
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Crystal inventory display under HUD
+    const crystalInventoryY = 160; // Start below HUD
+    const crystalSize = 40; // 50% of 80 = 40
+    const crystalSpacing = 50; // Adjust spacing
+    let inventoryIndex = 0;
+    
+    // Show dual shot if active
+    if (g.player.upgradeShots > 0) {
+      const x = 24; // Left edge alignment with HUD
+      const y = crystalInventoryY + (inventoryIndex * crystalSpacing);
+      
+      // Don't draw if it would go off screen
+      if (y + crystalSize/2 < canvas.height - 20) {
+        ctx.save();
+        
+        // Animated sparkle effect like pickup crystals
+        const sparkle = 0.8 + 0.2 * Math.sin(g.t * 8 + inventoryIndex * 0.5);
+        ctx.globalAlpha = sparkle;
+        
+        ctx.fillStyle = '#00BFFF'; // Dual shot color
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        
+        // Draw diamond shape
+        ctx.beginPath();
+        ctx.moveTo(x, y - crystalSize/2);
+        ctx.lineTo(x + crystalSize/2, y);
+        ctx.lineTo(x, y + crystalSize/2);
+        ctx.lineTo(x - crystalSize/2, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Draw crystal name
+        ctx.fillStyle = '#e3e7ef';
+        ctx.font = '12px system-ui';
+        ctx.textAlign = 'left';
+        ctx.fillText('Dual Shot', x + crystalSize/2 + 8, y + 4);
+        
+        ctx.restore();
+        
+        inventoryIndex++;
+      }
+    }
+    
+    // Show pattern multipliers
+    for (const [pattern, shots] of g.player.patternMultipliers) {
+      if (shots > 0) {
+        const x = 24;
+        const y = crystalInventoryY + (inventoryIndex * crystalSpacing);
+        
+        // Don't draw if it would go off screen
+        if (y + crystalSize/2 < canvas.height - 20) {
+          ctx.save();
+          
+          // Animated sparkle effect like pickup crystals
+          const sparkle = 0.8 + 0.2 * Math.sin(g.t * 8 + inventoryIndex * 0.5);
+          ctx.globalAlpha = sparkle;
+          
+          const powerup = bulletPowerups.find(bp => bp.type === pattern);
+          ctx.fillStyle = powerup ? powerup.color : '#ffffff';
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          
+          // Draw diamond shape
+          ctx.beginPath();
+          ctx.moveTo(x, y - crystalSize/2);
+          ctx.lineTo(x + crystalSize/2, y);
+          ctx.lineTo(x, y + crystalSize/2);
+          ctx.lineTo(x - crystalSize/2, y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          // Draw crystal name
+          ctx.fillStyle = '#e3e7ef';
+          ctx.font = '12px system-ui';
+          ctx.textAlign = 'left';
+          const crystalName = powerup ? powerup.name : pattern;
+          ctx.fillText(crystalName, x + crystalSize/2 + 8, y + 4);
+          
+          ctx.restore();
+          
+          inventoryIndex++;
+        }
+      }
+    }
+    
+    // Show active effects
+    for (const [effect, shots] of g.player.activeEffects) {
+      if (shots > 0) {
+        const x = 24;
+        const y = crystalInventoryY + (inventoryIndex * crystalSpacing);
+        
+        // Don't draw if it would go off screen
+        if (y + crystalSize/2 < canvas.height - 20) {
+          ctx.save();
+          
+          // Animated sparkle effect like pickup crystals
+          const sparkle = 0.8 + 0.2 * Math.sin(g.t * 8 + inventoryIndex * 0.5);
+          ctx.globalAlpha = sparkle;
+          
+          const powerup = bulletPowerups.find(bp => bp.type === effect);
+          
+          // Special glow effects for homing crystals in inventory
+          if (effect === 'homing') {
+            const glowIntensity = 0.5 + 0.3 * Math.sin(g.t * 10);
+            const glowSize = crystalSize/2 + 12;
+            
+            // Golden glow aura for inventory homing crystal
+            const inventoryGlow = ctx.createRadialGradient(x, y, crystalSize/2, x, y, glowSize);
+            inventoryGlow.addColorStop(0, `rgba(255, 215, 0, ${glowIntensity * 0.6})`);
+            inventoryGlow.addColorStop(0.7, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
+            inventoryGlow.addColorStop(1, `rgba(255, 215, 0, 0)`);
+            ctx.fillStyle = inventoryGlow;
+            ctx.beginPath();
+            ctx.arc(x, y, glowSize, 0, TAU);
+            ctx.fill();
+          }
+          
+          ctx.fillStyle = powerup ? powerup.color : '#ffffff';
+          ctx.strokeStyle = effect === 'homing' ? '#FFFF99' : '#ffffff';
+          ctx.lineWidth = effect === 'homing' ? 3 : 2;
+          
+          // Draw diamond shape
+          ctx.beginPath();
+          ctx.moveTo(x, y - crystalSize/2);
+          ctx.lineTo(x + crystalSize/2, y);
+          ctx.lineTo(x, y + crystalSize/2);
+          ctx.lineTo(x - crystalSize/2, y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          // Draw crystal name
+          ctx.fillStyle = '#e3e7ef';
+          ctx.font = '12px system-ui';
+          ctx.textAlign = 'left';
+          const crystalName = powerup ? powerup.name : effect;
+          ctx.fillText(crystalName, x + crystalSize/2 + 8, y + 4);
+          
+          ctx.restore();
+          
+          inventoryIndex++;
+        }
+      }
+    }
+  }
+
+  // ===== Loop (fixed-timestep with interpolation) =====
+  let last = performance.now();
+  const dtFixed = 1/60;
+  let acc = 0;
+  function frame(now){
+    try {
+      const rawDt = Math.min(0.05, (now - last)*0.001);
+      updatePerformanceLevel(rawDt * 1000); // Convert to milliseconds
+      last = now;
+      if (game && game.state === STATE.RUN){
+        acc += rawDt;
+        while (acc >= dtFixed){
+          try {
+            update(game, dtFixed);
+          } catch (updateError) {
+            console.error('Game update error:', updateError);
+            // Pause game on critical error to prevent infinite errors
+            if (game) game.state = STATE.PAUSE;
+            break;
+          }
+          acc -= dtFixed;
+        }
+        const alpha = acc / dtFixed;
+        try {
+          draw(game, alpha);
+        } catch (drawError) {
+          console.error('Game draw error:', drawError);
+        }
+      }
+
+      // FPS
+      if (game){
+        try {
+          game.fpsSamples.push(1/rawDt);
+          if (game.fpsSamples.length > 20){
+            game.fpsSamples.shift();
+            const avg = game.fpsSamples.reduce((a,b)=>a+b,0)/game.fpsSamples.length;
+            fpsTxt.textContent = 'FPS: ' + Math.round(avg);
+          }
+        } catch (fpsError) {
+          console.error('FPS calculation error:', fpsError);
+        }
+      }
+    } catch (frameError) {
+      console.error('Critical frame error:', frameError);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ===== Pause / Resume =====
+  function togglePause(){
+    if (!game || (game.state!==STATE.RUN && game.state!==STATE.PAUSE)) return;
+    if (game.state === STATE.RUN) {
+      game.state = STATE.PAUSE;
+      banner.style.display = 'block';
+      // Clear banner content safely
+      while (banner.firstChild) {
+        banner.removeChild(banner.firstChild);
+      }
+      
+      // Create pause screen elements
+      const title = document.createElement('h1');
+      title.textContent = 'Paused';
+      
+      const controlsDiv = document.createElement('div');
+      controlsDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      
+      const controlsTitle = document.createElement('div');
+      controlsTitle.style.marginBottom = '8px';
+      const controlsStrong = document.createElement('strong');
+      controlsStrong.textContent = 'Controls';
+      controlsTitle.appendChild(controlsStrong);
+      
+      const controlsText = document.createElement('div');
+      // Create control text with keyboard elements
+      const keys = ['W', 'A', 'S', 'D'];
+      keys.forEach(key => {
+        const kbd = document.createElement('kbd');
+        kbd.textContent = key;
+        controlsText.appendChild(kbd);
+      });
+      controlsText.appendChild(document.createTextNode(' move • mouse aim • '));
+      const mouse1 = document.createElement('kbd');
+      mouse1.textContent = 'Mouse1';
+      controlsText.appendChild(mouse1);
+      controlsText.appendChild(document.createTextNode(' shoot • '));
+      const shift = document.createElement('kbd');
+      shift.textContent = 'Shift';
+      controlsText.appendChild(shift);
+      controlsText.appendChild(document.createTextNode(' dash • '));
+      const space = document.createElement('kbd');
+      space.textContent = 'Space';
+      controlsText.appendChild(space);
+      controlsText.appendChild(document.createTextNode(' leap • '));
+      const p = document.createElement('kbd');
+      p.textContent = 'P';
+      controlsText.appendChild(p);
+      controlsText.appendChild(document.createTextNode(' pause • '));
+      const h = document.createElement('kbd');
+      h.textContent = 'H';
+      controlsText.appendChild(h);
+      controlsText.appendChild(document.createTextNode(' crystal legend • '));
+      const f11 = document.createElement('kbd');
+      f11.textContent = 'F11';
+      controlsText.appendChild(f11);
+      controlsText.appendChild(document.createTextNode(' fullscreen'));
+      
+      const mobileText = document.createElement('div');
+      mobileText.className = 'muted';
+      mobileText.style.marginTop = '6px';
+      mobileText.textContent = 'Mobile: Touch left side to move, right side to aim/shoot';
+      
+      controlsDiv.appendChild(controlsTitle);
+      controlsDiv.appendChild(controlsText);
+      controlsDiv.appendChild(mobileText);
+      
+      // Add upgrades section
+      const upgradesDiv = document.createElement('div');
+      upgradesDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      
+      const upgradesTitle = document.createElement('div');
+      upgradesTitle.style.marginBottom = '8px';
+      const upgradesStrong = document.createElement('strong');
+      upgradesStrong.textContent = 'Active Upgrades';
+      upgradesTitle.appendChild(upgradesStrong);
+      
+      const upgradesList = document.createElement('div');
+      upgradesList.style.cssText = 'max-height: 120px; overflow-y: auto; line-height: 1.4;';
+      
+      const upgrades = createUpgradesDisplay();
+      upgrades.forEach(upgrade => {
+        const upgradeItem = document.createElement('div');
+        upgradeItem.style.cssText = 'margin: 2px 0; color: #5af2c7;';
+        upgradeItem.textContent = '• ' + upgrade;
+        upgradesList.appendChild(upgradeItem);
+      });
+      
+      upgradesDiv.appendChild(upgradesTitle);
+      upgradesDiv.appendChild(upgradesList);
+      
+      const startBtn = document.createElement('button');
+      startBtn.id = 'startBtn';
+      startBtn.textContent = 'Resume';
+      
+      banner.appendChild(title);
+      banner.appendChild(controlsDiv);
+      banner.appendChild(upgradesDiv);
+      banner.appendChild(startBtn);
+      // Re-attach event listener to the new Resume button
+      document.getElementById('startBtn').addEventListener('click', () => { 
+        initAudio(); 
+        if (game && game.state === STATE.PAUSE) {
+          // Resume from pause
+          togglePause();
+        } else {
+          // Start new game
+          start(); 
+        }
+      });
+    } else {
+      banner.style.display = 'none';
+      game.state = STATE.RUN;
+      // Restore original banner content safely
+      while (banner.firstChild) {
+        banner.removeChild(banner.firstChild);
+      }
+      
+      // Create start screen elements
+      const title = document.createElement('h1');
+      title.textContent = 'Crystal Blitz';
+      
+      const controlsDiv = document.createElement('div');
+      controlsDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      
+      const controlsTitle = document.createElement('div');
+      controlsTitle.style.marginBottom = '8px';
+      const controlsStrong = document.createElement('strong');
+      controlsStrong.textContent = 'Controls';
+      controlsTitle.appendChild(controlsStrong);
+      
+      const controlsText = document.createElement('div');
+      // Create control text with keyboard elements
+      const keys = ['W', 'A', 'S', 'D'];
+      keys.forEach(key => {
+        const kbd = document.createElement('kbd');
+        kbd.textContent = key;
+        controlsText.appendChild(kbd);
+      });
+      controlsText.appendChild(document.createTextNode(' move • mouse aim • '));
+      const mouse1 = document.createElement('kbd');
+      mouse1.textContent = 'Mouse1';
+      controlsText.appendChild(mouse1);
+      controlsText.appendChild(document.createTextNode(' shoot • '));
+      const shift = document.createElement('kbd');
+      shift.textContent = 'Shift';
+      controlsText.appendChild(shift);
+      controlsText.appendChild(document.createTextNode(' dash • '));
+      const space = document.createElement('kbd');
+      space.textContent = 'Space';
+      controlsText.appendChild(space);
+      controlsText.appendChild(document.createTextNode(' leap • '));
+      const p = document.createElement('kbd');
+      p.textContent = 'P';
+      controlsText.appendChild(p);
+      controlsText.appendChild(document.createTextNode(' pause • '));
+      const h = document.createElement('kbd');
+      h.textContent = 'H';
+      controlsText.appendChild(h);
+      controlsText.appendChild(document.createTextNode(' crystal legend • '));
+      const f11 = document.createElement('kbd');
+      f11.textContent = 'F11';
+      controlsText.appendChild(f11);
+      controlsText.appendChild(document.createTextNode(' fullscreen'));
+      
+      const mobileText = document.createElement('div');
+      mobileText.className = 'muted';
+      mobileText.style.marginTop = '6px';
+      mobileText.textContent = 'Mobile: Touch left side to move, right side to aim/shoot';
+      
+      controlsDiv.appendChild(controlsTitle);
+      controlsDiv.appendChild(controlsText);
+      controlsDiv.appendChild(mobileText);
+      
+      const startBtn = document.createElement('button');
+      startBtn.id = 'startBtn';
+      startBtn.textContent = 'Start';
+      
+      banner.appendChild(title);
+      banner.appendChild(controlsDiv);
+      banner.appendChild(startBtn);
+      // Re-attach event listener to the new Start button
+      document.getElementById('startBtn').addEventListener('click', () => { 
+        initAudio(); 
+        if (game && game.state === STATE.PAUSE) {
+          // Resume from pause
+          togglePause();
+        } else {
+          // Start new game
+          start(); 
+        }
+      });
+    }
+  }
+
+  // ===== Start / Restart =====
+  function start(){
+    game = newGame();
+    banner.style.display = 'none';
+    gameOverPanel.style.display = 'none';
+    game.state = STATE.RUN;
+    // Center player
+    game.player.x = canvas.width/2;
+    game.player.y = canvas.height/2;
+    // Clear pools
+    for (const it of bullets.items) it.alive = false;
+    for (const it of enemies.items) it.alive = false;
+    for (const it of particles.items) it.alive = false;
+    for (const it of pickups.items) it.alive = false;
+    for (const it of bloodStains.items) it.alive = false;
+    for (const it of enemyBullets.items) it.alive = false;
+    
+    // Start first wave
+    game.waveActive = true;
+    showPowerupNotification(`WAVE 1 START`);
+    
+    // Spawn first wave enemies within 2-4 seconds
+    const spawnDuration = 2000 + Math.random() * 2000; // 2-4 seconds
+    const spawnInterval = spawnDuration / game.waveEnemiesTarget;
+    
+    for (let i = 0; i < game.waveEnemiesTarget; i++) {
+      setTimeout(() => {
+        if (game.waveActive) {
+          spawnEnemy(game);
+          game.waveEnemiesSpawned++;
+        }
+      }, i * spawnInterval);
+    }
+  }
+
+  startBtn.addEventListener('click', () => { 
+    initAudio(); 
+    if (game && game.state === STATE.PAUSE) {
+      // Resume from pause
+      togglePause();
+    } else {
+      // Start new game
+      start(); 
+    }
+  });
+  restartBtn.addEventListener('click', () => { start(); });
+
+  // Start in menu
+  game = newGame();
+
+  // Improve crispness on some displays
+  ctx.imageSmoothingEnabled = false;
+
+  // Visibility pause
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && game && game.state === STATE.RUN){
+      togglePause();
+    }
+  });
+  </script>
+</body>
+</html>
