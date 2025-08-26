@@ -4,6 +4,8 @@
 
 [![Play Now](https://img.shields.io/badge/🎮_PLAY_NOW-Crystal_Blitz-00ff88?style=for-the-badge)](https://zacsluss.github.io/Crystal_Blitz/Crystal_Blitz.html)
 
+[![Download](https://img.shields.io/badge/💾_DOWNLOAD-Game_File-ff6b35?style=for-the-badge)](https://github.com/Zacsluss/Crystal_Blitz/raw/main/Crystal_Blitz.html)
+
 ## 🎯 What is Crystal Blitz?
 
 Crystal Blitz is an intense arena shooter where you face endless waves of intelligent enemies while collecting powerful crystal upgrades. Master the art of movement, aim precision, and tactical crystal management to achieve the highest scores and survive the longest!
