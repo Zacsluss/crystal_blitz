@@ -325,7 +325,7 @@
       <div class="controls-title"><strong>Controls</strong></div>
       <div>
         <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move • mouse aim • <kbd>Mouse1</kbd> shoot • <kbd>Shift</kbd> dash • 
-        <kbd>Space</kbd> leap • <kbd>P</kbd> pause • <kbd>H</kbd> crystal legend • <kbd>F11</kbd> fullscreen
+        <kbd>Space</kbd> leap • <kbd>P</kbd> pause • <kbd>L</kbd> crystal legend • <kbd>F11</kbd> fullscreen
       </div>
       <div class="muted mobile-note">Mobile: Touch left side to move, right side to aim/shoot</div>
     </div>
@@ -512,7 +512,7 @@
   let touchShoot = {x: 0, y: 0, active: false};
   window.addEventListener('keydown', e => {
     if (e.code === 'KeyP'){ togglePause(); return; }
-    if (e.code === 'KeyH'){ 
+    if (e.code === 'KeyL'){ 
       crystalLegend.style.display = crystalLegend.style.display === 'block' ? 'none' : 'block';
       return;
     }
@@ -2931,7 +2931,7 @@
       controlsText.appendChild(p);
       controlsText.appendChild(document.createTextNode(' pause • '));
       const h = document.createElement('kbd');
-      h.textContent = 'H';
+      h.textContent = 'L';
       controlsText.appendChild(h);
       controlsText.appendChild(document.createTextNode(' crystal legend • '));
       const f11 = document.createElement('kbd');
@@ -3035,7 +3035,7 @@
       controlsText.appendChild(p);
       controlsText.appendChild(document.createTextNode(' pause • '));
       const h = document.createElement('kbd');
-      h.textContent = 'H';
+      h.textContent = 'L';
       controlsText.appendChild(h);
       controlsText.appendChild(document.createTextNode(' crystal legend • '));
       const f11 = document.createElement('kbd');

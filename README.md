@@ -7,7 +7,7 @@
 **Survive endless waves • Collect crystal powerups • Master advanced enemy AI**
 
 ## 🎮 Controls
-`WASD` Move • `Mouse` Aim/Shoot • `Shift` Dash • `Space` Leap • `P` Pause • `H` Legend
+`WASD` Move • `Mouse` Aim/Shoot • `Shift` Dash • `Space` Leap • `P` Pause • `L` Crystal Legend
 
 ## 💎 Crystal Arsenal
 **11 unique crystal types** with tactical variety:
