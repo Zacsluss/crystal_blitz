@@ -169,16 +169,58 @@
     #banner button:hover { filter: brightness(1.05); }
     .controls-panel {
       margin: 16px 0;
-      padding: 12px;
-      background: rgba(26, 31, 41, 0.7);
-      border-radius: 8px;
-      font-size: 13px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(26, 31, 41, 0.9), rgba(18, 22, 29, 0.8));
+      border-radius: 10px;
+      border: 1px solid rgba(90, 242, 199, 0.2);
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     .controls-panel .controls-title {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-size: 16px;
+      text-align: center;
+    }
+    .controls-panel .control-row {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .controls-panel .control-row:last-child {
+      border-bottom: none;
+    }
+    .controls-panel .control-keys {
+      display: inline-flex;
+      gap: 4px;
+      min-width: 120px;
+    }
+    .controls-panel .control-desc {
+      color: var(--fg);
+      font-weight: 500;
+    }
+    .controls-panel kbd {
+      background: linear-gradient(135deg, #2a3441, #1f2733);
+      border: 1px solid rgba(90, 242, 199, 0.3);
+      border-bottom: 2px solid rgba(90, 242, 199, 0.4);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     .controls-panel .mobile-note {
-      margin-top: 6px;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      text-align: center;
+      color: var(--muted);
     }
     .stat-value {
       margin-left: 4px;
@@ -330,11 +372,49 @@
   <div id="banner">
     <div class="controls-panel">
       <div class="controls-title"><strong>Controls</strong></div>
-      <div>
-        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move • mouse aim • <kbd>Mouse1</kbd> shoot • <kbd>Shift</kbd> dash • 
-        <kbd>Space</kbd> leap • <kbd>P</kbd> pause • <kbd>L</kbd> crystal legend • <kbd>F11</kbd> fullscreen
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+        </div>
+        <div class="control-desc">Move around the arena</div>
       </div>
-      <div class="muted mobile-note">Mobile: Touch left side to move, right side to aim/shoot</div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>Mouse</kbd>
+        </div>
+        <div class="control-desc">Aim and shoot</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>Shift</kbd>
+        </div>
+        <div class="control-desc">Dash through enemies</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>Space</kbd>
+        </div>
+        <div class="control-desc">Emergency leap</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>P</kbd>
+        </div>
+        <div class="control-desc">Pause game</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>L</kbd>
+        </div>
+        <div class="control-desc">Crystal legend</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys">
+          <kbd>F11</kbd>
+        </div>
+        <div class="control-desc">Toggle fullscreen</div>
+      </div>
+      <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot</div>
     </div>
     <button id="startBtn">Start</button>
   </div>
@@ -2901,59 +2981,44 @@
         banner.removeChild(banner.firstChild);
       }
       
-      // Create pause screen elements
+      // Create pause screen elements with enhanced styling
       
       const controlsDiv = document.createElement('div');
-      controlsDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      controlsDiv.className = 'controls-panel';
       
-      const controlsTitle = document.createElement('div');
-      controlsTitle.style.marginBottom = '8px';
-      const controlsStrong = document.createElement('strong');
-      controlsStrong.textContent = 'Controls';
-      controlsTitle.appendChild(controlsStrong);
-      
-      const controlsText = document.createElement('div');
-      // Create control text with keyboard elements
-      const keys = ['W', 'A', 'S', 'D'];
-      keys.forEach(key => {
-        const kbd = document.createElement('kbd');
-        kbd.textContent = key;
-        controlsText.appendChild(kbd);
-      });
-      controlsText.appendChild(document.createTextNode(' move • mouse aim • '));
-      const mouse1 = document.createElement('kbd');
-      mouse1.textContent = 'Mouse1';
-      controlsText.appendChild(mouse1);
-      controlsText.appendChild(document.createTextNode(' shoot • '));
-      const shift = document.createElement('kbd');
-      shift.textContent = 'Shift';
-      controlsText.appendChild(shift);
-      controlsText.appendChild(document.createTextNode(' dash • '));
-      const space = document.createElement('kbd');
-      space.textContent = 'Space';
-      controlsText.appendChild(space);
-      controlsText.appendChild(document.createTextNode(' leap • '));
-      const p = document.createElement('kbd');
-      p.textContent = 'P';
-      controlsText.appendChild(p);
-      controlsText.appendChild(document.createTextNode(' pause • '));
-      const h = document.createElement('kbd');
-      h.textContent = 'L';
-      controlsText.appendChild(h);
-      controlsText.appendChild(document.createTextNode(' crystal legend • '));
-      const f11 = document.createElement('kbd');
-      f11.textContent = 'F11';
-      controlsText.appendChild(f11);
-      controlsText.appendChild(document.createTextNode(' fullscreen'));
-      
-      const mobileText = document.createElement('div');
-      mobileText.className = 'muted';
-      mobileText.style.marginTop = '6px';
-      mobileText.textContent = 'Mobile: Touch left side to move, right side to aim/shoot';
-      
-      controlsDiv.appendChild(controlsTitle);
-      controlsDiv.appendChild(controlsText);
-      controlsDiv.appendChild(mobileText);
+      // Use the same enhanced controls layout as the main menu
+      controlsDiv.innerHTML = `
+        <div class="controls-title"><strong>Controls</strong></div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+          <div class="control-desc">Move around the arena</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Mouse</kbd></div>
+          <div class="control-desc">Aim and shoot</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Shift</kbd></div>
+          <div class="control-desc">Dash through enemies</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Space</kbd></div>
+          <div class="control-desc">Emergency leap</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>P</kbd></div>
+          <div class="control-desc">Resume game</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>L</kbd></div>
+          <div class="control-desc">Crystal legend</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>F11</kbd></div>
+          <div class="control-desc">Toggle fullscreen</div>
+        </div>
+        <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot</div>
+      `;
       
       // Add upgrades section
       const upgradesDiv = document.createElement('div');
@@ -3005,59 +3070,44 @@
         banner.removeChild(banner.firstChild);
       }
       
-      // Create start screen elements
+      // Create start screen elements with enhanced styling
       
       const controlsDiv = document.createElement('div');
-      controlsDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      controlsDiv.className = 'controls-panel';
       
-      const controlsTitle = document.createElement('div');
-      controlsTitle.style.marginBottom = '8px';
-      const controlsStrong = document.createElement('strong');
-      controlsStrong.textContent = 'Controls';
-      controlsTitle.appendChild(controlsStrong);
-      
-      const controlsText = document.createElement('div');
-      // Create control text with keyboard elements
-      const keys = ['W', 'A', 'S', 'D'];
-      keys.forEach(key => {
-        const kbd = document.createElement('kbd');
-        kbd.textContent = key;
-        controlsText.appendChild(kbd);
-      });
-      controlsText.appendChild(document.createTextNode(' move • mouse aim • '));
-      const mouse1 = document.createElement('kbd');
-      mouse1.textContent = 'Mouse1';
-      controlsText.appendChild(mouse1);
-      controlsText.appendChild(document.createTextNode(' shoot • '));
-      const shift = document.createElement('kbd');
-      shift.textContent = 'Shift';
-      controlsText.appendChild(shift);
-      controlsText.appendChild(document.createTextNode(' dash • '));
-      const space = document.createElement('kbd');
-      space.textContent = 'Space';
-      controlsText.appendChild(space);
-      controlsText.appendChild(document.createTextNode(' leap • '));
-      const p = document.createElement('kbd');
-      p.textContent = 'P';
-      controlsText.appendChild(p);
-      controlsText.appendChild(document.createTextNode(' pause • '));
-      const h = document.createElement('kbd');
-      h.textContent = 'L';
-      controlsText.appendChild(h);
-      controlsText.appendChild(document.createTextNode(' crystal legend • '));
-      const f11 = document.createElement('kbd');
-      f11.textContent = 'F11';
-      controlsText.appendChild(f11);
-      controlsText.appendChild(document.createTextNode(' fullscreen'));
-      
-      const mobileText = document.createElement('div');
-      mobileText.className = 'muted';
-      mobileText.style.marginTop = '6px';
-      mobileText.textContent = 'Mobile: Touch left side to move, right side to aim/shoot';
-      
-      controlsDiv.appendChild(controlsTitle);
-      controlsDiv.appendChild(controlsText);
-      controlsDiv.appendChild(mobileText);
+      // Use the same enhanced controls layout as the main menu
+      controlsDiv.innerHTML = `
+        <div class="controls-title"><strong>Controls</strong></div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+          <div class="control-desc">Move around the arena</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Mouse</kbd></div>
+          <div class="control-desc">Aim and shoot</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Shift</kbd></div>
+          <div class="control-desc">Dash through enemies</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>Space</kbd></div>
+          <div class="control-desc">Emergency leap</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>P</kbd></div>
+          <div class="control-desc">Pause game</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>L</kbd></div>
+          <div class="control-desc">Crystal legend</div>
+        </div>
+        <div class="control-row">
+          <div class="control-keys"><kbd>F11</kbd></div>
+          <div class="control-desc">Toggle fullscreen</div>
+        </div>
+        <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot</div>
+      `;
       
       const startBtn = document.createElement('button');
       startBtn.id = 'startBtn';
