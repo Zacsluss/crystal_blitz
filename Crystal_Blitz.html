@@ -140,7 +140,7 @@
       position: fixed;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.8);
       background: radial-gradient(1200px 700px at 40% 35%, rgba(90,242,199,0.08), transparent),
                   linear-gradient(180deg, var(--panel), var(--panel2));
       padding: 24px 28px;
@@ -149,13 +149,24 @@
       text-align: center;
       max-width: 700px;
       line-height: 1.5;
+      opacity: 0;
+      animation: menuFadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     #banner h1 {
       margin: 0 0 10px 0; 
       font-size: 28px; 
       letter-spacing: 0.3px;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: titleSlideIn 0.6s ease-out 0.3s forwards;
     }
-    #banner .sub { color: var(--muted); margin-bottom: 16px; }
+    #banner .sub { 
+      color: var(--muted); 
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(-15px);
+      animation: subtitleSlideIn 0.5s ease-out 0.5s forwards;
+    }
     #banner button {
       background: var(--accent);
       color: #002e24;
@@ -165,8 +176,19 @@
       font-weight: 600;
       cursor: pointer;
       box-shadow: 0 8px 16px rgba(90,242,199,0.25);
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+      animation: buttonSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards;
+      transition: all 0.3s ease;
     }
-    #banner button:hover { filter: brightness(1.05); }
+    #banner button:hover { 
+      filter: brightness(1.05);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 24px rgba(90,242,199,0.4);
+    }
+    #banner button:active {
+      transform: translateY(0px) scale(0.98);
+    }
     .controls-panel {
       margin: 16px 0;
       padding: 16px;
@@ -175,6 +197,9 @@
       border: 1px solid rgba(90, 242, 199, 0.2);
       font-size: 14px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: controlsSlideIn 0.6s ease-out 0.9s forwards;
     }
     .controls-panel .controls-title {
       margin-bottom: 12px;
@@ -237,6 +262,7 @@
       box-shadow: 0 12px 40px var(--shadow);
       text-align: center;
       line-height: 1.4;
+      opacity: 0;
     }
     #gameOver h2 { margin: 0 0 8px 0; }
     #gameOver button {
@@ -248,6 +274,14 @@
       border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #gameOver button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(90,242,199,0.4);
+    }
+    #gameOver button:active {
+      transform: translateY(0px) scale(0.98);
     }
     #fps {
       position: fixed;
@@ -279,6 +313,45 @@
       z-index: 1000;
       animation: powerupPulse 3s ease-out forwards;
     }
+    #waveAnnouncement {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: linear-gradient(135deg, rgba(18, 22, 29, 0.95), rgba(15, 19, 25, 0.95));
+      border: 3px solid var(--accent);
+      padding: 40px 60px;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 32px rgba(90,242,199,0.3);
+      text-align: center;
+      color: var(--accent);
+      display: none;
+      z-index: 1001;
+      opacity: 0;
+      backdrop-filter: blur(4px);
+    }
+    #waveAnnouncement .wave-number {
+      font-size: 72px;
+      font-weight: 900;
+      text-shadow: 0 0 16px rgba(90,242,199,0.8);
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    #waveAnnouncement .wave-subtitle {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--muted);
+      text-shadow: 0 0 8px rgba(90,242,199,0.4);
+      margin-top: 8px;
+    }
+    #waveAnnouncement.boss-wave {
+      border-color: #ff4444;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 32px rgba(255,68,68,0.4);
+    }
+    #waveAnnouncement.boss-wave .wave-number {
+      color: #ff4444;
+      text-shadow: 0 0 16px rgba(255,68,68,0.8);
+    }
     #powerupDialog {
       position: fixed;
       top: 50%;
@@ -293,6 +366,7 @@
       z-index: 2000;
       max-width: 600px;
       text-align: center;
+      opacity: 0;
     }
     #powerupDialog h2 {
       margin: 0 0 16px 0;
@@ -313,12 +387,26 @@
       padding: 16px 12px;
       cursor: pointer;
       min-width: 160px;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+    }
+    .powerup-option.animate-in {
+      opacity: 1;
+      transform: translateY(0px) scale(1);
     }
     .powerup-option:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 16px rgba(90,242,199,0.3);
-      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(90,242,199,0.4);
+      transform: translateY(-4px) scale(1.05);
+    }
+    .powerup-option:active {
+      transform: translateY(-2px) scale(0.98);
+    }
+    .powerup-option.selected {
+      animation: powerupSelected 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-color: #FFD700;
+      box-shadow: 0 8px 32px rgba(255, 215, 0, 0.6);
     }
     .powerup-option h3 {
       margin: 0 0 8px 0;
@@ -332,11 +420,36 @@
       line-height: 1.3;
     }
     @keyframes powerupPulse {
-      0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
-      10% { opacity: 1; transform: translateX(-50%) scale(1.1); }
-      20% { transform: translateX(-50%) scale(1); }
-      90% { opacity: 1; transform: translateX(-50%) scale(1); }
-      100% { opacity: 0; transform: translateX(-50%) scale(0.9); }
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.5) rotate(-3deg); 
+        filter: blur(6px);
+      }
+      8% { 
+        opacity: 0.9; 
+        transform: translateX(-50%) scale(1.2) rotate(1deg); 
+        filter: blur(1px);
+      }
+      15% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(0.95) rotate(-0.5deg); 
+        filter: blur(0px);
+      }
+      25% { 
+        transform: translateX(-50%) scale(1.05) rotate(0deg); 
+      }
+      35% { 
+        transform: translateX(-50%) scale(1) rotate(0deg); 
+      }
+      90% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(1) rotate(0deg); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.8) rotate(1deg); 
+        filter: blur(3px);
+      }
     }
     canvas { display: block; }
     .edge-warning {
@@ -354,10 +467,364 @@
       0% { opacity: 0.5; }
       100% { opacity: 0.5; }
     }
+    
+    /* Main Menu Animations */
+    @keyframes menuFadeIn {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8) rotate(-1deg); 
+        filter: blur(8px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes titleSlideIn {
+      0% { 
+        opacity: 0; 
+        transform: translateY(-20px); 
+        filter: blur(4px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateY(0px); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes subtitleSlideIn {
+      0% { 
+        opacity: 0; 
+        transform: translateY(-15px); 
+        filter: blur(2px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateY(0px); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes buttonSlideIn {
+      0% { 
+        opacity: 0; 
+        transform: translateY(20px) scale(0.9); 
+        filter: blur(2px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateY(0px) scale(1); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes controlsSlideIn {
+      0% { 
+        opacity: 0; 
+        transform: translateY(30px); 
+        filter: blur(2px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateY(0px); 
+        filter: blur(0px); 
+      }
+    }
+    
+    /* Pause Menu Animations */
+    @keyframes pauseSlideIn {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.9); 
+        filter: blur(6px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes pauseSlideOut {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: blur(0px); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.1); 
+        filter: blur(4px); 
+      }
+    }
+    
+    /* Game Over Animations */
+    @keyframes gameOverDramaticEntry {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5) rotate(-5deg); 
+        filter: blur(10px); 
+      }
+      50% { 
+        opacity: 0.8; 
+        transform: translate(-50%, -50%) scale(1.1) rotate(2deg); 
+        filter: blur(2px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes gameOverSlideOut {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: blur(0px); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8); 
+        filter: blur(6px); 
+      }
+    }
+    
+    /* Game Start Transition */
+    @keyframes gameStartFlash {
+      0% { 
+        background: radial-gradient(circle, rgba(90,242,199,0.3) 0%, transparent 50%);
+        opacity: 1;
+      }
+      50% { 
+        background: radial-gradient(circle, rgba(90,242,199,0.6) 0%, rgba(90,242,199,0.2) 30%, transparent 80%);
+        opacity: 1;
+      }
+      100% { 
+        background: radial-gradient(circle, transparent 0%, transparent 100%);
+        opacity: 0;
+      }
+    }
+    .game-start-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0;
+    }
+    
+    /* Powerup Selection Animations */
+    @keyframes powerupSelected {
+      0% { 
+        transform: translateY(-4px) scale(1.05);
+      }
+      20% { 
+        transform: translateY(-12px) scale(1.15) rotate(2deg);
+        filter: brightness(1.3);
+      }
+      50% { 
+        transform: translateY(-8px) scale(1.2) rotate(-1deg);
+        filter: brightness(1.5);
+      }
+      80% { 
+        transform: translateY(-4px) scale(1.1) rotate(0deg);
+        filter: brightness(1.2);
+      }
+      100% { 
+        transform: translateY(-4px) scale(1.05);
+        filter: brightness(1);
+      }
+    }
+    
+    @keyframes powerupDialogEntry {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8); 
+        filter: blur(6px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes powerupDialogExit {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: blur(0px); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.1); 
+        filter: blur(4px); 
+      }
+    }
+    
+    /* Wave Card Animations */
+    @keyframes waveCardEntry {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+        filter: blur(8px);
+      }
+      10% { 
+        opacity: 0.7; 
+        transform: translate(-50%, -50%) scale(1.3) rotate(3deg);
+        filter: blur(2px);
+      }
+      25% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(0.9) rotate(-1deg);
+        filter: blur(0px);
+      }
+      40% { 
+        transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+      }
+      60% { 
+        transform: translate(-50%, -50%) scale(0.95) rotate(0deg);
+      }
+      100% { 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+    }
+    
+    @keyframes waveCardExit {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.2);
+        filter: blur(4px);
+      }
+    }
+    
+    /* Enhanced Wave Announcements */
+    @keyframes waveDramaticEntry {
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.3) rotateY(90deg); 
+        filter: blur(10px);
+      }
+      30% { 
+        opacity: 0.8; 
+        transform: translateX(-50%) scale(1.3) rotateY(-10deg); 
+        filter: blur(2px);
+      }
+      60% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(0.9) rotateY(5deg); 
+        filter: blur(0px);
+      }
+      80% { 
+        transform: translateX(-50%) scale(1.1) rotateY(-2deg); 
+      }
+      90% { 
+        transform: translateX(-50%) scale(1) rotateY(0deg); 
+      }
+      95% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(1) rotateY(0deg); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.7) rotateY(-5deg); 
+        filter: blur(4px);
+      }
+    }
+    
+    @keyframes bossWaveEntry {
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.2); 
+        filter: blur(15px) hue-rotate(0deg);
+        background: linear-gradient(180deg, rgba(255, 0, 0, 0.9), rgba(139, 0, 0, 0.8));
+      }
+      15% { 
+        opacity: 0.9; 
+        transform: translateX(-50%) scale(1.5); 
+        filter: blur(3px) hue-rotate(180deg);
+      }
+      30% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(0.8); 
+        filter: blur(0px) hue-rotate(360deg);
+      }
+      50% { 
+        transform: translateX(-50%) scale(1.2); 
+      }
+      70% { 
+        transform: translateX(-50%) scale(1); 
+      }
+      90% { 
+        opacity: 1; 
+        transform: translateX(-50%) scale(1); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translateX(-50%) scale(0.5); 
+        filter: blur(8px);
+      }
+    }
+
+    /* Flashy Game Title Animations */
+    .game-title {
+      font-size: 48px !important;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(255, 107, 107, 0.5), 0 0 60px rgba(78, 205, 196, 0.3);
+      animation: rainbowShift 3s ease-in-out infinite, titlePulse 2s ease-in-out infinite alternate;
+      letter-spacing: 2px;
+      margin-bottom: 8px !important;
+    }
+
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes titlePulse {
+      0% { 
+        transform: translateY(-20px) scale(1);
+        filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.6));
+      }
+      100% { 
+        transform: translateY(-20px) scale(1.05);
+        filter: drop-shadow(0 0 40px rgba(78, 205, 196, 0.8));
+      }
+    }
+
+    .game-subtitle {
+      font-size: 16px;
+      color: #5af2c7;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(90, 242, 199, 0.5);
+      animation: subtitleGlow 2.5s ease-in-out infinite alternate;
+      letter-spacing: 1px;
+    }
+
+    @keyframes subtitleGlow {
+      0% { 
+        opacity: 0.8;
+        text-shadow: 0 0 10px rgba(90, 242, 199, 0.5);
+      }
+      100% { 
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(90, 242, 199, 0.8), 0 0 30px rgba(90, 242, 199, 0.4);
+      }
+    }
   </style>
 </head>
 <body>
   <canvas id="c"></canvas>
+  <div class="game-start-overlay" id="gameStartOverlay"></div>
   <div id="hud">
     <div class="row">Health
       <span class="bar health"><i id="healthBar" style="width:100%"></i></span>
@@ -370,6 +837,8 @@
     <div class="row">Wave <span id="wave" class="stat-value">1</span> • Kills <span id="kills" class="stat-value">0</span></div>
   </div>
   <div id="banner">
+    <h1 class="game-title">⚡ CRYSTAL BLITZ ⚡</h1>
+    <div class="game-subtitle">🌊 SURVIVE THE ENDLESS WAVES 🌊</div>
     <div class="controls-panel">
       <div class="controls-title"><strong>Controls</strong></div>
       <div class="control-row">
@@ -425,6 +894,10 @@
   </div>
   <div id="fps">FPS: —</div>
   <div id="powerupNotification"></div>
+  <div id="waveAnnouncement">
+    <div class="wave-number"></div>
+    <div class="wave-subtitle"></div>
+  </div>
   <div class="edge-warning top" id="edgeTop" style="display:none"></div>
   <div class="edge-warning bottom" id="edgeBottom" style="display:none"></div>
   <div class="edge-warning left" id="edgeLeft" style="display:none"></div>
@@ -542,8 +1015,10 @@
   const gameOverPanel = getElement('gameOver');
   const goWave = getElement('goWave');
   const goKills = getElement('goKills');
+  const gameStartOverlay = getElement('gameStartOverlay');
   const restartBtn = getElement('restartBtn');
   const powerupNotification = getElement('powerupNotification');
+  const waveAnnouncement = getElement('waveAnnouncement');
   const powerupDialog = getElement('powerupDialog');
   const crystalLegend = getElement('crystalLegend');
 
@@ -804,6 +1279,7 @@
     goWave.textContent = g.wave.toString();
     goKills.textContent = g.kills.toString();
     gameOverPanel.style.display = 'block';
+    gameOverPanel.style.animation = 'gameOverDramaticEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
   }
   
   // Generate upgrades display for pause menu
@@ -934,22 +1410,89 @@
     powerupNotification.textContent = powerupName.toUpperCase();
     powerupNotification.style.display = 'block';
     powerupNotification.style.animation = 'none';
+    
+    // Choose animation based on content type
+    let animationName = 'powerupPulse';
+    let duration = 3000;
+    
+    if (powerupName.includes('BOSS')) {
+      animationName = 'bossWaveEntry';
+      duration = 4000;
+    } else if (powerupName.includes('WAVE')) {
+      animationName = 'waveDramaticEntry';
+      duration = 3500;
+    }
+    
     // Force reflow to restart animation
     powerupNotification.offsetHeight;
-    powerupNotification.style.animation = 'powerupPulse 3s ease-out forwards';
+    powerupNotification.style.animation = `${animationName} ${duration/1000}s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`;
     
     // Hide after animation completes
     setTimeout(() => {
       powerupNotification.style.display = 'none';
-    }, 3000);
+    }, duration);
+  }
+
+  // ===== Wave Announcement =====
+  let waveAnnouncementTimeouts = [];
+  
+  function showWaveAnnouncement(waveNumber, isBossWave = false) {
+    console.log(`showWaveAnnouncement called: Wave ${waveNumber}, Boss: ${isBossWave}, Existing timeouts: ${waveAnnouncementTimeouts.length}`);
+    // Clear any existing timeouts to prevent overlapping animations
+    waveAnnouncementTimeouts.forEach(timeout => clearTimeout(timeout));
+    waveAnnouncementTimeouts = [];
+    
+    const waveNumberEl = waveAnnouncement.querySelector('.wave-number');
+    const subtitleEl = waveAnnouncement.querySelector('.wave-subtitle');
+    
+    waveNumberEl.textContent = `WAVE ${waveNumber}`;
+    subtitleEl.textContent = isBossWave ? 'SUPER BOSS INCOMING!' : 'GET READY';
+    
+    // Apply boss wave styling
+    if (isBossWave) {
+      waveAnnouncement.classList.add('boss-wave');
+    } else {
+      waveAnnouncement.classList.remove('boss-wave');
+    }
+    
+    // Reset any existing animation and show with dramatic entry animation
+    waveAnnouncement.style.animation = 'none';
+    waveAnnouncement.style.display = 'block';
+    // Force reflow before applying new animation
+    waveAnnouncement.offsetHeight;
+    waveAnnouncement.style.animation = 'waveCardEntry 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+    
+    // Hide after showing
+    const hideTimeout = setTimeout(() => {
+      waveAnnouncement.style.animation = 'waveCardExit 0.4s ease-out forwards';
+      const removeTimeout = setTimeout(() => {
+        waveAnnouncement.style.display = 'none';
+      }, 400);
+      waveAnnouncementTimeouts.push(removeTimeout);
+    }, 2500);
+    waveAnnouncementTimeouts.push(hideTimeout);
   }
 
   // ===== Powerup Selection =====
   function showPowerupDialog() {
-    // Pause game
+    // Pause game for powerup selection (different from manual pause)
     if (game && game.state === STATE.RUN) {
-      game.state = STATE.PAUSE;
+      game.state = STATE.POWERUP;
     }
+    
+    // Immediately hide all potential overlapping UI elements to prevent flash
+    waveAnnouncementTimeouts.forEach(timeout => clearTimeout(timeout));
+    waveAnnouncementTimeouts = [];
+    waveAnnouncement.style.animation = 'none';
+    waveAnnouncement.style.display = 'none';
+    
+    // Also ensure game start overlay is hidden
+    gameStartOverlay.style.animation = 'none';
+    gameStartOverlay.style.opacity = '0';
+    
+    // Hide powerup notification if it's showing
+    powerupNotification.style.animation = 'none';
+    powerupNotification.style.display = 'none';
     
     // Filter out maxed upgrades
     const p = game.player;
@@ -990,12 +1533,29 @@
       powerupDescs[i].textContent = powerup?.desc || 'No more powerups';
     });
     
-    powerupDialog.style.display = 'block';
+    // Small delay to ensure all other UI is hidden before showing dialog
+    setTimeout(() => {
+      powerupDialog.style.display = 'block';
+      powerupDialog.style.animation = 'powerupDialogEntry 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+      
+      // Animate in powerup options with staggered delays
+      const powerupOptions = powerupDialog.querySelectorAll('.powerup-option');
+      powerupOptions.forEach((option, index) => {
+        option.classList.remove('animate-in');
+        setTimeout(() => {
+          option.classList.add('animate-in');
+        }, 200 + index * 100);
+      });
+    }, 50); // 50ms delay to ensure UI cleanup
     
     // Add click handlers
     const handleChoice = (choice) => {
       const powerup = selected[choice];
       if (powerup) {
+        // Add selection animation to clicked option
+        const selectedOption = powerupOptions[choice];
+        selectedOption.classList.add('selected');
+        
         // Apply powerup (stackable)
         powerup.apply(game.player);
         
@@ -1003,13 +1563,20 @@
         const currentCount = game.player.upgradeCounts.get(powerup.id) || 0;
         game.player.upgradeCounts.set(powerup.id, currentCount + 1);
         
-        showPowerupNotification(powerup.name);
-      }
-      
-      // Hide dialog and resume game
-      powerupDialog.style.display = 'none';
-      if (game && game.state === STATE.PAUSE) {
-        game.state = STATE.RUN;
+        // Delay dialog close to show selection animation
+        setTimeout(() => {
+          // Hide dialog with animation and resume game
+          powerupDialog.style.animation = 'powerupDialogExit 0.3s ease-out forwards';
+          setTimeout(() => {
+            powerupDialog.style.display = 'none';
+            selectedOption.classList.remove('selected');
+            if (game && game.state === STATE.POWERUP) {
+              game.state = STATE.RUN;
+            }
+            // Show notification after dialog is fully closed
+            showPowerupNotification(powerup.name);
+          }, 300);
+        }, 200);
       }
     };
     
@@ -1022,7 +1589,7 @@
   // ===== Random Seeded? (not needed here) =====
 
   // ===== Game State =====
-  const STATE = { MENU:0, RUN:1, PAUSE:2, OVER:3 };
+  const STATE = { MENU:0, RUN:1, PAUSE:2, OVER:3, POWERUP:4 };
   let game = null;
   function newGame(){
     return {
@@ -1177,6 +1744,12 @@
     alive:false, x:0, y:0, vx:0, vy:0, r:3, life:0, maxLife:3.0
   }));
 
+  const mines = makePool(() => ({
+    alive:false, x:0, y:0, r:8, fuseTime:0, maxFuseTime:30.0, isArmed:false,
+    triggerRadius:35, explosionRadius:70, explosionDamage:20, flashTimer:0, 
+    isTriggered:false, owner:null
+  }));
+
   // Bullet powerup types
   const bulletPowerups = [
     {type: 'upgrade', color: '#00BFFF', shots: 50, name: 'Dual Shot'},
@@ -1212,14 +1785,14 @@
 
   // Behavior pools - unlock new behaviors every 2 waves (earlier unlocks for fun)
   const behaviorPools = [
-    // Waves 1-2: Basic behaviors
-    ['normal', 'zigzag', 'zerglingRush'],
+    // Waves 1-2: Basic behaviors with suicide crawlers
+    ['normal', 'zigzag', 'zerglingRush', 'suicide'],
     // Waves 3-4: Add flanking and charging early
-    ['normal', 'zigzag', 'flank', 'charge', 'zerglingRush'],
+    ['normal', 'zigzag', 'flank', 'charge', 'zerglingRush', 'suicide', 'slowpush', 'splitter', 'minelayer'],
     // Waves 5-6: Add erratic behavior earlier
-    ['normal', 'zigzag', 'flank', 'charge', 'erratic', 'zerglingRush'],
+    ['normal', 'zigzag', 'flank', 'charge', 'erratic', 'zerglingRush', 'suicide', 'slowpush', 'spiralshooter', 'splitter', 'minelayer'],
     // Waves 7+: All behaviors (no more zerglings)
-    ['normal', 'zigzag', 'flank', 'charge', 'erratic']
+    ['normal', 'zigzag', 'flank', 'charge', 'erratic', 'suicide', 'slowpush', 'spiralshooter', 'splitter', 'minelayer']
   ];
 
   function spawnEnemy(g){
@@ -1291,13 +1864,73 @@
         if (type.speed <= 90 && Math.random() < 0.20) {
           e.isShooter = true;
           e.shootTimer = Math.random() * 2.0; // Random initial delay
-          e.color = '#aa4400'; e.originalColor = '#aa4400'; // Darker color for shooters
+          
+          // Determine shooter pattern based on wave and chance
+          const rand = Math.random();
+          if (g.wave >= 3 && rand < 0.3) {
+            e.shootPattern = 'spread';
+            e.color = '#bb3300'; e.originalColor = '#bb3300'; // Red-orange for spread
+          } else if (g.wave >= 5 && rand < 0.6) {
+            e.shootPattern = 'burst';
+            e.burstCount = 0; // Track bursts in sequence
+            e.color = '#990000'; e.originalColor = '#990000'; // Dark red for burst
+          } else {
+            e.shootPattern = 'single';
+            e.color = '#aa4400'; e.originalColor = '#aa4400'; // Brown for single
+          }
         }
         
         // Select behavior from available pool based on current wave
         const poolIndex = Math.min(Math.floor((g.wave - 1) / 2), behaviorPools.length - 1);
         const availableBehaviors = behaviorPools[poolIndex];
         e.behavior = availableBehaviors[(Math.random() * availableBehaviors.length) | 0];
+      }
+      
+      // Set special colors and stats for specific behaviors
+      if (e.behavior === 'suicide') {
+        e.color = '#8844ff'; // Purple for suicide crawlers
+        e.originalColor = '#8844ff';
+        // Speed cap for suicide crawlers to prevent crazy speeds
+        e.speed = Math.min(e.speed, 180 + g.wave * 10); // Wave 6 = 240 max
+      } else if (e.behavior === 'slowpush') {
+        // Make them extra tanky and slow
+        e.hp = Math.ceil(e.hp * 1.8); // 80% more HP
+        e.speed *= 0.7; // 30% slower
+        e.touchDmg = Math.ceil(e.touchDmg * 1.3); // 30% more damage
+        e.color = '#666666'; // Dark gray for tanks
+        e.originalColor = '#666666';
+        e.knockbackStrength = 250; // Knockback force
+        
+        // Shield system
+        const baseShieldHP = 15;
+        const diff = 1 + g.wave * 0.12; // Same scaling as enemy HP
+        e.shieldHP = Math.ceil(baseShieldHP * diff);
+        e.maxShieldHP = e.shieldHP;
+        e.hasShield = true;
+        
+        // Shield direction tracking (90% speed for counterplay)
+        e.shieldDirection = { x: 1, y: 0 }; // Initial direction
+      } else if (e.behavior === 'spiralshooter') {
+        // Make them distinctive and slower
+        e.speed *= 0.8; // 20% slower for spiral shooters
+        e.color = '#ff8800'; // Bright orange for spiral shooters
+        e.originalColor = '#ff8800';
+      } else if (e.behavior === 'charge') {
+        // Speed cap for dash zombies to prevent crazy dash speeds
+        e.speed = Math.min(e.speed, 150 + g.wave * 8); // Wave 5 = 190 max
+        e.color = '#ffcc00'; // Yellow for charge enemies
+        e.originalColor = '#ffcc00';
+      } else if (e.behavior === 'splitter') {
+        // Make them slightly tankier and distinctive
+        e.hp = Math.ceil(e.hp * 1.3); // 30% more HP
+        e.r = Math.ceil(e.r * 1.1); // 10% bigger
+        e.color = '#cc44cc'; // Purple-magenta for splitters
+        e.originalColor = '#cc44cc';
+      } else if (e.behavior === 'minelayer') {
+        // Make them slower and distinctive
+        e.speed *= 0.8; // 20% slower (plus 30% in behavior = 44% total reduction)
+        e.color = '#996633'; // Brown for mine layers
+        e.originalColor = '#996633';
       }
       
       e.alive = true;
@@ -1318,8 +1951,81 @@
       // Large blood burst on death
       spawnBlood(enemy.x, enemy.y, 0, 0, 'death');
       
+      // Suicide crawler explosion - bigger and more dramatic
+      if (enemy.behavior === 'suicide') {
+        // Extra explosion sound
+        beep(80, 0.2, 'sawtooth', 0.15); // Deep explosion boom
+        
+        // Large explosion particles
+        const explosionParticles = 25;
+        for (let i = 0; i < explosionParticles; i++) {
+          particles.spawn(p => {
+            const angle = (i / explosionParticles) * TAU + Math.random() * 0.4;
+            const speed = randRange(200, 450); // Faster particles
+            p.x = enemy.x; p.y = enemy.y;
+            p.vx = fastCos(angle) * speed;
+            p.vy = fastSin(angle) * speed;
+            p.life = 0; p.maxLife = randRange(0.6, 1.2); // Longer lasting
+            p.size = randRange(4, 9); // Bigger particles
+            p.color = '#ff4400'; // Orange explosion color
+            p.hasGravity = false;
+            p.alive = true;
+          });
+        }
+        
+        // Damage player if close enough (explosion radius)
+        const explosionRadius = 45;
+        const distToPlayer = fastLength(enemy.x - game.player.x, enemy.y - game.player.y);
+        if (distToPlayer <= explosionRadius) {
+          game.player.hp -= 15; // Explosion damage
+          beep(500, 0.1, 'square', 0.1); // Player hurt sound
+          
+          // Add screen shake effect (if available)
+          if (game.screenShake !== undefined) {
+            game.screenShake = Math.max(game.screenShake || 0, 0.3);
+          }
+        }
+      }
+      
+      // Splitter zombie - spawns 2-3 smaller enemies on death
+      if (enemy.behavior === 'splitter') {
+        const childCount = 2 + Math.floor(Math.random() * 2); // 2-3 children
+        const spreadAngle = TAU; // Full circle spread
+        
+        for (let i = 0; i < childCount; i++) {
+          const angle = (i / childCount) * spreadAngle + Math.random() * 0.5; // Even spread with variance
+          const distance = randRange(20, 40); // Spawn distance from parent
+          
+          // Spawn child enemy using existing spawn system
+          enemies.spawn(child => {
+            child.x = enemy.x + fastCos(angle) * distance;
+            child.y = enemy.y + fastSin(angle) * distance;
+            child.vx = fastCos(angle) * randRange(50, 100); // Initial velocity away from parent
+            child.vy = fastSin(angle) * randRange(50, 100);
+            
+            // Child stats - smaller and weaker than parent
+            child.r = Math.max(6, enemy.r * 0.6); // 60% size, minimum 6 radius
+            child.hp = Math.max(1, Math.floor(enemy.hp * 0.4)); // 40% HP, minimum 1
+            child.speed = enemy.speed * 1.2; // 20% faster
+            child.touchDmg = Math.max(1, Math.floor(enemy.touchDmg * 0.7)); // 70% damage
+            child.color = '#ff66ff'; // Pink for child splitters
+            child.originalColor = '#ff66ff';
+            child.behavior = 'normal'; // Children use normal behavior
+            child.deathTimer = 0;
+            child.dying = false;
+            child.alive = true;
+            
+            // Clamp to screen bounds
+            child.x = clamp(child.x, child.r, game.width() - child.r);
+            child.y = clamp(child.y, child.r, game.height() - child.r);
+          });
+        }
+        
+        beep(250, 0.08, 'sawtooth', 0.10); // Splitting sound
+      }
+      
       // Enemy pop/burst effect - satisfying explosion
-      const popParticles = 15;
+      const popParticles = enemy.behavior === 'suicide' ? 20 : 15; // More particles for suicide
       for (let i = 0; i < popParticles; i++) {
         particles.spawn(p => {
           const angle = (i / popParticles) * TAU + Math.random() * 0.3; // Even spread with variance
@@ -1415,9 +2121,9 @@
           }
           waveSound();
           if (game.wave % 10 === 0) {
-            showPowerupNotification(`WAVE ${game.wave} - SUPER BOSS INCOMING!`);
+            showWaveAnnouncement(game.wave, true);
           } else {
-            showPowerupNotification(`WAVE ${game.wave} INCOMING`);
+            showWaveAnnouncement(game.wave, false);
           }
           game.waveActive = true;
           
@@ -1433,7 +2139,7 @@
               }
             }, i * spawnInterval);
           }
-        }, 1500); // 1.5 second breathing room between waves
+        }, 3000); // 3 second breathing room between waves (allows previous wave card to fully disappear)
       }
       
       // Powerup selection - accelerating progression: 10, 25, 50, 100, then formula-based
@@ -1541,10 +2247,10 @@
   }
 
 
-  function spawnEnemyBullet(x, y, targetX, targetY) {
-    const dirVec = normInPlace(targetX - x, targetY - y, vecPool.temp1);
-    const dx = dirVec.x, dy = dirVec.y;
-    const speed = Math.min(350, 200 + game.wave); // 200 base + 1 per wave, capped at 350
+  function spawnEnemyBullet(x, y, targetX, targetY, angleOffset = 0, speedMult = 1.0) {
+    const baseAngle = Math.atan2(targetY - y, targetX - x) + angleOffset;
+    const dx = fastCos(baseAngle), dy = fastSin(baseAngle);
+    const speed = Math.min(350, 200 + game.wave) * speedMult; // 200 base + 1 per wave, capped at 350
     
     enemyBullets.spawn(b => {
       b.x = x;
@@ -1556,6 +2262,22 @@
       b.maxLife = 3.0;
       b.alive = true;
     });
+  }
+
+  // Enhanced shooter patterns
+  function spawnEnemyBurstFire(x, y, targetX, targetY, burstCount = 3) {
+    for (let i = 0; i < burstCount; i++) {
+      spawnEnemyBullet(x, y, targetX, targetY);
+    }
+  }
+
+  function spawnEnemySpreadShot(x, y, targetX, targetY, bulletCount = 3, spreadAngle = Math.PI/4) {
+    const halfSpread = spreadAngle / 2;
+    for (let i = 0; i < bulletCount; i++) {
+      const angleOffset = bulletCount === 1 ? 0 : 
+        -halfSpread + (i / (bulletCount - 1)) * spreadAngle;
+      spawnEnemyBullet(x, y, targetX, targetY, angleOffset);
+    }
   }
 
   function spawnBulletPickup(x, y){
@@ -1941,17 +2663,52 @@
         e.vx += dx * e.speed * dt * 0.3 * freezeMultiplier;
         e.vy += dy * e.speed * dt * 0.3 * freezeMultiplier;
       } else if (e.behavior === 'charge') {
-        // Periodic charging behavior with cadence
-        if (!e.chargeTimer) e.chargeTimer = Math.random() * 2 + 1;
-        e.chargeTimer -= dt;
-        if (e.chargeTimer <= 0) {
-          e.vx += dx * e.speed * 5 * dt; // Strong charge (no cadence during charge)
-          e.vy += dy * e.speed * 5 * dt;
-          e.chargeTimer = 2 + Math.random() * 3;
-        } else {
-          // Normal movement between charges with cadence
-          e.vx += dx * e.speed * 1.2 * dt * walkRhythm;
-          e.vy += dy * e.speed * 1.2 * dt * walkRhythm;
+        // Enhanced dash zombie with telegraph system
+        if (!e.dashState) e.dashState = 'prowling';
+        if (!e.dashTimer) e.dashTimer = 2 + Math.random() * 3;
+        
+        e.dashTimer -= dt;
+        
+        if (e.dashState === 'prowling') {
+          // Prowl around player between dashes
+          e.vx += dx * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
+          e.vy += dy * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
+          
+          if (e.dashTimer <= 0) {
+            // Start telegraph phase
+            e.dashState = 'telegraph';
+            e.dashTimer = 1.0; // 1 second telegraph
+            e.originalColor = e.color;
+            e.dashDirection = { x: dx, y: dy }; // Lock dash direction
+            beep(400, 0.1, 'triangle', 0.08); // Telegraph warning sound
+          }
+        } else if (e.dashState === 'telegraph') {
+          // Flash bright white during telegraph and slow down
+          e.color = Math.sin(g.t * 12) > 0 ? '#ffffff' : e.originalColor;
+          
+          // Move very slowly during telegraph
+          e.vx += dx * e.speed * dt * 0.2 * freezeMultiplier;
+          e.vy += dy * e.speed * dt * 0.2 * freezeMultiplier;
+          
+          if (e.dashTimer <= 0) {
+            // Start dash
+            e.dashState = 'dashing';
+            e.dashTimer = 0.4; // Short dash duration
+            e.color = '#ffff00'; // Bright yellow while dashing
+            beep(600, 0.05, 'sawtooth', 0.12); // Dash sound
+          }
+        } else if (e.dashState === 'dashing') {
+          // Fast linear dash in locked direction
+          const dashSpeed = e.speed * 3; // Reduced from 6x to 3x speed
+          e.vx += e.dashDirection.x * dashSpeed * dt * 8;
+          e.vy += e.dashDirection.y * dashSpeed * dt * 8;
+          
+          if (e.dashTimer <= 0) {
+            // Return to prowling
+            e.dashState = 'prowling';
+            e.dashTimer = 3 + Math.random() * 2; // 3-5 second cooldown
+            e.color = e.originalColor; // Restore original color
+          }
         }
       } else if (e.behavior === 'erratic') {
         // Chaotic movement with some player attraction and subtle cadence
@@ -2036,15 +2793,203 @@
           e.vx += dx * e.speed * dt * 0.8 * walkRhythm;
           e.vy += dy * e.speed * dt * 0.8 * walkRhythm;
         }
+      } else if (e.behavior === 'suicide') {
+        // Suicide crawler - orbits player then charges periodically
+        if (!e.chargeState) e.chargeState = 'orbiting';
+        if (!e.chargeTimer) e.chargeTimer = 10 + Math.random() * 10; // 10-20 second orbit time
+        if (!e.orbitAngle) e.orbitAngle = Math.random() * TAU; // Random starting orbit position
+        if (!e.baseColor) e.baseColor = '#8844ff'; // Purple base color
+        
+        e.chargeTimer -= dt;
+        
+        if (e.chargeState === 'orbiting') {
+          // Orbit around player at medium distance
+          const orbitRadius = 120;
+          const orbitSpeed = 1.2; // Orbit speed
+          e.orbitAngle += dt * orbitSpeed;
+          
+          const targetX = p.x + fastCos(e.orbitAngle) * orbitRadius;
+          const targetY = p.y + fastSin(e.orbitAngle) * orbitRadius;
+          
+          const orbitDx = targetX - e.x;
+          const orbitDy = targetY - e.y;
+          const orbitVec = normInPlace(orbitDx, orbitDy, vecPool.temp3);
+          
+          // Move toward orbit position with some attraction to player
+          e.vx += orbitVec.x * e.speed * dt * 1.5;
+          e.vy += orbitVec.y * e.speed * dt * 1.5;
+          e.vx += dx * e.speed * dt * 0.2; // Slight player attraction
+          e.vy += dy * e.speed * dt * 0.2;
+          
+          e.color = e.baseColor; // Purple while orbiting
+          
+          if (e.chargeTimer <= 0) {
+            // Start telegraph phase
+            e.chargeState = 'telegraph';
+            e.chargeTimer = 1.0; // Telegraph for 1 second
+          }
+        } else if (e.chargeState === 'telegraph') {
+          // Flash bright red during telegraph
+          e.color = Math.sin(g.t * 15) > 0 ? '#ff0000' : e.baseColor;
+          
+          // Slow down during telegraph
+          e.vx += dx * e.speed * dt * 0.2;
+          e.vy += dy * e.speed * dt * 0.2;
+          
+          if (e.chargeTimer <= 0) {
+            // Start charging
+            e.chargeState = 'charging';
+            e.chargeTimer = 4.0; // Longer charge duration
+            e.color = '#ff0000'; // Stay red while charging
+            beep(350, 0.12, 'sawtooth', 0.10); // Charge sound
+          }
+        } else if (e.chargeState === 'charging') {
+          // Seeking charge - gentler curve toward player like seeking bullets
+          const seekVec = normInPlace(p.x - e.x, p.y - e.y, vecPool.temp2);
+          const sx = seekVec.x, sy = seekVec.y;
+          
+          // Use seeking bullet approach - blend current direction with target direction
+          const currentSpeed = fastLength(e.vx, e.vy) || e.speed * 2; // 2x base speed
+          const currentVec = currentSpeed > 0 ? normInPlace(e.vx, e.vy, vecPool.temp3) : { x: sx, y: sy };
+          const seekingStrength = 0.15; // Gentler than bullet seeking (0.2)
+          
+          // Gradually curve toward player
+          const newDx = currentVec.x + sx * seekingStrength;
+          const newDy = currentVec.y + sy * seekingStrength;
+          const finalVec = normInPlace(newDx, newDy, vecPool.temp1);
+          
+          // Apply final velocity at 2x speed
+          const targetSpeed = e.speed * 2; // Actual 2x speed
+          e.vx = finalVec.x * targetSpeed;
+          e.vy = finalVec.y * targetSpeed;
+          
+          // Check if hit screen boundaries
+          const gameWidth = g.width();
+          const gameHeight = g.height();
+          const hitBoundary = (e.x <= e.r || e.x >= gameWidth - e.r || 
+                              e.y <= e.r || e.y >= gameHeight - e.r);
+          
+          if (e.chargeTimer <= 0 || hitBoundary) {
+            // Reset to orbiting instead of exploding
+            e.chargeState = 'orbiting';
+            e.chargeTimer = 8 + Math.random() * 8; // 8-16 second orbit before next charge
+            e.color = e.baseColor; // Back to purple
+            e.orbitAngle = Math.atan2(e.y - p.y, e.x - p.x); // Start orbit from current position
+          }
+        }
+      } else if (e.behavior === 'slowpush') {
+        // Slow push - deliberate tanky movement toward player
+        const pushStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.4); // Heavy, slow rhythm
+        e.vx += dx * e.speed * dt * 0.8 * pushStep * freezeMultiplier; // Slow but persistent
+        e.vy += dy * e.speed * dt * 0.8 * pushStep * freezeMultiplier;
+        
+        // Update shield direction at 90% of rotation speed for counterplay
+        if (e.hasShield && e.shieldDirection) {
+          const shieldRotationSpeed = 0.9; // 90% speed
+          const targetDir = { x: dx, y: dy };
+          
+          // Smoothly interpolate shield direction toward player direction
+          e.shieldDirection.x = e.shieldDirection.x * (1 - shieldRotationSpeed * dt) + targetDir.x * shieldRotationSpeed * dt;
+          e.shieldDirection.y = e.shieldDirection.y * (1 - shieldRotationSpeed * dt) + targetDir.y * shieldRotationSpeed * dt;
+          
+          // Normalize shield direction
+          const len = Math.sqrt(e.shieldDirection.x * e.shieldDirection.x + e.shieldDirection.y * e.shieldDirection.y);
+          if (len > 0) {
+            e.shieldDirection.x /= len;
+            e.shieldDirection.y /= len;
+          }
+        }
+      } else if (e.behavior === 'spiralshooter') {
+        // Spiral shooter - slow movement, rotates aim and shoots in patterns
+        e.vx += dx * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier; // Slow movement
+        e.vy += dy * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier;
+        
+        // Initialize spiral shooting properties
+        if (!e.spiralAngle) e.spiralAngle = 0;
+        if (!e.spiralShootTimer) e.spiralShootTimer = Math.random() * 2;
+        
+        // Rotate spiral angle continuously
+        const rotationSpeed = 3.0; // radians per second
+        e.spiralAngle += rotationSpeed * dt;
+        
+        // Shoot periodically in spiral pattern
+        e.spiralShootTimer -= dt;
+        if (e.spiralShootTimer <= 0) {
+          spawnEnemyBullet(e.x, e.y, 
+            e.x + fastCos(e.spiralAngle) * 100, 
+            e.y + fastSin(e.spiralAngle) * 100);
+          e.spiralShootTimer = 0.6; // Half frequency (was 0.3)
+          beep(320, 0.04, 'triangle', 0.04); // High-pitched spiral sound
+        }
+      } else if (e.behavior === 'splitter') {
+        // Splitter zombie - normal movement with slight erratic behavior
+        const splitStep = 0.8 + 0.3 * Math.sin(e.cadence * 1.5); // Slightly erratic rhythm
+        e.vx += dx * e.speed * dt * 1.0 * splitStep * freezeMultiplier;
+        e.vy += dy * e.speed * dt * 1.0 * splitStep * freezeMultiplier;
+        // Add slight random movement for unpredictability
+        e.vx += (Math.random() - 0.5) * 50 * dt;
+        e.vy += (Math.random() - 0.5) * 50 * dt;
+      } else if (e.behavior === 'minelayer') {
+        // Mine layer - slow movement, drops mines periodically
+        e.vx += dx * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier; // 30% slower
+        e.vy += dy * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier;
+        
+        // Initialize mine dropping properties
+        if (!e.mineDropTimer) e.mineDropTimer = 1 + Math.random() * 2;
+        if (!e.minesDropped) e.minesDropped = 0;
+        const maxMines = 8; // Increased limit to 8 mines per enemy
+        
+        // Drop mines periodically every 6 seconds
+        e.mineDropTimer -= dt;
+        if (e.mineDropTimer <= 0 && e.minesDropped < maxMines) {
+          // Spawn mine at current position
+          mines.spawn(mine => {
+            mine.x = e.x + (Math.random() - 0.5) * 20; // Slight position variance
+            mine.y = e.y + (Math.random() - 0.5) * 20;
+            mine.fuseTime = 0;
+            mine.maxFuseTime = 30.0; // Long fuse - only triggered by proximity
+            mine.isArmed = false; // Not armed immediately
+            mine.triggerRadius = 35; // Original radius for triggering
+            mine.explosionRadius = 70; // Doubled explosion radius
+            mine.explosionDamage = 15 + game.wave * 2; // Scales with wave
+            mine.flashTimer = 0;
+            mine.isTriggered = false; // New triggered state
+            mine.alive = true;
+            mine.owner = e; // Track which enemy dropped it
+          });
+          
+          e.minesDropped++;
+          e.mineDropTimer = 12.0; // Fixed 12 second interval
+          beep(180, 0.08, 'square', 0.06); // Mine drop sound
+        }
       }
       
-      // Shooter enemy logic - fire at player every 1.8 seconds
+      // Shooter enemy logic with different patterns
       if (e.isShooter) {
         e.shootTimer -= dt;
         if (e.shootTimer <= 0) {
-          spawnEnemyBullet(e.x, e.y, p.x, p.y);
-          e.shootTimer = 2.0; // Reset timer
-          beep(300, 0.06, 'sine', 0.08); // Enemy shooting sound
+          if (e.shootPattern === 'spread') {
+            spawnEnemySpreadShot(e.x, e.y, p.x, p.y, 3, Math.PI/3); // 3 bullets, 60° spread
+            e.shootTimer = 2.5; // Slightly slower for spread
+            beep(280, 0.08, 'sine', 0.10); // Lower, longer sound for spread
+          } else if (e.shootPattern === 'burst') {
+            spawnEnemyBullet(e.x, e.y, p.x, p.y);
+            e.burstCount++;
+            
+            if (e.burstCount >= 3) {
+              e.shootTimer = 3.0; // Long cooldown after burst
+              e.burstCount = 0;
+              beep(320, 0.05, 'sine', 0.06); // Final burst sound
+            } else {
+              e.shootTimer = 0.15; // Quick successive shots
+              beep(300, 0.04, 'sine', 0.06); // Rapid burst sound
+            }
+          } else {
+            // Single shot (default)
+            spawnEnemyBullet(e.x, e.y, p.x, p.y);
+            e.shootTimer = 2.0; // Reset timer
+            beep(300, 0.06, 'sine', 0.08); // Enemy shooting sound
+          }
         }
       }
       
@@ -2166,7 +3111,32 @@
         if (fastDistanceCheck(b.x, b.y, e.x, e.y, rr)){
           // hit
           const damage = b.critical ? 2 : 1; // Critical hits deal double damage
-          e.hp -= damage;
+          
+          // Shield system - ONLY for slowpush enemies with shields
+          let hitsShield = false;
+          if (e.behavior === 'slowpush' && e.hasShield && e.shieldHP > 0 && e.shieldDirection) {
+            // Calculate bullet direction relative to enemy
+            const bulletDir = normInPlace(b.x - e.x, b.y - e.y, vecPool.temp2);
+            
+            // Check if bullet is coming from shield side (dot product > 0 means same direction)
+            const dotProduct = bulletDir.x * e.shieldDirection.x + bulletDir.y * e.shieldDirection.y;
+            hitsShield = dotProduct > 0.3; // Shield covers ~120° arc in front
+          }
+          
+          if (hitsShield) {
+            // Bullet hits shield
+            e.shieldHP -= damage;
+            if (e.shieldHP <= 0) {
+              e.hasShield = false; // Shield broken
+              beep(200, 0.06, 'square', 0.08); // Shield break sound
+            } else {
+              beep(300, 0.03, 'triangle', 0.05); // Shield hit sound
+            }
+          } else {
+            // Bullet hits enemy body directly (from behind/side or no shield)
+            e.hp -= damage;
+          }
+          
           b.hitEnemies.add(e); // Mark this enemy as hit by this bullet
           
           // Critical hit effects
@@ -2345,6 +3315,27 @@
           g.damageFlash = 0.3; // Red vignette flash for 0.3 seconds
           hurtSound();
           
+          // Suicide crawlers reset to orbiting after hitting player
+          if (e.behavior === 'suicide') {
+            e.chargeState = 'orbiting';
+            e.chargeTimer = 6 + Math.random() * 6; // 6-12 second orbit after hit
+            e.color = e.baseColor || '#8844ff'; // Back to purple
+            e.orbitAngle = Math.atan2(e.y - p.y, e.x - p.x) + Math.PI; // Orbit away from player initially
+          }
+          
+          // Slow push enemies apply knockback
+          if (e.behavior === 'slowpush' && e.knockbackStrength) {
+            const knockbackVec = normInPlace(p.x - e.x, p.y - e.y, vecPool.temp1);
+            const knockbackForce = e.knockbackStrength;
+            
+            // Apply impulse knockback to player
+            p.vx += knockbackVec.x * knockbackForce * dt;
+            p.vy += knockbackVec.y * knockbackForce * dt;
+            
+            // Visual/audio feedback for knockback
+            beep(150, 0.08, 'square', 0.06); // Low thud sound
+          }
+          
           // Adrenaline boost trigger
           if (p.adrenalineBoost) {
             p.adrenalineTimer = 3.0; // 3 seconds of speed boost
@@ -2407,10 +3398,27 @@
       
       // Player collision (reuse distance calculation)
       if (dist < 20) {
+        // Create collection particle burst before removing pickup
+        const powerup = bulletPowerupMap.get(pickup.type);
+        const particleColor = powerup ? powerup.color : '#ffffff';
+        for (let i = 0; i < 8; i++) {
+          particles.spawn(part => {
+            part.x = pickup.x;
+            part.y = pickup.y;
+            const angle = (i / 8) * TAU;
+            const speed = 100 + Math.random() * 100;
+            part.vx = Math.cos(angle) * speed;
+            part.vy = Math.sin(angle) * speed;
+            part.life = 0;
+            part.maxLife = 0.5;
+            part.size = 2 + Math.random() * 2;
+            part.color = particleColor;
+          });
+        }
+        
         pickup.alive = false;
         
         // All crystals now use unified bullet powerup system
-        const powerup = bulletPowerupMap.get(pickup.type);
         if (powerup) {
           if (powerup.type === 'upgrade') {
             // Dual shot upgrade
@@ -2433,6 +3441,66 @@
           }
           showPowerupNotification(powerup.name);
         }
+      }
+    }
+
+    // mines - timed explosives
+    for (const mine of mines.items) {
+      if (!mine.alive) continue;
+      
+      // Fuse timer
+      mine.fuseTime += dt;
+      mine.flashTimer += dt;
+      
+      // Arm mine after 0.5 seconds (can't be triggered immediately)
+      if (!mine.isArmed && mine.fuseTime >= 0.5) {
+        mine.isArmed = true;
+      }
+      
+      // Check player proximity for armed mines
+      if (mine.isArmed && !mine.isTriggered) {
+        const distToPlayer = fastLength(mine.x - p.x, mine.y - p.y);
+        
+        // Trigger mine if player steps into trigger radius
+        if (distToPlayer <= mine.triggerRadius) {
+          mine.isTriggered = true;
+          mine.fuseTime = 0; // Reset fuse for explosion countdown
+          mine.maxFuseTime = 1.5; // 1.5 second explosion delay
+          beep(400, 0.1, 'triangle', 0.1); // Trigger warning sound
+        }
+      }
+      
+      // Handle triggered mines
+      if (mine.isTriggered && mine.fuseTime >= mine.maxFuseTime) {
+        // Explode mine
+        const explosionDist = fastLength(mine.x - p.x, mine.y - p.y);
+        if (explosionDist <= mine.explosionRadius) {
+          // Damage player
+          p.hp -= mine.explosionDamage;
+          beep(100, 0.15, 'sawtooth', 0.2); // Deep explosion
+          spawnBlood(p.x, p.y, 0, 0, 'player');
+          hurtSound();
+        }
+        
+        // Explosion particles (bigger explosion)
+        for (let i = 0; i < 30; i++) {
+          particles.spawn(part => {
+            const angle = (i / 30) * TAU + Math.random() * 0.3;
+            const speed = randRange(150, 350); // Bigger explosion
+            part.x = mine.x; part.y = mine.y;
+            part.vx = fastCos(angle) * speed;
+            part.vy = fastSin(angle) * speed;
+            part.life = 0; part.maxLife = randRange(0.6, 1.0); // Longer lasting
+            part.size = randRange(3, 7); // Bigger particles
+            part.color = '#ff6600'; // Orange explosion
+            part.hasGravity = false;
+            part.alive = true;
+          });
+        }
+        
+        // Reduce mine count for owner
+        if (mine.owner) mine.owner.minesDropped--;
+        mine.alive = false;
       }
     }
 
@@ -2656,6 +3724,33 @@
         ctx.beginPath();
         ctx.arc(e.x, e.y, e.r, 0, TAU);
         ctx.fill();
+        
+        // Shield rendering - ONLY for slowpush enemies
+        if (e.behavior === 'slowpush' && e.hasShield && e.shieldHP > 0) {
+          // Use lagged shield direction instead of instant player direction
+          const shieldDir = e.shieldDirection || { x: 1, y: 0 };
+          const shieldOffset = e.r + 5; // 5 pixels in front of enemy
+          const shieldX = e.x + shieldDir.x * shieldOffset;
+          const shieldY = e.y + shieldDir.y * shieldOffset;
+          
+          // Shield dimensions
+          const shieldWidth = e.r * 1.2;
+          const shieldHeight = e.r * 0.8;
+          
+          // Shield health-based transparency
+          const shieldAlpha = Math.max(0.3, e.shieldHP / e.maxShieldHP);
+          
+          ctx.save();
+          ctx.globalAlpha = shieldAlpha;
+          ctx.fillStyle = '#888888'; // Gray shield
+          ctx.fillRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          
+          // Shield border
+          ctx.strokeStyle = '#aaaaaa';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          ctx.restore();
+        }
       }
     }
 
@@ -2741,6 +3836,61 @@
       ctx.stroke();
       
       ctx.restore();
+    }
+
+    // mines - explosive devices
+    for (const mine of mines.items) {
+      if (!mine.alive) continue;
+      
+      // Mine body
+      ctx.fillStyle = mine.isArmed ? '#ff4400' : '#994400'; // Orange when armed, dark orange when not
+      ctx.beginPath();
+      ctx.arc(mine.x, mine.y, mine.r, 0, TAU);
+      ctx.fill();
+      
+      // Show trigger radius for armed mines (static circle)
+      if (mine.isArmed && !mine.isTriggered) {
+        ctx.strokeStyle = 'rgba(255, 100, 0, 0.3)'; // Faint orange circle
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]); // Small dashed circle
+        ctx.beginPath();
+        ctx.arc(mine.x, mine.y, mine.triggerRadius, 0, TAU);
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset line dash
+      }
+      
+      // Flashing effect when triggered and about to explode
+      if (mine.isTriggered) {
+        const flashRate = Math.min(20, mine.fuseTime * 15); // Accelerating flash
+        if (Math.sin(mine.flashTimer * flashRate) > 0) {
+          ctx.fillStyle = '#ffff00'; // Bright yellow flash
+          ctx.beginPath();
+          ctx.arc(mine.x, mine.y, mine.r, 0, TAU);
+          ctx.fill();
+        }
+        
+        // Pulsing explosion radius warning circle (doubled size)
+        const pulseIntensity = 0.4 + 0.5 * Math.sin(mine.flashTimer * flashRate * 0.8);
+        ctx.strokeStyle = `rgba(255, 255, 0, ${pulseIntensity})`;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 4]); // Bigger dashed circle
+        ctx.beginPath();
+        ctx.arc(mine.x, mine.y, mine.explosionRadius, 0, TAU);
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset line dash
+      }
+      
+      // Mine spikes/details
+      ctx.strokeStyle = '#663300';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * TAU;
+        const spike = mine.r + 2;
+        ctx.moveTo(mine.x, mine.y);
+        ctx.lineTo(mine.x + fastCos(angle) * spike, mine.y + fastSin(angle) * spike);
+      }
+      ctx.stroke();
     }
 
     // particles
@@ -2976,6 +4126,7 @@
     if (game.state === STATE.RUN) {
       game.state = STATE.PAUSE;
       banner.style.display = 'block';
+      banner.style.animation = 'pauseSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
       // Clear banner content safely
       while (banner.firstChild) {
         banner.removeChild(banner.firstChild);
@@ -3063,7 +4214,10 @@
         }
       });
     } else {
-      banner.style.display = 'none';
+      banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 300);
       game.state = STATE.RUN;
       // Restore original banner content safely
       while (banner.firstChild) {
@@ -3096,7 +4250,7 @@
         </div>
         <div class="control-row">
           <div class="control-keys"><kbd>P</kbd></div>
-          <div class="control-desc">Pause game</div>
+          <div class="control-desc">Resume game</div>
         </div>
         <div class="control-row">
           <div class="control-keys"><kbd>L</kbd></div>
@@ -3132,23 +4286,49 @@
   // ===== Start / Restart =====
   function start(){
     game = newGame();
-    banner.style.display = 'none';
-    gameOverPanel.style.display = 'none';
+    // Animate out existing screens
+    if (banner.style.display !== 'none') {
+      banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
+      setTimeout(() => { banner.style.display = 'none'; }, 300);
+    }
+    if (gameOverPanel.style.display !== 'none') {
+      gameOverPanel.style.animation = 'gameOverSlideOut 0.4s ease-out forwards';
+      setTimeout(() => { gameOverPanel.style.display = 'none'; }, 400);
+    } else {
+      banner.style.display = 'none';
+      gameOverPanel.style.display = 'none';
+    }
     game.state = STATE.RUN;
     // Center player
     game.player.x = canvas.width/2;
     game.player.y = canvas.height/2;
+    
+    // Dramatic game start flash effect
+    gameStartOverlay.style.animation = 'gameStartFlash 1.2s ease-out forwards';
+    setTimeout(() => {
+      gameStartOverlay.style.opacity = '0';
+    }, 1200);
     // Clear pools
     for (const it of bullets.items) it.alive = false;
     for (const it of enemies.items) it.alive = false;
     for (const it of particles.items) it.alive = false;
     for (const it of pickups.items) it.alive = false;
+    for (const it of mines.items) it.alive = false;
     for (const it of bloodStains.items) it.alive = false;
     for (const it of enemyBullets.items) it.alive = false;
     
     // Start first wave
     game.waveActive = true;
-    showPowerupNotification(`WAVE 1 START`);
+    
+    // Ensure wave announcement is fully reset before showing wave 1
+    waveAnnouncement.style.animation = 'none';
+    waveAnnouncement.style.display = 'none';
+    // Clear any existing timeouts to prevent flash
+    waveAnnouncementTimeouts.forEach(timeout => clearTimeout(timeout));
+    waveAnnouncementTimeouts = [];
+    
+    // Skip wave 1 announcement to avoid flash issue
+    // showWaveAnnouncement(1, false);
     
     // Spawn first wave enemies within 2-4 seconds
     const spawnDuration = 2000 + Math.random() * 2000; // 2-4 seconds
