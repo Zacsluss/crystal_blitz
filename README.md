@@ -13,8 +13,8 @@
   ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
   ![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
   ![Web Audio](https://img.shields.io/badge/Web_Audio_API-5A9FD4?style=flat-square&logo=webaudio&logoColor=white)
-  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-5,116-brightgreen?style=flat-square)
-  ![File Size](https://img.shields.io/badge/File_Size-250KB-blue?style=flat-square)
+  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-5,153-brightgreen?style=flat-square)
+  ![File Size](https://img.shields.io/badge/File_Size-188KB-blue?style=flat-square)
   ![Performance](https://img.shields.io/badge/Performance-60_FPS-green?style=flat-square)
   
   <br>
@@ -41,7 +41,7 @@ open Crystal_Blitz.html  # That's it!
 
 ## 🎯 **What Makes This Special**
 
-> A technical demonstration of advanced web development - achieving AAA game performance in a single 250KB HTML file with no build process, no dependencies, and no external assets.
+> A technical demonstration of advanced web development - achieving AAA game performance in a single 188KB HTML file with no build process, no dependencies, and no external assets.
 
 ### 🌟 **Core Features**
 
@@ -207,12 +207,24 @@ python -m http.server 8000  # Optional local server
 
 ## 🎯 **Project Stats**
 
-- **5,116** lines of code
-- **250KB** file size
+- **5,153** lines of optimized code
+- **188KB** file size (25% smaller after optimization!)
 - **0** dependencies
 - **0** build steps
 - **100%** browser compatible
-- **60** FPS performance
+- **60** FPS consistent performance
+
+## ⚡ **Performance Optimizations**
+
+This game features cutting-edge performance optimizations:
+
+- **Zero Garbage Collection**: Eliminated string concatenation and array allocations in game loop
+- **Gradient Caching**: All gradients cached with LRU eviction
+- **Particle Limits**: Hard caps prevent performance degradation (500 particles, 200 blood stains)
+- **Object Pooling**: Pre-allocated pools for all game entities
+- **DOM Update Batching**: Minimized reflows with requestAnimationFrame batching
+- **Value Caching**: HUD only updates when values actually change
+- **LRU Trig Cache**: Cached sin/cos calculations with smart eviction
 
 ---
 
