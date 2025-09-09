@@ -20,18 +20,18 @@
 **Crystal Blitz** is a single-file HTML5 arena survival shooter game where players face endless waves of increasingly difficult enemies. The game features a robust crystal-based powerup system, intelligent enemy AI, and progressive difficulty scaling.
 
 ### Key Features
-- **Single-File Architecture**: Entire game contained in one HTML file (4374 lines)
+- **Single-File Architecture**: Entire game contained in one HTML file (5116 lines)
 - **No External Dependencies**: Self-contained with procedural audio, no external assets
 - **Cross-Platform**: Works on desktop and mobile browsers
 - **Performance Optimized**: Adaptive quality system, object pooling, spatial partitioning
-- **Rich Gameplay**: 11 crystal types, 17 permanent upgrades, 10+ enemy behaviors
+- **Rich Gameplay**: 11 crystal types, 17 permanent upgrades, 12+ enemy behaviors
 
 ### Technology Stack
 - **Language**: Vanilla JavaScript (ES6+)
 - **Rendering**: HTML5 Canvas 2D API
 - **Audio**: Web Audio API (procedural sound generation)
 - **Build**: None required (single HTML file)
-- **Size**: ~220KB uncompressed
+- **Size**: ~250KB uncompressed
 
 ---
 
@@ -323,7 +323,7 @@ distance² < (r1 + r2)²
 
 #### Shield System (Slowpush Enemies)
 - Directional shields covering 120° arc
-- Shield HP scales with wave difficulty
+- Shield HP scales with wave difficulty (base 15 HP × difficulty multiplier)
 - Dot product check for hit direction (>0.3 = shield hit)
 - 90% rotation speed for counterplay opportunity
 
@@ -595,11 +595,11 @@ performanceLevel: 0.3 to 1.0
 Crystal_Blitz.html
 ├── <head>
 │   ├── Meta tags
-│   └── <style> (823 lines CSS)
+│   └── <style> (1072 lines CSS)
 ├── <body>
 │   ├── Canvas element
 │   ├── UI containers
-│   └── <script> (3391 lines JS)
+│   └── <script> (3859 lines JS)
 ```
 
 #### Module Pattern
@@ -713,7 +713,7 @@ entity = {
 - **Visual Warning**: Accelerating flash when triggered
 - **Damage Scaling**: 15 + (wave * 2) damage
 - **Mine Limit**: 8 per minelayer enemy
-- **Drop Interval**: 12 seconds between drops
+- **Drop Interval**: Fixed 12 seconds between drops
 
 ### Enemy Bullet System
 - **Base Speed**: 200 + wave (capped at 350)
