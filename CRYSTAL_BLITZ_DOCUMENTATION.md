@@ -513,10 +513,16 @@ function setFillStyle(style) {
 }
 ```
 
-#### Gradient Caching
+#### Gradient Caching with LRU
+```javascript
+const gradientCache = new Map();
+const MAX_GRADIENT_CACHE_SIZE = 100;
+```
+- Global cache persists between frames (no memory leak)
+- LRU eviction when cache exceeds 100 entries
 - Numeric keys for fast Map lookups
-- Reused gradients for particle effects
-- Pre-computed gradient stops
+- Caches all gradients: leap glow, boss aura, damage vignette, homing crystals
+- Prevents recreation of expensive gradient objects every frame
 
 #### Batch Rendering
 - Single path for multiple shapes (bullets, enemies)
@@ -532,17 +538,44 @@ function setFillStyle(style) {
 
 ### Memory Management
 
+#### Zero Garbage Collection in Game Loop
+- **No String Concatenation**: Template literals instead of `+ '%'`
+- **Value Caching**: DOM only updates when values change
+- **Array Allocation Free**: Using `normInPlace` with pooled vectors
+- **No Console Statements**: All console.log/error removed from hot paths
+
+#### Hard Particle Limits
+```javascript
+const MAX_PARTICLES = 500;
+const MAX_BLOOD_STAINS = 200;
+```
+- Prevents unbounded growth during intense combat
+- Checks before spawning new particles
+- Maintains consistent performance
+
 #### Object Pooling
 - Pre-allocated entity arrays
 - Reuse dead objects
 - No runtime allocations
 - Minimal garbage collection
 
+#### LRU Trig Cache
+```javascript
+// Smart eviction instead of clearing entire cache
+if (sinCache.size > TRIG_CACHE_SIZE) {
+  const firstKey = sinCache.keys().next().value;
+  sinCache.delete(firstKey);
+}
+```
+- Removes oldest entry when full
+- Maintains cache effectiveness
+- Prevents cache thrashing
+
 #### Optimized Data Structures
-- Sets for O(1) lookups
-- Maps for efficient key-value
-- Cached calculations
-- Reusable vector objects
+- Sets for O(1) effect lookups
+- Maps for efficient key-value caching
+- Pooled vector objects for calculations
+- Numeric keys instead of string templates
 
 ### Computational Optimizations
 

@@ -465,16 +465,12 @@
       background: rgba(255, 91, 110, 0.5);
       pointer-events: none;
       z-index: 100;
-      animation: edgePulse 0.5s ease-in-out infinite alternate;
+      animation: pulse 0.5s ease-in-out infinite alternate;
     }
     .edge-warning.top { top: 0; left: 0; right: 0; height: 16px; }
     .edge-warning.bottom { bottom: 0; left: 0; right: 0; height: 16px; }
     .edge-warning.left { left: 0; top: 0; bottom: 0; width: 16px; }
     .edge-warning.right { right: 0; top: 0; bottom: 0; width: 16px; }
-    @keyframes edgePulse {
-      0% { opacity: 0.5; }
-      100% { opacity: 0.5; }
-    }
     
     /* Main Menu Animations */
     @keyframes menuFadeIn {
@@ -1329,7 +1325,7 @@
 
   // Fast length calculation without fastLength()
   function fastLength(x, y) {
-    return Math.sqrt(x * x + y * y) || 1;
+    return Math.sqrt(x * x + y * y);
   }
 
   // Old norm function - kept for compatibility where destructuring is needed
@@ -1503,7 +1499,9 @@
     const key = Math.round(angle * 1000);
     if (!sinCache.has(key)) {
       if (sinCache.size > TRIG_CACHE_SIZE) {
-        sinCache.clear(); // Clear cache when it gets too large
+        // LRU eviction - remove oldest entry
+        const firstKey = sinCache.keys().next().value;
+        sinCache.delete(firstKey);
       }
       sinCache.set(key, Math.sin(key / 1000));
     }
@@ -1514,7 +1512,9 @@
     const key = Math.round(angle * 1000);
     if (!cosCache.has(key)) {
       if (cosCache.size > TRIG_CACHE_SIZE) {
-        cosCache.clear();
+        // LRU eviction - remove oldest entry  
+        const firstKey = cosCache.keys().next().value;
+        cosCache.delete(firstKey);
       }
       cosCache.set(key, Math.cos(key / 1000));
     }
@@ -1559,7 +1559,7 @@
     if (style && style !== '' && style !== 'undefined' && style !== 'null' && style !== 'transparent' && style !== 'none') {
       validStyle = style;
     } else {
-      console.error('Invalid fillStyle attempted:', style);
+      // Invalid fillStyle attempted
     }
     
     if (lastFillStyle !== validStyle) {
@@ -1621,6 +1621,13 @@
   }
   
   function shouldSpawnParticle() {
+    // Count active particles for hard cap
+    let activeCount = 0;
+    for (const p of particles.items) {
+      if (p.alive) activeCount++;
+    }
+    // Don't spawn if at cap
+    if (activeCount >= MAX_PARTICLES) return false;
     return Math.random() < performanceLevel;
   }
   
@@ -1692,7 +1699,7 @@
         audioCtx.resume && audioCtx.resume();
       }
     } catch (audioError) {
-      console.error('Audio initialization failed:', audioError);
+      // Audio initialization failed
       // Game can continue without audio
     }
   }
@@ -1712,7 +1719,7 @@
       osc.start(now);
       osc.stop(now + duration);
     } catch (beepError) {
-      console.error('Audio beep error:', beepError);
+      // Audio beep error
       // Silently fail for audio errors
     }
   }
@@ -2056,6 +2063,11 @@
   }
 
   // ===== Object Pools =====
+  const MAX_PARTICLES = 500; // Hard cap on total particles
+  const MAX_BLOOD_STAINS = 200; // Hard cap on blood stains
+  let activeParticleCount = 0;
+  let activeBloodStainCount = 0;
+  
   function makePool(createFn, initial=0){
     const items = [];
     for (let i=0;i<initial;i++) items.push(createFn());
@@ -2396,8 +2408,26 @@
         // Extra explosion sound
         beep(80, 0.2, 'sawtooth', 0.15); // Deep explosion boom
         
-        // Large explosion particles
-        const explosionParticles = 25;
+        // Large explosion particles with shockwave effect
+        const explosionParticles = 35; // More particles for bigger explosion
+        
+        // Create expanding shockwave ring
+        for (let i = 0; i < 20; i++) {
+          particles.spawn(p => {
+            const angle = (i / 20) * TAU;
+            const speed = 250; // Uniform speed for ring effect
+            p.x = enemy.x; p.y = enemy.y;
+            p.vx = fastCos(angle) * speed;
+            p.vy = fastSin(angle) * speed;
+            p.life = 0; p.maxLife = 0.4; // Short lived for shockwave
+            p.size = 6; // Medium size
+            p.color = '#ff8800'; // Orange shockwave
+            p.hasGravity = false;
+            p.alive = true;
+          });
+        }
+        
+        // Main explosion particles
         for (let i = 0; i < explosionParticles; i++) {
           particles.spawn(p => {
             const angle = (i / explosionParticles) * TAU + Math.random() * 0.4;
@@ -2407,25 +2437,48 @@
             p.vy = fastSin(angle) * speed;
             p.life = 0; p.maxLife = randRange(0.6, 1.2); // Longer lasting
             p.size = randRange(4, 9); // Bigger particles
-            // Orange explosion with color variation
-            const orangeBase = 0xff;
-            const orangeGreen = 0x44 + Math.floor(Math.random() * 40) - 20; // ±20 variation
-            p.color = '#' + orangeBase.toString(16) + Math.max(0x20, Math.min(0x88, orangeGreen)).toString(16).padStart(2,'0') + '00';
+            // Purple-orange explosion to match enemy color
+            if (Math.random() < 0.3) {
+              p.color = '#8844ff'; // Some purple (enemy color)
+            } else {
+              // Orange explosion with variation
+              const orangeBase = 0xff;
+              const orangeGreen = 0x44 + Math.floor(Math.random() * 40) - 20;
+              p.color = '#' + orangeBase.toString(16) + Math.max(0x20, Math.min(0x88, orangeGreen)).toString(16).padStart(2,'0') + '00';
+            }
             p.hasGravity = false;
             p.alive = true;
           });
         }
         
         // Damage player if close enough (explosion radius)
-        const explosionRadius = 45;
+        const explosionRadius = 80; // Increased from 45 for more danger
         const distToPlayer = fastLength(enemy.x - game.player.x, enemy.y - game.player.y);
-        if (distToPlayer <= explosionRadius) {
-          game.player.hp -= 15; // Explosion damage
-          beep(500, 0.1, 'square', 0.1); // Player hurt sound
+        if (distToPlayer <= explosionRadius && game.invulTime <= 0) {
+          // Apply damage with reduction
+          const explosionDamage = 20; // Increased from 15
+          const actualDamage = Math.ceil(explosionDamage * (1 - game.player.damageReduction));
+          game.player.hp -= actualDamage;
           
-          // Add screen shake effect (if available)
-          if (game.screenShake !== undefined) {
-            game.screenShake = Math.max(game.screenShake || 0, 0.3);
+          // Set invulnerability and damage flash
+          game.invulTime = 0.35;
+          game.damageFlash = 0.3;
+          
+          // Knockback from explosion
+          const knockbackForce = 400;
+          const dx = game.player.x - enemy.x;
+          const dy = game.player.y - enemy.y;
+          const dist = Math.max(1, distToPlayer);
+          game.player.vx += (dx / dist) * knockbackForce;
+          game.player.vy += (dy / dist) * knockbackForce;
+          
+          // Effects
+          hurtSound();
+          spawnBlood(game.player.x, game.player.y, 0, 0, 'player');
+          
+          // Check for player death
+          if (game.player.hp <= 0) {
+            triggerGameOver(game);
           }
         }
         
@@ -2435,8 +2488,9 @@
           
           const distToEnemy = fastLength(enemy.x - otherEnemy.x, enemy.y - otherEnemy.y);
           if (distToEnemy <= explosionRadius) {
-            // 50% damage to enemies compared to player damage
-            const explosionDamage = 8; // Half of 15 player damage, rounded up
+            // Scale damage based on distance (closer = more damage)
+            const damageFalloff = 1 - (distToEnemy / explosionRadius) * 0.5; // 50-100% damage
+            const explosionDamage = Math.ceil(10 * damageFalloff); // 5-10 damage
             otherEnemy.hp -= explosionDamage;
             
             // Knockback from explosion center
@@ -2890,6 +2944,13 @@
   const BLOOD_COLORS = ['#ff0000', '#cc0000', '#800000', '#990000', '#e60000', '#b30000', '#660000', '#a60000'];
   
   function spawnBlood(x, y, dirX=0, dirY=0, type='impact'){
+    // Check blood stain cap
+    let activeStains = 0;
+    for (const s of bloodStains.items) {
+      if (s.alive) activeStains++;
+    }
+    if (activeStains >= MAX_BLOOD_STAINS) return; // Don't spawn if at cap
+    
     
     if (type === 'impact') {
       // Small blood spray from bullet impact
@@ -2946,6 +3007,10 @@
     }
   }
 
+  // ===== Gradient Cache (for performance) =====
+  const gradientCache = new Map();
+  const MAX_GRADIENT_CACHE_SIZE = 100;
+  
   // ===== Update & Draw =====
   function update(g, dt){
     g.t += dt;
@@ -2998,9 +3063,9 @@
     
     // Emergency leap (Space key)
     if (keys.has('Space') && p.leapReady && (ax || ay)) {
-      const [leapX, leapY] = norm(ax, ay);
-      p.vx += leapX * p.leapSpeed;
-      p.vy += leapY * p.leapSpeed;
+      const leapVec = normInPlace(ax, ay, vecPool.temp1);
+      p.vx += leapVec.x * p.leapSpeed;
+      p.vy += leapVec.y * p.leapSpeed;
       p.leapCd = 3.0; // 3 second cooldown
       p.leapReady = false;
       beep(400, 0.08, 'triangle', 0.03); // Leap sound effect
@@ -3029,7 +3094,8 @@
     }
     
     if (ax || ay){
-      const [nx,ny] = norm(ax,ay);
+      const moveVec = normInPlace(ax, ay, vecPool.temp1);
+      const nx = moveVec.x, ny = moveVec.y;
       const waveSpeedBonus = g.wave * 0.2; // +0.2 speed per wave
       const adrenalineBonus = (p.adrenalineTimer > 0) ? 1.2 : 1.0; // +20% speed during adrenaline
       const baseSpeed = (p.speed + waveSpeedBonus) * adrenalineBonus;
@@ -3047,7 +3113,8 @@
     // shooting
     if (p.fireTimer > 0) p.fireTimer -= dt;
     if (mouseDown && p.fireTimer <= 0){
-      const [dx,dy] = norm(mouseX - p.x, mouseY - p.y);
+      const shootVec = normInPlace(mouseX - p.x, mouseY - p.y, vecPool.temp1);
+      const dx = shootVec.x, dy = shootVec.y;
       
       // Gather all active effects (new modular system)
       const activeEffects = [];
@@ -3449,7 +3516,7 @@
           e.shieldDirection.y = e.shieldDirection.y * (1 - shieldRotationSpeed * dt) + targetDir.y * shieldRotationSpeed * dt;
           
           // Normalize shield direction
-          const len = Math.sqrt(e.shieldDirection.x * e.shieldDirection.x + e.shieldDirection.y * e.shieldDirection.y);
+          const len = fastLength(e.shieldDirection.x, e.shieldDirection.y);
           if (len > 0) {
             e.shieldDirection.x /= len;
             e.shieldDirection.y /= len;
@@ -3918,9 +3985,9 @@
         const knockbackReduction = Math.min(1.0, p.knockbackResistance || 0);
         const knockbackForce = 200 * (1 - knockbackReduction);
         if (knockbackForce > 0) {
-          const [nx,ny] = norm(p.x - e.x, p.y - e.y);
-          p.vx += nx * knockbackForce;
-          p.vy += ny * knockbackForce;
+          const knockVec = normInPlace(p.x - e.x, p.y - e.y, vecPool.temp1);
+          p.vx += knockVec.x * knockbackForce;
+          p.vy += knockVec.y * knockbackForce;
         }
       }
     }
@@ -4169,13 +4236,38 @@
     }
 
     // HUD - batch updates to prevent layout thrashing
+    // Cache previous values to avoid unnecessary updates
+    const newHp = Math.max(0, Math.floor(p.hp));
+    const newStamina = Math.floor(p.stamina);
+    const hpPercent = clamp(p.hp/p.maxHp,0,1)*100;
+    const staminaPercent = clamp(p.stamina/100,0,1)*100;
+    
     queueDOMUpdate(() => {
-      hpTxt.textContent = Math.max(0, Math.floor(p.hp)).toString();
-      hudHpBar.style.width = clamp(p.hp/p.maxHp,0,1)*100 + '%';
-      staminaTxt.textContent = Math.floor(p.stamina).toString();
-      hudStaminaBar.style.width = clamp(p.stamina/100,0,1)*100 + '%';
-      waveTxt.textContent = g.wave.toString();
-      killsTxt.textContent = g.kills.toString();
+      // Only update if values changed
+      if (hpTxt._lastValue !== newHp) {
+        hpTxt._lastValue = newHp;
+        hpTxt.textContent = newHp.toString();
+      }
+      if (hudHpBar._lastPercent !== hpPercent) {
+        hudHpBar._lastPercent = hpPercent;
+        hudHpBar.style.width = `${hpPercent}%`;
+      }
+      if (staminaTxt._lastValue !== newStamina) {
+        staminaTxt._lastValue = newStamina;
+        staminaTxt.textContent = newStamina.toString();
+      }
+      if (hudStaminaBar._lastPercent !== staminaPercent) {
+        hudStaminaBar._lastPercent = staminaPercent;
+        hudStaminaBar.style.width = `${staminaPercent}%`;
+      }
+      if (waveTxt._lastValue !== g.wave) {
+        waveTxt._lastValue = g.wave;
+        waveTxt.textContent = g.wave.toString();
+      }
+      if (killsTxt._lastValue !== g.kills) {
+        killsTxt._lastValue = g.kills;
+        killsTxt.textContent = g.kills.toString();
+      }
       
       // Update mobile button states
       if (isMobile && leapBtn) {
@@ -4187,7 +4279,10 @@
           leapBtn.classList.add('cooldown');
           // Update cooldown timer visual
           const cooldownPercent = (p.leapCd / 3.0) * 100;
-          leapBtn.style.setProperty('--cooldown-percent', cooldownPercent + '%');
+          if (leapBtn._lastCooldown !== cooldownPercent) {
+            leapBtn._lastCooldown = cooldownPercent;
+            leapBtn.style.setProperty('--cooldown-percent', `${cooldownPercent}%`);
+          }
         }
       }
     });
@@ -4205,8 +4300,10 @@
     // Reset render state for new frame
     resetRenderState();
     
-    // Cache gradients to avoid recreation (gradients are EXPENSIVE to create)
-    const gradientCache = new Map();
+    // Clear gradient cache if it gets too large
+    if (gradientCache.size > MAX_GRADIENT_CACHE_SIZE) {
+      gradientCache.clear();
+    }
     
     // clear
     setFillStyle('#0b0d10');
@@ -4276,11 +4373,16 @@
       const glowIntensity = 0.7 + 0.3 * fastSin(g.t * 6); // Pulsing glow
       const glowRadius = p.radius + 8;
       
-      // Outer glow
-      const outerGradient = ctx.createRadialGradient(p.x, p.y, p.radius, p.x, p.y, glowRadius);
-      outerGradient.addColorStop(0, `rgba(0, 255, 255, ${glowIntensity * 0.3})`);
-      outerGradient.addColorStop(0.7, `rgba(0, 255, 255, ${glowIntensity * 0.2})`);
-      outerGradient.addColorStop(1, `rgba(0, 255, 255, 0)`);
+      // Outer glow (cached)
+      const glowKey = `leap_${((glowRadius*100)|0)}_${((glowIntensity*100)|0)}`;
+      let outerGradient = gradientCache.get(glowKey);
+      if (!outerGradient) {
+        outerGradient = ctx.createRadialGradient(p.x, p.y, p.radius, p.x, p.y, glowRadius);
+        outerGradient.addColorStop(0, `rgba(0, 255, 255, ${glowIntensity * 0.3})`);
+        outerGradient.addColorStop(0.7, `rgba(0, 255, 255, ${glowIntensity * 0.2})`);
+        outerGradient.addColorStop(1, `rgba(0, 255, 255, 0)`);
+        gradientCache.set(glowKey, outerGradient);
+      }
       ctx.fillStyle = outerGradient;
       ctx.beginPath();
       ctx.arc(p.x, p.y, glowRadius, 0, TAU);
@@ -4332,11 +4434,16 @@
         const phaseColors = ['#800080', '#ff0080', '#ff8000', '#8000ff'];
         const pulseIntensity = 0.7 + 0.3 * fastSin(g.t * 6);
         
-        // Intimidating aura
+        // Intimidating aura (cached)
         const auraRadius = e.r + 20;
-        const auraGradient = ctx.createRadialGradient(e.x, e.y, e.r, e.x, e.y, auraRadius);
-        auraGradient.addColorStop(0, `${phaseColors[phase]}80`);
-        auraGradient.addColorStop(1, `${phaseColors[phase]}00`);
+        const auraKey = `boss_${phase}_${((pulseIntensity*100)|0)}`;
+        let auraGradient = gradientCache.get(auraKey);
+        if (!auraGradient) {
+          auraGradient = ctx.createRadialGradient(e.x, e.y, e.r, e.x, e.y, auraRadius);
+          auraGradient.addColorStop(0, `${phaseColors[phase]}80`);
+          auraGradient.addColorStop(1, `${phaseColors[phase]}00`);
+          gradientCache.set(auraKey, auraGradient);
+        }
         ctx.fillStyle = auraGradient;
         ctx.beginPath();
         ctx.arc(e.x, e.y, auraRadius, 0, TAU);
@@ -4500,11 +4607,16 @@
         ctx.arc(pickup.x, pickup.y, glowSize, 0, TAU);
         ctx.fill();
         
-        // Inner bright core
-        const coreGlow = ctx.createRadialGradient(pickup.x, pickup.y, 0, pickup.x, pickup.y, 12);
-        coreGlow.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity * 0.9})`);
-        coreGlow.addColorStop(0.3, `rgba(255, 235, 59, ${glowIntensity * 0.7})`);
-        coreGlow.addColorStop(1, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
+        // Inner bright core (cached)
+        const coreKey = `core_${((glowIntensity*100)|0)}`;
+        let coreGlow = gradientCache.get(coreKey);
+        if (!coreGlow) {
+          coreGlow = ctx.createRadialGradient(pickup.x, pickup.y, 0, pickup.x, pickup.y, 12);
+          coreGlow.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity * 0.9})`);
+          coreGlow.addColorStop(0.3, `rgba(255, 235, 59, ${glowIntensity * 0.7})`);
+          coreGlow.addColorStop(1, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
+          gradientCache.set(coreKey, coreGlow);
+        }
         ctx.fillStyle = coreGlow;
         ctx.beginPath();
         ctx.arc(pickup.x, pickup.y, 12, 0, TAU);
@@ -4614,17 +4726,21 @@
       ctx.globalAlpha = 1;
     }
 
-    // Red damage vignette
+    // Red damage vignette (cached)
     if (g.damageFlash > 0) {
       const intensity = g.damageFlash / 0.3; // Fade from 1 to 0
-      const gradient = ctx.createRadialGradient(
-        canvas.width/2, canvas.height/2, 0,
-        canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height)
-      );
-      gradient.addColorStop(0, `rgba(255, 0, 0, 0)`);
-      gradient.addColorStop(0.7, `rgba(255, 0, 0, ${intensity * 0.1})`);
-      gradient.addColorStop(1, `rgba(255, 0, 0, ${intensity * 0.4})`);
-      
+      const vignetteKey = `vignette_${((intensity*100)|0)}`;
+      let gradient = gradientCache.get(vignetteKey);
+      if (!gradient) {
+        gradient = ctx.createRadialGradient(
+          canvas.width/2, canvas.height/2, 0,
+          canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height)
+        );
+        gradient.addColorStop(0, `rgba(255, 0, 0, 0)`);
+        gradient.addColorStop(0.7, `rgba(255, 0, 0, ${intensity * 0.1})`);
+        gradient.addColorStop(1, `rgba(255, 0, 0, ${intensity * 0.4})`);
+        gradientCache.set(vignetteKey, gradient);
+      }
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -4748,11 +4864,16 @@
             // Add extra shadow glow for homing
             // No shadow effects
             
-            // Golden glow aura for inventory homing crystal
-            const inventoryGlow = ctx.createRadialGradient(x, y, crystalSize/2, x, y, glowSize);
-            inventoryGlow.addColorStop(0, `rgba(255, 215, 0, ${glowIntensity * 0.6})`);
-            inventoryGlow.addColorStop(0.7, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
-            inventoryGlow.addColorStop(1, `rgba(255, 215, 0, 0)`);
+            // Golden glow aura for inventory homing crystal (cached)
+            const invGlowKey = `inv_homing_${((glowIntensity*100)|0)}_${((glowSize*10)|0)}`;
+            let inventoryGlow = gradientCache.get(invGlowKey);
+            if (!inventoryGlow) {
+              inventoryGlow = ctx.createRadialGradient(x, y, crystalSize/2, x, y, glowSize);
+              inventoryGlow.addColorStop(0, `rgba(255, 215, 0, ${glowIntensity * 0.6})`);
+              inventoryGlow.addColorStop(0.7, `rgba(255, 215, 0, ${glowIntensity * 0.3})`);
+              inventoryGlow.addColorStop(1, `rgba(255, 215, 0, 0)`);
+              gradientCache.set(invGlowKey, inventoryGlow);
+            }
             ctx.fillStyle = inventoryGlow;
             ctx.beginPath();
             ctx.arc(x, y, glowSize, 0, TAU);
@@ -4803,7 +4924,7 @@
           try {
             update(game, dtFixed);
           } catch (updateError) {
-            console.error('Game update error:', updateError);
+            // Game update error
             // Pause game on critical error to prevent infinite errors
             if (game) game.state = STATE.PAUSE;
             break;
@@ -4814,7 +4935,7 @@
         try {
           draw(game, alpha);
         } catch (drawError) {
-          console.error('Game draw error:', drawError);
+          // Game draw error
         }
       }
 
@@ -4830,17 +4951,54 @@
             fpsTxt.textContent = 'FPS: ' + Math.round(avg);
           }
         } catch (fpsError) {
-          console.error('FPS calculation error:', fpsError);
+          // FPS calculation error
         }
       }
     } catch (frameError) {
-      console.error('Critical frame error:', frameError);
+      // Critical frame error
     }
 
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
+  // ===== Helper function to create controls HTML =====
+  function createControlsHTML() {
+    return `
+      <div class="controls-title"><strong>Controls</strong></div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+        <div class="control-desc">Move around the arena</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>Mouse</kbd></div>
+        <div class="control-desc">Aim and shoot</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>Shift</kbd></div>
+        <div class="control-desc">Dash through enemies</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>Space</kbd></div>
+        <div class="control-desc">Emergency leap</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>P</kbd></div>
+        <div class="control-desc">Resume game</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>L</kbd></div>
+        <div class="control-desc">Crystal legend</div>
+      </div>
+      <div class="control-row">
+        <div class="control-keys"><kbd>F11</kbd></div>
+        <div class="control-desc">Toggle fullscreen</div>
+      </div>
+      <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot<br>
+      💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
+    `;
+  }
+  
   // ===== Pause / Resume =====
   function togglePause(){
     if (!game || (game.state!==STATE.RUN && game.state!==STATE.PAUSE)) return;
@@ -4848,50 +5006,14 @@
       game.state = STATE.PAUSE;
       banner.style.display = 'block';
       banner.style.animation = 'pauseSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-      // Clear banner content safely
-      while (banner.firstChild) {
-        banner.removeChild(banner.firstChild);
-      }
+      // Clear banner content efficiently
+      banner.innerHTML = '';
       
       // Create pause screen elements with enhanced styling
       
       const controlsDiv = document.createElement('div');
       controlsDiv.className = 'controls-panel';
-      
-      // Use the same enhanced controls layout as the main menu
-      controlsDiv.innerHTML = `
-        <div class="controls-title"><strong>Controls</strong></div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
-          <div class="control-desc">Move around the arena</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Mouse</kbd></div>
-          <div class="control-desc">Aim and shoot</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Shift</kbd></div>
-          <div class="control-desc">Dash through enemies</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Space</kbd></div>
-          <div class="control-desc">Emergency leap</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>P</kbd></div>
-          <div class="control-desc">Resume game</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>L</kbd></div>
-          <div class="control-desc">Crystal legend</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>F11</kbd></div>
-          <div class="control-desc">Toggle fullscreen</div>
-        </div>
-        <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot<br>
-        💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
-      `;
+      controlsDiv.innerHTML = createControlsHTML();
       
       // Add upgrades section
       const upgradesDiv = document.createElement('div');
@@ -4941,50 +5063,14 @@
         banner.style.display = 'none';
       }, 300);
       game.state = STATE.RUN;
-      // Restore original banner content safely
-      while (banner.firstChild) {
-        banner.removeChild(banner.firstChild);
-      }
+      // Restore original banner content efficiently
+      banner.innerHTML = '';
       
       // Create start screen elements with enhanced styling
       
       const controlsDiv = document.createElement('div');
       controlsDiv.className = 'controls-panel';
-      
-      // Use the same enhanced controls layout as the main menu
-      controlsDiv.innerHTML = `
-        <div class="controls-title"><strong>Controls</strong></div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
-          <div class="control-desc">Move around the arena</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Mouse</kbd></div>
-          <div class="control-desc">Aim and shoot</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Shift</kbd></div>
-          <div class="control-desc">Dash through enemies</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>Space</kbd></div>
-          <div class="control-desc">Emergency leap</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>P</kbd></div>
-          <div class="control-desc">Resume game</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>L</kbd></div>
-          <div class="control-desc">Crystal legend</div>
-        </div>
-        <div class="control-row">
-          <div class="control-keys"><kbd>F11</kbd></div>
-          <div class="control-desc">Toggle fullscreen</div>
-        </div>
-        <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot<br>
-        💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
-      `;
+      controlsDiv.innerHTML = createControlsHTML();
       
       const startBtn = document.createElement('button');
       startBtn.id = 'startBtn';
