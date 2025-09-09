@@ -3,8 +3,8 @@
   # ⚡ CRYSTAL BLITZ ⚡
   ### *High-Performance Arena Shooter in a Single HTML File*
   
-  [![Play Now](https://img.shields.io/badge/🎮_PLAY_NOW-Crystal_Blitz-00ff88?style=for-the-badge&logo=gamepad&logoColor=white)](https://zacsluss.github.io/Crystal_Blitz/Crystal_Blitz.html)
-  [![Download](https://img.shields.io/badge/💾_DOWNLOAD-Single_File-ff6b35?style=for-the-badge&logo=download&logoColor=white)](https://github.com/Zacsluss/Crystal_Blitz/raw/main/Crystal_Blitz.html)
+  [![Play Now](https://img.shields.io/badge/🎮_PLAY_NOW-Crystal_Blitz-00ff88?style=for-the-badge&logo=gamepad&logoColor=white)](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)
+  [![Download](https://img.shields.io/badge/💾_DOWNLOAD-Single_File-ff6b35?style=for-the-badge&logo=download&logoColor=white)](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html)
   [![Documentation](https://img.shields.io/badge/📖_DOCS-Technical_Details-4078c0?style=for-the-badge&logo=github&logoColor=white)](CRYSTAL_BLITZ_DOCUMENTATION.md)
   
   ---
@@ -30,8 +30,8 @@
 ## 🚀 **Quick Start**
 
 ```bash
-git clone https://github.com/Zacsluss/Crystal_Blitz.git
-cd Crystal_Blitz
+git clone https://github.com/Zacsluss/CRYSTAL_BLITZ.git
+cd CRYSTAL_BLITZ
 open Crystal_Blitz.html  # That's it!
 ```
 
@@ -191,8 +191,8 @@ This project demonstrates mastery of:
 
 ### Quick Setup
 ```bash
-git clone https://github.com/Zacsluss/Crystal_Blitz.git
-cd Crystal_Blitz
+git clone https://github.com/Zacsluss/CRYSTAL_BLITZ.git
+cd CRYSTAL_BLITZ
 python -m http.server 8000  # Optional local server
 # Visit http://localhost:8000/Crystal_Blitz.html
 ```

@@ -1802,7 +1802,7 @@
     
     // CRITICAL: If already showing, don't restart animation
     if (waveAnnouncement.dataset.active === 'true' || waveAnnouncement.style.display !== 'none') {
-      console.log('Wave announcement already active, skipping');
+      // Wave announcement already active, skipping
       return;
     }
     
@@ -2886,18 +2886,10 @@
     }
   }
 
+  // Pre-computed blood colors to avoid runtime generation
+  const BLOOD_COLORS = ['#ff0000', '#cc0000', '#800000', '#990000', '#e60000', '#b30000', '#660000', '#a60000'];
+  
   function spawnBlood(x, y, dirX=0, dirY=0, type='impact'){
-    // Add more color variation with hue shifts
-    const baseColors = ['#ff0000', '#cc0000', '#800000', '#990000'];
-    const bloodColors = [];
-    for (const color of baseColors) {
-      bloodColors.push(color);
-      // Add slight variations
-      const r = parseInt(color.substr(1,2), 16);
-      const variation = Math.floor(Math.random() * 30) - 15; // ±15 variation
-      const newR = Math.max(80, Math.min(255, r + variation));
-      bloodColors.push('#' + newR.toString(16).padStart(2,'0') + '0000');
-    }
     
     if (type === 'impact') {
       // Small blood spray from bullet impact
@@ -2912,14 +2904,15 @@
           p.vy = fastSin(angle) * speed;
           p.life = 0; p.maxLife = 0.3 + Math.random() * 0.5; // Inline randRange
           p.size = 1 + Math.random() * 2; // Inline randRange
-          p.color = bloodColors[(Math.random() * bloodColors.length) | 0];
+          p.color = BLOOD_COLORS[(Math.random() * BLOOD_COLORS.length) | 0];
           p.hasGravity = true;
           p.alive = true;
         });
       }
     } else if (type === 'death') {
       // Large blood burst when enemy dies
-      for (let i=0; i<20; i++){
+      const deathParticleCount = performanceLevel > 0.5 ? 15 : 8;
+      for (let i=0; i<deathParticleCount; i++){
         particles.spawn(p => {
           const angle = Math.random() * TAU;
           const speed = 60 + Math.random() * 190; // Inline randRange
@@ -2928,14 +2921,15 @@
           p.vy = fastSin(angle) * speed;
           p.life = 0; p.maxLife = 0.8 + Math.random() * 0.7; // Inline randRange
           p.size = 2 + Math.random() * 4; // Inline randRange
-          p.color = bloodColors[(Math.random() * bloodColors.length) | 0];
+          p.color = BLOOD_COLORS[(Math.random() * BLOOD_COLORS.length) | 0];
           p.hasGravity = true;
           p.alive = true;
         });
       }
     } else if (type === 'player') {
       // Player damage - red particles flying outward
-      for (let i=0; i<15; i++){
+      const playerParticleCount = performanceLevel > 0.5 ? 10 : 5;
+      for (let i=0; i<playerParticleCount; i++){
         particles.spawn(p => {
           const angle = Math.random() * TAU;
           const speed = 100 + Math.random() * 100; // Inline randRange
@@ -4394,8 +4388,7 @@
         } else if (e.baseColor && e.baseColor !== '' && e.baseColor !== 'undefined') {
           renderColor = e.baseColor;
         } else {
-          // Log for debugging
-          console.warn('Enemy using fallback color!', e.behavior, 'color:', e.color, 'original:', e.originalColor, 'base:', e.baseColor);
+          // Removed console.warn that was causing performance issues
         }
         
         // Apply crit flash if needed
