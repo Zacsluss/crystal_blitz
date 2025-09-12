@@ -13,8 +13,8 @@
   ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
   ![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
   ![Web Audio](https://img.shields.io/badge/Web_Audio_API-5A9FD4?style=flat-square&logo=webaudio&logoColor=white)
-  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-5,153-brightgreen?style=flat-square)
-  ![File Size](https://img.shields.io/badge/File_Size-188KB-blue?style=flat-square)
+  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-7,704-brightgreen?style=flat-square)
+  ![File Size](https://img.shields.io/badge/File_Size-283KB-blue?style=flat-square)
   ![Performance](https://img.shields.io/badge/Performance-60_FPS-green?style=flat-square)
   
   <br>
@@ -41,7 +41,7 @@ open Crystal_Blitz.html  # That's it!
 
 ## 🎯 **What Makes This Special**
 
-> A technical demonstration of advanced web development - achieving AAA game performance in a single 188KB HTML file with no build process, no dependencies, and no external assets.
+> A technical demonstration of advanced web development - achieving AAA game performance in a single 283KB HTML file with no build process, no dependencies, and no external assets.
 
 ### 🌟 **Core Features**
 
@@ -207,8 +207,8 @@ python -m http.server 8000  # Optional local server
 
 ## 🎯 **Project Stats**
 
-- **7,830** lines of optimized code
-- **225KB** file size (highly optimized!)
+- **7,704** lines of optimized code
+- **283KB** file size (enhanced with glassmorphism UI!)
 - **0** dependencies
 - **0** build steps
 - **100%** browser compatible

@@ -20,18 +20,19 @@
 **Crystal Blitz** is a single-file HTML5 arena survival shooter game where players face endless waves of increasingly difficult enemies. The game features a robust crystal-based powerup system, intelligent enemy AI, and progressive difficulty scaling.
 
 ### Key Features
-- **Single-File Architecture**: Entire game contained in one HTML file (7,830 lines)
+- **Single-File Architecture**: Entire game contained in one HTML file (7,704 lines)
 - **No External Dependencies**: Self-contained with procedural audio, no external assets
 - **Cross-Platform**: Works on desktop and mobile browsers
 - **Performance Optimized**: Adaptive quality system, object pooling, spatial partitioning
 - **Rich Gameplay**: 11 crystal types, 17 permanent upgrades, 12+ enemy behaviors
+- **Enhanced UI**: Glassmorphism effects, shimmer animations, improved visual feedback
 
 ### Technology Stack
 - **Language**: Vanilla JavaScript (ES6+)
 - **Rendering**: HTML5 Canvas 2D API
 - **Audio**: Web Audio API (procedural sound generation)
 - **Build**: None required (single HTML file)
-- **Size**: ~225KB uncompressed
+- **Size**: ~283KB uncompressed
 
 ---
 
@@ -416,6 +417,7 @@ Level 5+: +50 + 50*(level-3) kills
 - Position: Top-left
 - Gradient: Red (#ff6b6b → #ffa5a5)
 - Updates: Real-time with damage flash
+- Effects: Shimmer animation on healing, enhanced glow
 
 #### Stamina Bar
 - Position: Below health
@@ -628,11 +630,11 @@ performanceLevel: 0.3 to 1.0
 Crystal_Blitz.html
 ├── <head>
 │   ├── Meta tags
-│   └── <style> (2,250 lines CSS)
+│   └── <style> (Enhanced CSS with glassmorphism)
 ├── <body>
 │   ├── Canvas element
 │   ├── UI containers
-│   └── <script> (5,580 lines JS)
+│   └── <script> (Optimized JavaScript)
 ```
 
 #### Module Pattern
