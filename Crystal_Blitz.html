@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="screen-orientation" content="landscape">
   <title>Crystal Blitz — Arena Shooter</title>
   <style>
     :root {
@@ -31,7 +32,7 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      background: linear-gradient(180deg, rgba(18, 22, 29, 0.7), rgba(15, 19, 25, 0.7));
       padding: 20px 24px;
       border-radius: 10px;
       box-shadow: 0 6px 14px var(--shadow);
@@ -39,7 +40,7 @@
       user-select: none;
       pointer-events: none;
       min-width: 440px;
-      opacity: 0.5;
+      backdrop-filter: blur(4px);
       z-index: 200;
     }
     #hud .row {
@@ -58,20 +59,151 @@
       border-radius: 999px;
       overflow: hidden;
       border: 1px solid #1f2430;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     }
     #hud .bar > i {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
+      display: block;
+      height: 100%;
       background: linear-gradient(90deg, var(--accent), #34d1ff);
       box-shadow: inset 0 0 6px rgba(0,0,0,0.25);
+      transition: none;
+      position: relative;
+      border-radius: 999px;
+    }
+    #hud .bar.healing > i::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.4) 45%, 
+        rgba(255,255,255,0.6) 50%, 
+        rgba(255,255,255,0.4) 55%, 
+        rgba(255,255,255,0) 100%);
+      animation: shimmer 1.5s infinite;
+      opacity: 0.8;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
     }
     #hud .bar.health > i { 
       background: var(--health-gradient); 
-      box-shadow: 0 0 8px rgba(255, 107, 107, 0.6), inset 0 0 6px rgba(0,0,0,0.25);
+      box-shadow: 0 0 20px rgba(255, 107, 107, 1), 0 0 40px rgba(255, 107, 107, 0.6), inset 0 0 10px rgba(0,0,0,0.3);
+      filter: brightness(1.1);
+    }
+    #hud .bar.health.taking-damage > i {
+      background: linear-gradient(90deg, #ff3333, #ff6666) !important;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.3) !important;
+      filter: brightness(1.4) saturate(1.5);
+      animation: damageFlash 0.3s ease-out;
+    }
+    @keyframes damageFlash {
+      0% { 
+        filter: brightness(2) saturate(2);
+      }
+      50% {
+        filter: brightness(1.7) saturate(1.7);
+      }
+      100% { 
+        filter: brightness(1.4) saturate(1.5);
+      }
+    }
+    #hud .bar.health.low > i {
+      animation: pulseLow 1s ease-in-out infinite;
+    }
+    @keyframes pulseLow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 107, 107, 1), 0 0 40px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(0,0,0,0.3);
+        filter: brightness(1.1);
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(255, 107, 107, 1), 0 0 80px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.2);
+        filter: brightness(1.5);
+      }
     }
     #hud .bar.stamina > i { 
       background: var(--stamina-gradient); 
-      box-shadow: 0 0 8px rgba(255, 209, 102, 0.6), inset 0 0 6px rgba(0,0,0,0.25);
+      box-shadow: 0 0 20px rgba(255, 209, 102, 1), 0 0 40px rgba(255, 209, 102, 0.6), inset 0 0 10px rgba(0,0,0,0.3);
+      filter: brightness(1.1);
+    }
+    #hud .bar.stamina.using-stamina > i {
+      background: linear-gradient(90deg, #ff9933, #ffcc66) !important;
+      box-shadow: 0 0 30px rgba(255, 153, 0, 1), 0 0 60px rgba(255, 200, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.3) !important;
+      filter: brightness(1.3) saturate(1.4);
+      animation: staminaDrain 0.2s ease-out;
+    }
+    @keyframes staminaDrain {
+      0% { 
+        filter: brightness(1.8) saturate(1.8);
+      }
+      100% { 
+        filter: brightness(1.3) saturate(1.4);
+      }
+    }
+    #hud .bar.stamina.low > i {
+      animation: pulseStaminaLow 0.8s ease-in-out infinite;
+    }
+    @keyframes pulseStaminaLow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 209, 102, 1), 0 0 40px rgba(255, 200, 0, 0.6), inset 0 0 10px rgba(0,0,0,0.3);
+        filter: brightness(1.1);
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(255, 209, 102, 1), 0 0 80px rgba(255, 200, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.2);
+        filter: brightness(1.6);
+      }
+    }
+    #hud .bar.heat > i { 
+      background: linear-gradient(90deg, #ff9933, #ff6600);
+      box-shadow: 0 0 15px rgba(255, 153, 51, 0.8), inset 0 0 8px rgba(0,0,0,0.3);
+      filter: brightness(1.1);
+      transition: all 0.15s ease;
+    }
+    #hud .bar.heat.warning > i {
+      background: linear-gradient(90deg, #ff6600, #ff4400) !important;
+      box-shadow: 0 0 25px rgba(255, 102, 0, 1), 0 0 50px rgba(255, 102, 0, 0.6), inset 0 0 12px rgba(0,0,0,0.3) !important;
+      filter: brightness(1.2);
+      animation: heatWarning 0.8s ease-in-out infinite;
+    }
+    @keyframes heatWarning {
+      0%, 100% { filter: brightness(1.2); }
+      50% { filter: brightness(1.5); }
+    }
+    #hud .bar.heat.danger > i {
+      background: linear-gradient(90deg, #ff3300, #ff0000) !important;
+      box-shadow: 0 0 35px rgba(255, 0, 0, 1), 0 0 70px rgba(255, 0, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.2) !important;
+      filter: brightness(1.4) saturate(1.5);
+      animation: heatDanger 0.4s ease-in-out infinite;
+    }
+    @keyframes heatDanger {
+      0%, 100% { 
+        filter: brightness(1.4) saturate(1.5);
+        transform: scaleY(1);
+      }
+      50% { 
+        filter: brightness(1.8) saturate(2);
+        transform: scaleY(1.05);
+      }
+    }
+    #hud .bar.heat.overheated > i {
+      background: linear-gradient(90deg, #ffffff, #ff0000, #ffffff) !important;
+      box-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 100px rgba(255, 0, 0, 1), inset 0 0 20px rgba(255,255,255,0.5) !important;
+      filter: brightness(2) saturate(0.5);
+      animation: overheatPulse 0.3s ease-in-out infinite;
+    }
+    @keyframes overheatPulse {
+      0%, 100% { 
+        filter: brightness(2) saturate(0.5);
+        background-position: 0% 50%;
+      }
+      50% { 
+        filter: brightness(2.5) saturate(0.3);
+        background-position: 100% 50%;
+      }
     }
     #hud .muted { color: var(--muted); }
     #help {
@@ -248,6 +380,108 @@
       text-align: center;
       color: var(--muted);
     }
+    /* Tab system for pause menu */
+    .tab-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+    .tab-button {
+      padding: 8px 16px;
+      background: rgba(26, 31, 41, 0.7);
+      border: 1px solid rgba(90, 242, 199, 0.3);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .tab-button.active {
+      background: rgba(90, 242, 199, 0.2);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .tab-button:hover {
+      background: rgba(90, 242, 199, 0.15);
+      color: var(--fg);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Enemy legend styles */
+    .enemy-legend {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .enemy-legend::-webkit-scrollbar {
+      width: 6px;
+    }
+    .enemy-legend::-webkit-scrollbar-track {
+      background: rgba(26, 31, 41, 0.5);
+      border-radius: 3px;
+    }
+    .enemy-legend::-webkit-scrollbar-thumb {
+      background: rgba(90, 242, 199, 0.5);
+      border-radius: 3px;
+    }
+    .enemy-category {
+      margin-bottom: 16px;
+    }
+    .enemy-category h4 {
+      color: var(--accent);
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(90, 242, 199, 0.3);
+      padding-bottom: 4px;
+    }
+    .enemy-entry {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+      padding: 4px;
+      background: rgba(18, 22, 29, 0.4);
+      border-radius: 4px;
+    }
+    .enemy-icon {
+      width: 30px;
+      height: 30px;
+      margin-right: 12px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 16px;
+    }
+    .enemy-preview-canvas {
+      margin-right: 12px;
+      border-radius: 4px;
+      background: #222;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+    .enemy-info {
+      flex: 1;
+    }
+    .enemy-name {
+      font-weight: 600;
+      color: var(--fg);
+      font-size: 13px;
+    }
+    .enemy-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
     .stat-value {
       margin-left: 4px;
     }
@@ -296,15 +530,20 @@
     }
     #powerupNotification {
       position: fixed;
-      top: 80px;
+      top: 180px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(180deg, rgba(18, 22, 29, 0.525), rgba(15, 19, 25, 0.525));
-      border: 2px solid rgba(90, 242, 199, 0.7);
-      padding: 24px 40px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px var(--shadow);
-      font-size: 36px;
+      background: linear-gradient(135deg, rgba(18, 22, 29, 0.25), rgba(15, 19, 25, 0.25));
+      border: 2px solid rgba(90, 242, 199, 0.3);
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 
+        0 8px 24px rgba(0,0,0,0.2),
+        0 0 30px rgba(90,242,199,0.5),
+        0 0 60px rgba(255,91,110,0.3),
+        0 0 90px rgba(52,209,255,0.2),
+        0 0 120px rgba(255,209,102,0.15);
+      font-size: 24px;
       font-weight: 700;
       text-align: center;
       color: var(--accent);
@@ -312,20 +551,56 @@
       letter-spacing: 1px;
       display: none;
       z-index: 1000;
-      animation: powerupPulse 3s ease-out forwards;
+      animation: powerupPulse 3s ease-out forwards, crystalRainbowGlow 2s ease-in-out infinite;
       pointer-events: none;
       user-select: none;
     }
+    
+    @keyframes crystalRainbowGlow {
+      0%, 100% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(90,242,199,0.6),
+          0 0 80px rgba(255,91,110,0.4),
+          0 0 120px rgba(52,209,255,0.3);
+      }
+      25% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(255,91,110,0.6),
+          0 0 80px rgba(52,209,255,0.4),
+          0 0 120px rgba(255,209,102,0.3);
+      }
+      50% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(52,209,255,0.6),
+          0 0 80px rgba(255,209,102,0.4),
+          0 0 120px rgba(90,242,199,0.3);
+      }
+      75% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(255,209,102,0.6),
+          0 0 80px rgba(90,242,199,0.4),
+          0 0 120px rgba(255,91,110,0.3);
+      }
+    }
     #waveAnnouncement {
       position: fixed;
-      top: 50%;
+      top: 30px;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      background: linear-gradient(135deg, rgba(18, 22, 29, 0.35), rgba(15, 19, 25, 0.35));
-      border: 3px solid var(--accent);
-      padding: 40px 60px;
-      border-radius: 16px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 32px rgba(90,242,199,0.3);
+      transform: translateX(-50%) scale(1);
+      background: linear-gradient(135deg, rgba(18, 22, 29, 0.25), rgba(15, 19, 25, 0.25));
+      border: 2px solid rgba(90, 242, 199, 0.3);
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 
+        0 8px 24px rgba(0,0,0,0.2), 
+        0 0 30px rgba(90,242,199,0.4),
+        0 0 60px rgba(255,91,110,0.3),
+        0 0 90px rgba(52,209,255,0.2),
+        0 0 120px rgba(255,209,102,0.15);
       text-align: center;
       color: var(--accent);
       display: none;
@@ -334,39 +609,98 @@
       backdrop-filter: blur(4px);
       pointer-events: none;
       user-select: none;
+      min-width: 180px;
+      animation: rainbowGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes rainbowGlow {
+      0%, 100% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 30px rgba(90,242,199,0.5),
+          0 0 60px rgba(255,91,110,0.3),
+          0 0 90px rgba(52,209,255,0.2);
+      }
+      25% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 30px rgba(255,91,110,0.5),
+          0 0 60px rgba(52,209,255,0.3),
+          0 0 90px rgba(255,209,102,0.2);
+      }
+      50% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 30px rgba(52,209,255,0.5),
+          0 0 60px rgba(255,209,102,0.3),
+          0 0 90px rgba(90,242,199,0.2);
+      }
+      75% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 30px rgba(255,209,102,0.5),
+          0 0 60px rgba(90,242,199,0.3),
+          0 0 90px rgba(255,91,110,0.2);
+      }
     }
     #waveAnnouncement .wave-number {
-      font-size: 72px;
-      font-weight: 900;
-      text-shadow: 0 0 16px rgba(90,242,199,0.8);
-      margin-bottom: 16px;
-      letter-spacing: 2px;
+      font-size: 24px;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(90,242,199,0.8);
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+      line-height: 1;
     }
     #waveAnnouncement .wave-subtitle {
-      font-size: 24px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--muted);
-      text-shadow: 0 0 8px rgba(90,242,199,0.4);
-      margin-top: 8px;
+      text-shadow: 0 0 4px rgba(90,242,199,0.4);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     #waveAnnouncement.boss-wave {
-      border-color: #ff4444;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 32px rgba(255,68,68,0.4);
+      border-color: rgba(255, 68, 68, 0.3);
+      background: linear-gradient(135deg, rgba(18, 22, 29, 0.25), rgba(25, 15, 15, 0.25));
+      animation: bossRainbowGlow 2s ease-in-out infinite;
+    }
+    
+    @keyframes bossRainbowGlow {
+      0%, 100% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(255,68,68,0.6),
+          0 0 80px rgba(255,91,110,0.4),
+          0 0 120px rgba(255,209,102,0.2);
+      }
+      50% {
+        box-shadow: 
+          0 8px 24px rgba(0,0,0,0.2),
+          0 0 40px rgba(255,91,110,0.6),
+          0 0 80px rgba(255,68,68,0.4),
+          0 0 120px rgba(52,209,255,0.2);
+      }
     }
     #waveAnnouncement.boss-wave .wave-number {
       color: #ff4444;
-      text-shadow: 0 0 16px rgba(255,68,68,0.8);
+      text-shadow: 0 0 8px rgba(255,68,68,0.8);
     }
     #powerupDialog {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: linear-gradient(180deg, rgba(18, 22, 29, 0.375), rgba(15, 19, 25, 0.375));
-      border: 3px solid var(--accent);
+      background: linear-gradient(180deg, rgba(18, 22, 29, 0.25), rgba(15, 19, 25, 0.25));
+      border: 3px solid rgba(90, 242, 199, 0.4);
       padding: 24px 28px;
       border-radius: 16px;
-      box-shadow: 0 16px 48px var(--shadow);
+      box-shadow: 
+        0 16px 48px rgba(0,0,0,0.3),
+        0 0 40px rgba(90,242,199,0.5),
+        0 0 80px rgba(255,91,110,0.3),
+        0 0 120px rgba(52,209,255,0.2),
+        0 0 160px rgba(255,209,102,0.15);
       display: none;
       z-index: 2000;
       max-width: 600px;
@@ -374,6 +708,46 @@
       opacity: 0;
       pointer-events: none;
       user-select: none;
+      animation: upgradeRainbowGlow 2.5s ease-in-out infinite;
+    }
+    
+    @keyframes upgradeRainbowGlow {
+      0%, 100% {
+        box-shadow: 
+          0 16px 48px rgba(0,0,0,0.3),
+          0 0 50px rgba(90,242,199,0.6),
+          0 0 100px rgba(255,91,110,0.4),
+          0 0 150px rgba(52,209,255,0.3),
+          0 0 200px rgba(255,209,102,0.2);
+        border-color: rgba(90, 242, 199, 0.5);
+      }
+      25% {
+        box-shadow: 
+          0 16px 48px rgba(0,0,0,0.3),
+          0 0 50px rgba(255,91,110,0.6),
+          0 0 100px rgba(52,209,255,0.4),
+          0 0 150px rgba(255,209,102,0.3),
+          0 0 200px rgba(90,242,199,0.2);
+        border-color: rgba(255, 91, 110, 0.5);
+      }
+      50% {
+        box-shadow: 
+          0 16px 48px rgba(0,0,0,0.3),
+          0 0 50px rgba(52,209,255,0.6),
+          0 0 100px rgba(255,209,102,0.4),
+          0 0 150px rgba(90,242,199,0.3),
+          0 0 200px rgba(255,91,110,0.2);
+        border-color: rgba(52, 209, 255, 0.5);
+      }
+      75% {
+        box-shadow: 
+          0 16px 48px rgba(0,0,0,0.3),
+          0 0 50px rgba(255,209,102,0.6),
+          0 0 100px rgba(90,242,199,0.4),
+          0 0 150px rgba(255,91,110,0.3),
+          0 0 200px rgba(52,209,255,0.2);
+        border-color: rgba(255, 209, 102, 0.5);
+      }
     }
     #powerupDialog h2 {
       margin: 0 0 16px 0;
@@ -591,21 +965,136 @@
       }
     }
     
-    /* Game Start Transition */
-    @keyframes gameStartFlash {
-      0% { 
-        background: radial-gradient(circle, rgba(90,242,199,0.3) 0%, transparent 50%);
-        opacity: 1;
+    /* Trippy Shockwave Reality Ripple Effect */
+    @keyframes psychedelicRipple {
+      0% {
+        width: 10px;
+        height: 10px;
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 0;
+        filter: hue-rotate(0deg) blur(0px);
       }
-      50% { 
-        background: radial-gradient(circle, rgba(90,242,199,0.6) 0%, rgba(90,242,199,0.2) 30%, transparent 80%);
+      10% {
+        width: 100px;
+        height: 100px;
+        transform: translate(-50%, -50%) rotate(36deg);
         opacity: 1;
+        filter: hue-rotate(60deg) blur(0px);
       }
-      100% { 
-        background: radial-gradient(circle, transparent 0%, transparent 100%);
+      30% {
+        width: 300px;
+        height: 300px;
+        transform: translate(-50%, -50%) rotate(120deg);
+        opacity: 0.9;
+        filter: hue-rotate(180deg) blur(1px);
+      }
+      50% {
+        width: 600px;
+        height: 600px;
+        transform: translate(-50%, -50%) rotate(180deg);
+        opacity: 0.7;
+        filter: hue-rotate(270deg) blur(2px);
+      }
+      70% {
+        width: 900px;
+        height: 900px;
+        transform: translate(-50%, -50%) rotate(270deg);
+        opacity: 0.4;
+        filter: hue-rotate(360deg) blur(4px);
+      }
+      100% {
+        width: 1500px;
+        height: 1500px;
+        transform: translate(-50%, -50%) rotate(360deg);
+        opacity: 0;
+        filter: hue-rotate(420deg) blur(10px);
+      }
+    }
+    
+    @keyframes realityTear {
+      0% {
+        clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%);
+        transform: rotate(0deg) scale(0);
+        filter: saturate(5) contrast(3);
+      }
+      25% {
+        clip-path: polygon(45% 45%, 55% 45%, 55% 55%, 45% 55%);
+        transform: rotate(90deg) scale(0.5);
+      }
+      50% {
+        clip-path: polygon(30% 30%, 70% 30%, 70% 70%, 30% 70%);
+        transform: rotate(180deg) scale(1);
+        filter: saturate(2) contrast(1.5) brightness(1.5);
+      }
+      75% {
+        clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 90%);
+        transform: rotate(270deg) scale(1.5);
+      }
+      100% {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        transform: rotate(360deg) scale(2);
+        filter: saturate(1) contrast(1) brightness(1);
         opacity: 0;
       }
     }
+    
+    @keyframes chromaShift {
+      0%, 100% { filter: hue-rotate(0deg) saturate(3); }
+      25% { filter: hue-rotate(90deg) saturate(4); }
+      50% { filter: hue-rotate(180deg) saturate(5); }
+      75% { filter: hue-rotate(270deg) saturate(4); }
+    }
+    
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2px, 2px); }
+      20% { transform: translate(2px, -2px); }
+      30% { transform: translate(-2px, -2px); }
+      40% { transform: translate(2px, 2px); }
+      50% { transform: translate(-1px, 1px); }
+      60% { transform: translate(1px, -1px); }
+      70% { transform: translate(-1px, -1px); }
+      80% { transform: translate(1px, 1px); }
+      90% { transform: translate(0, 0); }
+    }
+    
+    @keyframes warpGrid {
+      0% {
+        transform: perspective(1000px) rotateX(0deg) rotateZ(0deg) scale(1);
+        background-position: 0 0, 0 0, 0 0, 0 0;
+        opacity: 0;
+        filter: blur(0px);
+      }
+      10% {
+        transform: perspective(1000px) rotateX(60deg) rotateZ(10deg) scale(1.5);
+        opacity: 1;
+        filter: blur(0px);
+      }
+      25% {
+        transform: perspective(1000px) rotateX(-30deg) rotateZ(-5deg) scale(0.8);
+        background-position: -10px -10px, 10px 10px, -20px 20px, 20px -20px;
+        opacity: 0.9;
+      }
+      50% {
+        transform: perspective(1000px) rotateX(45deg) rotateZ(180deg) scale(1.2);
+        background-position: 20px 20px, -20px -20px, 40px -40px, -40px 40px;
+        opacity: 0.7;
+        filter: blur(1px);
+      }
+      75% {
+        transform: perspective(1000px) rotateX(-60deg) rotateZ(270deg) scale(1.8);
+        background-position: -5px -5px, 5px 5px, -10px 10px, 10px -10px;
+        opacity: 0.4;
+        filter: blur(2px);
+      }
+      100% {
+        transform: perspective(1000px) rotateX(0deg) rotateZ(360deg) scale(3);
+        background-position: 50px 50px, -50px -50px, 100px -100px, -100px 100px;
+        opacity: 0;
+        filter: blur(5px);
+      }
+    }
+    
     .game-start-overlay {
       position: fixed;
       top: 0;
@@ -615,6 +1104,99 @@
       pointer-events: none;
       z-index: 999;
       opacity: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(11,13,16,0.4) 100%);
+    }
+    
+    .ripple-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+    }
+    
+    .ripple {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      opacity: 0;
+      background: transparent;
+    }
+    
+    .ripple1 {
+      border: 8px solid rgba(90,242,199,0.9);
+      box-shadow: 
+        0 0 40px rgba(90,242,199,0.8),
+        inset 0 0 40px rgba(90,242,199,0.4);
+      animation: psychedelicRipple 1.5s ease-out;
+    }
+    
+    .ripple2 {
+      border: 6px solid rgba(255,91,110,0.9);
+      box-shadow: 
+        0 0 40px rgba(255,91,110,0.8),
+        inset 0 0 40px rgba(255,91,110,0.4);
+      animation: psychedelicRipple 1.5s ease-out 0.2s;
+    }
+    
+    .ripple3 {
+      border: 4px solid rgba(52,209,255,0.9);
+      box-shadow: 
+        0 0 40px rgba(52,209,255,0.8),
+        inset 0 0 40px rgba(52,209,255,0.4);
+      animation: psychedelicRipple 1.5s ease-out 0.4s;
+    }
+    
+    .ripple4 {
+      border: 10px solid rgba(255,209,102,0.9);
+      box-shadow: 
+        0 0 40px rgba(255,209,102,0.8),
+        inset 0 0 40px rgba(255,209,102,0.4);
+      animation: psychedelicRipple 1.5s ease-out 0.6s;
+    }
+    
+    .reality-tear {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, 
+        rgba(90,242,199,0.3) 0%, 
+        rgba(255,91,110,0.3) 25%, 
+        rgba(52,209,255,0.3) 50%, 
+        rgba(255,209,102,0.3) 75%, 
+        rgba(90,242,199,0.3) 100%);
+      animation: realityTear 1.8s ease-in-out;
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .warp-grid {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background-image: 
+        linear-gradient(rgba(90,242,199,0.6) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(90,242,199,0.6) 2px, transparent 2px),
+        linear-gradient(45deg, rgba(255,91,110,0.3) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(52,209,255,0.3) 1px, transparent 1px);
+      background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
+      animation: warpGrid 1.8s ease-out;
+      transform-origin: center center;
+      pointer-events: none;
+      overflow: hidden;
     }
     
     /* Powerup Selection Animations */
@@ -669,38 +1251,38 @@
     @keyframes waveCardEntry {
       0% { 
         opacity: 0; 
-        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
-        filter: blur(8px);
+        transform: translateX(-50%) translateY(-30px) scale(0.5);
+        filter: blur(4px);
       }
       10% { 
         opacity: 0.7; 
-        transform: translate(-50%, -50%) scale(1.3) rotate(3deg);
-        filter: blur(2px);
+        transform: translateX(-50%) translateY(-5px) scale(1.1);
+        filter: blur(1px);
       }
       25% { 
         opacity: 1; 
-        transform: translate(-50%, -50%) scale(0.9) rotate(-1deg);
+        transform: translateX(-50%) translateY(2px) scale(0.95);
         filter: blur(0px);
       }
       40% { 
-        transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+        transform: translateX(-50%) translateY(-1px) scale(1.02);
       }
       60% { 
-        transform: translate(-50%, -50%) scale(0.95) rotate(0deg);
+        transform: translateX(-50%) translateY(1px) scale(0.99);
       }
       100% { 
-        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        transform: translateX(-50%) translateY(0) scale(1);
       }
     }
     
     @keyframes waveCardExit {
       0% { 
         opacity: 1; 
-        transform: translate(-50%, -50%) scale(1);
+        transform: translateX(-50%) scale(1);
       }
       100% { 
         opacity: 0; 
-        transform: translate(-50%, -50%) scale(1.2);
+        transform: translateX(-50%) translateY(-20px) scale(0.8);
         filter: blur(4px);
       }
     }
@@ -937,6 +1519,236 @@
       }
     }
     
+    /* Mobile Touch Zones Visual Indicators */
+    #touchZones {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 450;
+      display: none;
+    }
+    
+    .touch-zone {
+      position: absolute;
+      border: 2px dashed rgba(90, 242, 199, 0.3);
+      background: rgba(90, 242, 199, 0.05);
+      pointer-events: none;
+    }
+    
+    .touch-zone.left {
+      left: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      border-right: 2px solid rgba(90, 242, 199, 0.3);
+    }
+    
+    .touch-zone.right {
+      right: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+    }
+    
+    .touch-indicator {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid rgba(90, 242, 199, 0.6);
+      background: radial-gradient(circle, rgba(90, 242, 199, 0.3), transparent);
+      pointer-events: none;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+    
+    .touch-indicator.active {
+      display: block;
+      animation: touchPulse 0.3s ease-out;
+    }
+    
+    @keyframes touchPulse {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    }
+    
+    /* Landscape Orientation Lock Message */
+    #orientationWarning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0b0d10 0%, #12161d 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 30px;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    #orientationWarning.show {
+      display: flex !important;
+    }
+    
+    .rotate-icon {
+      width: 120px;
+      height: 80px;
+      border: 3px solid var(--accent);
+      border-radius: 15px;
+      position: relative;
+      animation: rotatePhone 2s ease-in-out infinite;
+      background: rgba(90, 242, 199, 0.1);
+    }
+    
+    .rotate-icon::before {
+      content: '📱';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+    }
+    
+    .rotate-icon::after {
+      content: '↻';
+      position: absolute;
+      bottom: -35px;
+      right: -35px;
+      font-size: 32px;
+      color: var(--accent);
+      animation: spin 2s linear infinite;
+    }
+    
+    @keyframes rotatePhone {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .orientation-message {
+      font-size: 28px;
+      color: var(--fg);
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .orientation-submessage {
+      font-size: 18px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    
+    /* Force landscape on mobile - show warning in portrait */
+    @media screen and (orientation: portrait) and (max-width: 1024px) {
+      #orientationWarning {
+        display: flex !important;
+      }
+      
+      #c, #gameStartOverlay, #hud, #mobileControls, #touchZones, #virtualJoystick, #banner, #gameOver {
+        visibility: hidden !important;
+      }
+    }
+    
+    /* Optimize UI for landscape mobile */
+    @media screen and (orientation: landscape) and (max-height: 600px) {
+      #hud {
+        top: 5px;
+        left: 10px;
+        padding: 10px 14px;
+        font-size: 18px;
+        min-width: 320px;
+      }
+      
+      #hud .bar {
+        --w: 220px;
+        height: 10px;
+      }
+      
+      .mobile-btn {
+        width: 65px;
+        height: 65px;
+        font-size: 24px;
+      }
+      
+      .sprint-btn {
+        bottom: 15px;
+        left: 15px;
+        width: 75px;
+        height: 75px;
+      }
+      
+      .leap-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 75px;
+        height: 75px;
+      }
+      
+      .pause-btn {
+        top: 5px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+      }
+      
+      #virtualJoystick {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .joystick-knob {
+        width: 35px;
+        height: 35px;
+      }
+    }
+    
+    /* Mobile Virtual Joystick */
+    #virtualJoystick {
+      position: fixed;
+      width: 120px;
+      height: 120px;
+      display: none;
+      pointer-events: none;
+      z-index: 460;
+    }
+    
+    .joystick-base {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid rgba(90, 242, 199, 0.4);
+      background: radial-gradient(circle, rgba(18, 22, 29, 0.8), rgba(15, 19, 25, 0.6));
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .joystick-knob {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #34d1ff);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 8px rgba(90, 242, 199, 0.5);
+      transition: none;
+    }
+    
     /* Mobile Control Buttons */
     .mobile-btn {
       position: fixed;
@@ -944,7 +1756,7 @@
       border: 2px solid rgba(90, 242, 199, 0.5);
       border-radius: 50%;
       color: var(--accent);
-      font-size: 24px;
+      font-size: 28px;
       cursor: pointer;
       user-select: none;
       touch-action: none;
@@ -954,6 +1766,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      -webkit-tap-highlight-color: transparent;
     }
     
     .mobile-btn:active {
@@ -971,10 +1784,10 @@
     
     /* Sprint Button - Bottom Left */
     .sprint-btn {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       left: 20px;
-      bottom: 100px;
+      bottom: 120px;
     }
     
     .sprint-btn.sprinting {
@@ -983,10 +1796,10 @@
     
     /* Leap Button - Bottom Right */
     .leap-btn {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       right: 20px;
-      bottom: 100px;
+      bottom: 120px;
       position: relative;
     }
     
@@ -1069,7 +1882,16 @@
 </head>
 <body>
   <canvas id="c"></canvas>
-  <div class="game-start-overlay" id="gameStartOverlay"></div>
+  <div class="game-start-overlay" id="gameStartOverlay">
+    <div class="warp-grid"></div>
+    <div class="reality-tear"></div>
+    <div class="ripple-container">
+      <div class="ripple ripple1"></div>
+      <div class="ripple ripple2"></div>
+      <div class="ripple ripple3"></div>
+      <div class="ripple ripple4"></div>
+    </div>
+  </div>
   <div id="hud">
     <div class="row">Health
       <span class="bar health"><i id="healthBar" style="width:100%"></i></span>
@@ -1078,6 +1900,10 @@
     <div class="row">Stamina
       <span class="bar stamina"><i id="staminaBar" style="width:100%"></i></span>
       <span id="staminaTxt">100</span>
+    </div>
+    <div class="row">Heat
+      <span class="bar heat"><i id="heatBar" style="width:0%"></i></span>
+      <span id="heatTxt">0</span>
     </div>
     <div class="row">Wave <span id="wave" class="stat-value">1</span> • Kills <span id="kills" class="stat-value">0</span></div>
   </div>
@@ -1240,6 +2066,31 @@
     </div>
   </div>
   
+  <!-- Mobile Touch Zones -->
+  <div id="touchZones">
+    <div class="touch-zone left">
+      <div style="position: absolute; top: 20px; left: 20px; color: rgba(90, 242, 199, 0.5); font-size: 14px;">MOVE</div>
+    </div>
+    <div class="touch-zone right">
+      <div style="position: absolute; top: 20px; right: 20px; color: rgba(90, 242, 199, 0.5); font-size: 14px;">AIM & SHOOT</div>
+    </div>
+    <div id="touchIndicatorLeft" class="touch-indicator"></div>
+    <div id="touchIndicatorRight" class="touch-indicator"></div>
+  </div>
+  
+  <!-- Virtual Joystick -->
+  <div id="virtualJoystick">
+    <div class="joystick-base"></div>
+    <div id="joystickKnob" class="joystick-knob"></div>
+  </div>
+  
+  <!-- Orientation Warning -->
+  <div id="orientationWarning">
+    <div class="rotate-icon"></div>
+    <div class="orientation-message">Please Rotate Your Device</div>
+    <div class="orientation-submessage">Crystal Blitz requires landscape orientation for the best experience</div>
+  </div>
+  
   <!-- Mobile Control Buttons (only visible on touch devices) -->
   <div id="mobileControls" style="display:none">
     <button id="sprintBtn" class="mobile-btn sprint-btn">💨</button>
@@ -1279,8 +2130,10 @@
   const banner = getElement('banner');
   const hudHpBar = getElement('healthBar');
   const hudStaminaBar = getElement('staminaBar');
+  const hudHeatBar = getElement('heatBar');
   const hpTxt = getElement('hpTxt');
   const staminaTxt = getElement('staminaTxt');
+  const heatTxt = getElement('heatTxt');
   const waveTxt = getElement('wave');
   const killsTxt = getElement('kills');
   const fpsTxt = getElement('fps');
@@ -1347,9 +2200,14 @@
   const keys = new Set();
   let mouseX = 0, mouseY = 0, mouseDown = false;
   
-  // Mobile touch support
-  let touchMove = {x: 0, y: 0, active: false};
-  let touchShoot = {x: 0, y: 0, active: false};
+  // Mobile touch support with improved handling
+  let touchMove = {x: 0, y: 0, startX: 0, startY: 0, active: false, id: null};
+  let touchShoot = {x: 0, y: 0, active: false, id: null};
+  let touchZonesElement = null;
+  let virtualJoystick = null;
+  let joystickKnob = null;
+  let touchIndicatorLeft = null;
+  let touchIndicatorRight = null;
   window.addEventListener('keydown', e => {
     if (e.code === 'KeyP'){ togglePause(); return; }
     if (e.code === 'KeyL'){ 
@@ -1373,54 +2231,252 @@
   window.addEventListener('mouseup', () => mouseDown = false);
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   
-  // Touch controls for mobile
+  // Improved touch controls for mobile
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     initAudio();
-    const touch = e.touches[0];
-    if (touch.clientX < canvas.width / 2) {
-      // Left side - movement
-      touchMove.active = true;
-      touchMove.x = touch.clientX;
-      touchMove.y = touch.clientY;
-    } else {
-      // Right side - shooting/aiming
-      touchShoot.active = true;
-      touchShoot.x = touch.clientX;
-      touchShoot.y = touch.clientY;
-      mouseX = touch.clientX;
-      mouseY = touch.clientY;
-      mouseDown = true;
+    
+    // Handle multiple touches
+    for (let i = 0; i < e.touches.length; i++) {
+      const touch = e.touches[i];
+      // Use canvas bounds for more accurate detection
+      const rect = canvas.getBoundingClientRect();
+      const screenMidpoint = rect.width / 2;
+      
+      if (touch.clientX < screenMidpoint && !touchMove.active) {
+        // Left side - movement
+        touchMove.active = true;
+        touchMove.id = touch.identifier;
+        touchMove.startX = touch.clientX;
+        touchMove.startY = touch.clientY;
+        touchMove.x = touch.clientX;
+        touchMove.y = touch.clientY;
+        
+        // Show virtual joystick at touch position
+        if (virtualJoystick) {
+          virtualJoystick.style.display = 'block';
+          virtualJoystick.style.left = touch.clientX + 'px';
+          virtualJoystick.style.top = touch.clientY + 'px';
+          virtualJoystick.style.transform = 'translate(-50%, -50%)';
+          virtualJoystick.style.bottom = 'auto'; // Reset bottom positioning
+        }
+        
+        // Show touch indicator
+        if (touchIndicatorLeft) {
+          touchIndicatorLeft.style.left = touch.clientX + 'px';
+          touchIndicatorLeft.style.top = touch.clientY + 'px';
+          touchIndicatorLeft.classList.add('active');
+        }
+      } else if (touch.clientX >= screenMidpoint && !touchShoot.active) {
+        // Right side - shooting/aiming
+        touchShoot.active = true;
+        touchShoot.id = touch.identifier;
+        touchShoot.x = touch.clientX;
+        touchShoot.y = touch.clientY;
+        // Convert to canvas coordinates
+        mouseX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        mouseY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        mouseDown = true;
+        
+        // Show touch indicator
+        if (touchIndicatorRight) {
+          touchIndicatorRight.style.left = touch.clientX + 'px';
+          touchIndicatorRight.style.top = touch.clientY + 'px';
+          touchIndicatorRight.classList.add('active');
+        }
+      }
     }
   });
   
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
-    const touch = e.touches[0];
-    if (touchMove.active && touch.clientX < canvas.width / 2) {
-      touchMove.x = touch.clientX;
-      touchMove.y = touch.clientY;
-    } else if (touchShoot.active && touch.clientX >= canvas.width / 2) {
-      touchShoot.x = touch.clientX;
-      touchShoot.y = touch.clientY;
-      mouseX = touch.clientX;
-      mouseY = touch.clientY;
+    
+    for (let i = 0; i < e.touches.length; i++) {
+      const touch = e.touches[i];
+      
+      if (touchMove.active && touch.identifier === touchMove.id) {
+        touchMove.x = touch.clientX;
+        touchMove.y = touch.clientY;
+        
+        // Update joystick knob position
+        if (joystickKnob && virtualJoystick) {
+          const dx = touch.clientX - touchMove.startX;
+          const dy = touch.clientY - touchMove.startY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 40; // Max joystick movement
+          
+          if (distance > maxDistance) {
+            const angle = Math.atan2(dy, dx);
+            joystickKnob.style.left = (50 + (Math.cos(angle) * maxDistance * 100 / 120)) + '%';
+            joystickKnob.style.top = (50 + (Math.sin(angle) * maxDistance * 100 / 120)) + '%';
+          } else {
+            joystickKnob.style.left = (50 + (dx * 100 / 120)) + '%';
+            joystickKnob.style.top = (50 + (dy * 100 / 120)) + '%';
+          }
+        }
+        
+        // Update touch indicator
+        if (touchIndicatorLeft) {
+          touchIndicatorLeft.style.left = touch.clientX + 'px';
+          touchIndicatorLeft.style.top = touch.clientY + 'px';
+        }
+      } else if (touchShoot.active && touch.identifier === touchShoot.id) {
+        touchShoot.x = touch.clientX;
+        touchShoot.y = touch.clientY;
+        // Convert to canvas coordinates
+        mouseX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        mouseY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        
+        // Update touch indicator
+        if (touchIndicatorRight) {
+          touchIndicatorRight.style.left = touch.clientX + 'px';
+          touchIndicatorRight.style.top = touch.clientY + 'px';
+        }
+      }
     }
   });
   
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
+    
+    // Check which touch ended
+    let moveEnded = true;
+    let shootEnded = true;
+    
+    for (let i = 0; i < e.touches.length; i++) {
+      const touch = e.touches[i];
+      if (touch.identifier === touchMove.id) moveEnded = false;
+      if (touch.identifier === touchShoot.id) shootEnded = false;
+    }
+    
+    if (moveEnded && touchMove.active) {
+      touchMove.active = false;
+      touchMove.id = null;
+      
+      // Hide virtual joystick and reset knob
+      if (virtualJoystick) {
+        virtualJoystick.style.display = 'none';
+      }
+      if (joystickKnob) {
+        joystickKnob.style.left = '50%';
+        joystickKnob.style.top = '50%';
+      }
+      if (touchIndicatorLeft) {
+        touchIndicatorLeft.classList.remove('active');
+      }
+    }
+    
+    if (shootEnded && touchShoot.active) {
+      touchShoot.active = false;
+      touchShoot.id = null;
+      mouseDown = false;
+      
+      if (touchIndicatorRight) {
+        touchIndicatorRight.classList.remove('active');
+      }
+    }
+  });
+  
+  // Prevent default touch behavior on canvas
+  canvas.addEventListener('touchcancel', e => {
+    e.preventDefault();
     touchMove.active = false;
+    touchMove.id = null;
     touchShoot.active = false;
+    touchShoot.id = null;
     mouseDown = false;
+    
+    // Hide all indicators
+    if (virtualJoystick) virtualJoystick.style.display = 'none';
+    if (joystickKnob) {
+      joystickKnob.style.left = '50%';
+      joystickKnob.style.top = '50%';
+    }
+    if (touchIndicatorLeft) touchIndicatorLeft.classList.remove('active');
+    if (touchIndicatorRight) touchIndicatorRight.classList.remove('active');
   });
   
   // ===== Mobile Controls Detection & Setup =====
   const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   
-  if (isMobile && mobileControls) {
+  // Initialize mobile UI elements
+  touchZonesElement = document.getElementById('touchZones');
+  virtualJoystick = document.getElementById('virtualJoystick');
+  joystickKnob = document.getElementById('joystickKnob');
+  touchIndicatorLeft = document.getElementById('touchIndicatorLeft');
+  touchIndicatorRight = document.getElementById('touchIndicatorRight');
+  const orientationWarning = document.getElementById('orientationWarning');
+  
+  if (isMobile) {
+    // Show mobile controls and touch zones
+    if (mobileControls) mobileControls.style.display = 'block';
+    if (touchZonesElement) touchZonesElement.style.display = 'block';
+    
+    // Add mobile-specific styles and prevent scrolling
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    canvas.style.touchAction = 'none';
+    
+    // Prevent iOS bounce scrolling
+    document.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    
+    // Handle orientation changes
+    function checkOrientation() {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      
+      if (isPortrait && isMobile) {
+        // Show warning and pause game
+        if (orientationWarning) {
+          orientationWarning.classList.add('show');
+        }
+        if (game && game.state === STATE.RUN) {
+          game.state = STATE.PAUSE;
+        }
+        return false; // Not in correct orientation
+      } else {
+        // Hide warning and allow game
+        if (orientationWarning) {
+          orientationWarning.classList.remove('show');
+        }
+        // Update canvas size on orientation change
+        if (game) {
+          resize();
+        }
+        return true; // In correct orientation
+      }
+    }
+    
+    // Check orientation on load and changes
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 100); // Delay to let orientation settle
+    });
+    window.addEventListener('resize', () => {
+      if (isMobile) checkOrientation();
+    });
+    
+    // Initial orientation check
+    setTimeout(() => {
+      checkOrientation();
+    }, 100);
+    
+    // Try to lock orientation if API is available (works on some Android devices)
+    if (screen.orientation && screen.orientation.lock) {
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+          screen.orientation.lock('landscape').catch(() => {
+            console.log('Orientation lock not supported');
+          });
+        }
+      });
+    }
+    
     // Show mobile controls
-    mobileControls.style.display = 'block';
+    if (mobileControls) mobileControls.style.display = 'block';
     
     // Sprint button - toggle or hold behavior
     let sprintActive = false;
@@ -1765,7 +2821,10 @@
     {id: 'criticalChance', name: 'Critical Strike', desc: '+10% critical hit chance', apply: (p) => p.criticalChance = Math.min(0.5, (p.criticalChance || 0) + 0.1)},
     {id: 'vampire', name: 'Vampire', desc: '+0.5 HP per enemy killed', apply: (p) => p.vampiricHealing = (p.vampiricHealing || 0) + 0.5},
     {id: 'adrenaline', name: 'Adrenaline', desc: '+20% speed for 3s after damage', apply: (p) => p.adrenalineBoost = true},
-    {id: 'efficient', name: 'Efficient', desc: '+5% chance shots don\'t consume ammo', apply: (p) => p.ammoEfficiency = Math.min(0.50, (p.ammoEfficiency || 0) + 0.05)}
+    {id: 'efficient', name: 'Efficient', desc: '+5% chance shots don\'t consume ammo', apply: (p) => p.ammoEfficiency = Math.min(0.50, (p.ammoEfficiency || 0) + 0.05)},
+    {id: 'heatSink', name: 'Heat Sink', desc: '+25% heat dissipation', apply: (p) => p.heatDissipation *= 1.25},
+    {id: 'coolantSystem', name: 'Coolant System', desc: '-20% heat per shot', apply: (p) => p.heatEfficiencyMod *= 0.8},
+    {id: 'extendedMagazine', name: 'Extended Magazine', desc: '+25% max heat capacity', apply: (p) => { p.maxHeat *= 1.25; }}
   ];
 
   // ===== Powerup Notification =====
@@ -1828,7 +2887,15 @@
     const subtitleEl = waveAnnouncement.querySelector('.wave-subtitle');
     
     waveNumberEl.textContent = `WAVE ${waveNumber}`;
-    subtitleEl.textContent = isBossWave ? 'SUPER BOSS INCOMING!' : 'GET READY';
+    
+    // Set subtitle based on wave number and type
+    if (isBossWave) {
+      subtitleEl.textContent = 'SUPER BOSS INCOMING!';
+    } else if (waveNumber === 3) {
+      subtitleEl.textContent = 'HEAVY ENEMIES UNLOCKED!';
+    } else {
+      subtitleEl.textContent = 'GET READY';
+    }
     
     // Apply boss wave styling
     if (isBossWave) {
@@ -1850,7 +2917,9 @@
       
       // Apply animation on next frame
       requestAnimationFrame(() => {
-        waveAnnouncement.style.animation = 'waveCardEntry 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        // Include both the entry animation and the continuous rainbow glow
+        const glowAnimation = isBossWave ? 'bossRainbowGlow 2s ease-in-out infinite' : 'rainbowGlow 3s ease-in-out infinite';
+        waveAnnouncement.style.animation = `waveCardEntry 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, ${glowAnimation}`;
         waveAnnouncement.style.opacity = ''; // Let animation control opacity
       });
     });
@@ -2112,6 +3181,14 @@
       patternMultipliers: new Map(), // Map of pattern type -> remaining shots
       fireDelay: 0.12,
       fireTimer: 0,
+      // Weapon overheat system
+      heat: 0,
+      maxHeat: 100,
+      overheated: false,
+      heatPerShot: 2, // Base heat per shot (50 shots to overheat)
+      heatDissipation: 25, // Heat dissipated per second when not firing
+      overheatCooldown: 40, // Heat level to recover to after overheating
+      heatEfficiencyMod: 1.0, // Modifier from upgrades
       dashCd: 0, dashReady: true,
       // Emergency leap system
       leapCd: 0, leapReady: true,
@@ -2143,7 +3220,7 @@
 
   const enemies = makePool(() => ({
     alive:false, x:0, y:0, vx:0, vy:0, r:14, hp:2, speed: 90, touchDmg: 12, color:'#ff5b6e',
-    deathTimer: 0, dying: false, originalColor: '#ff5b6e'
+    deathTimer: 0, dying: false, originalColor: '#ff5b6e', behavior: 'stalker', isShooter: false
   }));
 
   const particles = makePool(() => ({
@@ -2164,7 +3241,7 @@
 
   const mines = makePool(() => ({
     alive:false, x:0, y:0, r:8, fuseTime:0, maxFuseTime:30.0, isArmed:false,
-    triggerRadius:35, explosionRadius:70, explosionDamage:20, flashTimer:0, 
+    triggerRadius:35, explosionRadius:70, explosionDamage:8, flashTimer:0, 
     isTriggered:false, owner:null
   }));
 
@@ -2195,22 +3272,24 @@
 
   // Enemy types for variety
   const enemyTypes = [
-    {r:14, hp:1, speed:90, dmg:5, color:'#ff4444', name:'normal'}, // red (was 9)
-    {r:10, hp:1, speed:140, dmg:5, color:'#ffaa00', name:'fast'}, // orange (was 9)
-    {r:18, hp:3, speed:60, dmg:8, color:'#ff6600', name:'tank'}, // dark orange (was 12)
-    {r:12, hp:2, speed:200, dmg:5, color:'#cccc00', name:'zergling'}, // dark yellow rushers (was 9)
+    {r:14, hp:1, speed:120, dmg:5, color:'#AAFF00', name:'stalker'}, // yellow-green (medium speed)
+    {r:12, hp:1, speed:180, dmg:5, color:'#FF8800', name:'wraith'}, // bright orange (very fast) - increased from 10
+    {r:18, hp:3, speed:80, dmg:8, color:'#00CCFF', name:'brute'}, // sky blue (slow)
+    {r:14, hp:2, speed:220, dmg:5, color:'#FF2200', name:'swarm'}, // red-orange (blazing fast) - increased from 12
   ];
 
   // Behavior pools - unlock new behaviors every 2 waves (earlier unlocks for fun)
   const behaviorPools = [
-    // Waves 1-2: Basic behaviors with suicide crawlers
-    ['normal', 'zigzag', 'zerglingRush', 'suicide'],
-    // Waves 3-4: Add flanking and charging early
-    ['normal', 'zigzag', 'flank', 'charge', 'zerglingRush', 'suicide', 'slowpush', 'splitter', 'minelayer'],
-    // Waves 5-6: Add erratic behavior earlier
-    ['normal', 'zigzag', 'flank', 'charge', 'erratic', 'zerglingRush', 'suicide', 'slowpush', 'spiralshooter', 'splitter', 'minelayer'],
-    // Waves 7+: All behaviors (no more zerglings)
-    ['normal', 'zigzag', 'flank', 'charge', 'erratic', 'suicide', 'slowpush', 'spiralshooter', 'splitter', 'minelayer']
+    // Wave 1: Basic behaviors with volatiles (NO bombers)
+    ['stalker', 'serpent', 'leaper', 'volatile'],
+    // Waves 2-3: Add bombers and more behaviors (2x prowler weight)
+    ['stalker', 'serpent', 'prowler', 'prowler', 'berserker', 'leaper', 'volatile', 'bomber'],
+    // Waves 4-5: Add juggernauts and dividers (2x prowler weight)
+    ['stalker', 'serpent', 'prowler', 'prowler', 'berserker', 'leaper', 'volatile', 'juggernaut', 'divider', 'trapper', 'bomber'],
+    // Waves 5-6: Add maniac behavior (2x prowler weight)
+    ['stalker', 'serpent', 'prowler', 'prowler', 'berserker', 'maniac', 'leaper', 'volatile', 'juggernaut', 'vortex', 'divider', 'trapper', 'bomber'],
+    // Waves 7+: All behaviors (2x prowler weight)
+    ['stalker', 'serpent', 'prowler', 'prowler', 'berserker', 'maniac', 'leaper', 'volatile', 'juggernaut', 'vortex', 'divider', 'trapper', 'bomber']
   ];
 
   function spawnEnemy(g, clusterX = null, clusterY = null){
@@ -2235,34 +3314,48 @@
       e.x = x; e.y = y;
       e.vx = 0; e.vy = 0;
       
-      // Select enemy type based on wave with zergling replacement logic
+      // Reset shooter status to defaults (behavior will be set later)
+      e.isShooter = false;
+      e.shootTimer = 0;
+      
+      // Select enemy type based on wave with swarm replacement logic
       let type;
-      if (g.wave <= 12 && Math.random() < 0.4) {
-        // 40% chance for zerglings in waves 1-12
-        type = enemyTypes.find(t => t.name === 'zergling');
+      if (Math.random() < 0.3) {
+        // 30% chance for swarm throughout the game
+        type = enemyTypes.find(t => t.name === 'swarm');
       } else {
-        // Normal enemy type selection (excluding zerglings for waves 13+)
-        const baseTypes = g.wave <= 12 ? 
-          enemyTypes.filter(t => t.name !== 'zergling') : // Exclude zerglings from normal pool in waves 1-12
-          enemyTypes.filter(t => t.name !== 'zergling');  // No zerglings after wave 12
+        // Normal enemy type selection (excluding swarm)
+        const baseTypes = enemyTypes.filter(t => t.name !== 'swarm');
         const availableTypes = Math.min(baseTypes.length, 1 + Math.floor(g.wave/3));
         type = baseTypes[(Math.random() * availableTypes) | 0];
       }
       
       // Apply type stats with difficulty scaling (reduced by 30%)
-      const diff = 1 + g.wave * 0.084; // Was 0.12, now 0.084 (30% reduction)
+      const diff = 1 + g.wave * 0.06; // Gentler scaling (was 0.084)
       // Add ±10% size variance for visual variety
       const sizeVariance = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
       e.r = type.r * sizeVariance;
       e.hp = Math.ceil(type.hp * diff);
       e.speed = Math.min(500, type.speed * diff * (0.85 + Math.random() * 0.3)); // ±15% speed variance, capped at 500
       e.touchDmg = Math.ceil(type.dmg * diff * 0.7); // Additional 30% reduction for damage
-      // Add slight color variation within red-orange-yellow spectrum
+      // Add slight color variation for each speed-based color
       const colorVariations = {
-        '#ff4444': ['#ff3333', '#ff5555', '#ff4444', '#ff6666'],
-        '#ffaa00': ['#ff9900', '#ffbb00', '#ffaa00', '#ffcc00'],
-        '#ff6600': ['#ff5500', '#ff7700', '#ff6600', '#ff8800'],
-        '#cccc00': ['#cccc00', '#dddd00', '#bbbb00', '#aaaa00'] // dark yellow variations
+        '#AAFF00': ['#99FF00', '#BBFF00', '#AAFF00', '#88FF00'], // Stalker - yellow-green
+        '#FF8800': ['#FF7700', '#FF9900', '#FF8800', '#FFAA00'], // Wraith - bright orange  
+        '#00CCFF': ['#00BBFF', '#00DDFF', '#00CCFF', '#00AAFF'], // Brute - sky blue
+        '#FF2200': ['#FF1100', '#FF3300', '#FF2200', '#FF4400'], // Swarm - red-orange
+        '#FF0000': ['#FF0000', '#FF2222', '#EE0000', '#CC0000'], // Overlord - pure red
+        '#FFCC00': ['#FFBB00', '#FFDD00', '#FFCC00', '#FFAA00'], // Elite - golden
+        '#00FF88': ['#00FF77', '#00FF99', '#00FF88', '#00FFAA'], // Gunners - cyan-green
+        '#FF4400': ['#FF3300', '#FF5500', '#FF4400', '#FF6600'], // Volatile - orange-red
+        '#CC44FF': ['#BB33FF', '#DD55FF', '#CC44FF', '#AA22FF'], // Juggernaut - magenta
+        '#00FFCC': ['#00FFBB', '#00FFDD', '#00FFCC', '#00FFAA'], // Vortex - cyan
+        '#FF6600': ['#FF5500', '#FF7700', '#FF6600', '#FF8800'], // Berserker - orange
+        '#0088FF': ['#0077FF', '#0099FF', '#0088FF', '#00AAFF'], // Divider - blue
+        '#4444FF': ['#3333FF', '#5555FF', '#4444FF', '#6666FF'], // Trapper - blue-purple
+        '#8844FF': ['#7733FF', '#9955FF', '#8844FF', '#AA66FF'], // Bomber - purple
+        '#FFAA00': ['#FF9900', '#FFBB00', '#FFAA00', '#FFCC00'], // Maniac - yellow-orange
+        '#88FF00': ['#77FF00', '#99FF00', '#88FF00', '#AAFF00']  // Prowler/Serpent - lime
       };
       // ENSURE EVERY ENEMY STARTS WITH A VALID COLOR
       const baseColor = type.color || '#ff4444'; // Default to red if no color
@@ -2276,25 +3369,34 @@
       e.deathTimer = 0;
       e.dying = false;
       
-      // Initialize shooter properties
-      e.isShooter = false;
-      e.shootTimer = 0;
-      
       // Boss spawning logic - limited per wave
       if (g.wave % 10 === 0 && g.waveBossesSpawned < g.waveBossesTarget) {
         // Super boss spawn (limited quantity per wave)
-        e.r *= 4; e.hp *= 4; e.touchDmg *= 2;
-        e.color = '#800080'; e.originalColor = '#800080'; e.behavior = 'superboss';
+        e.r *= 3; e.hp *= 9; e.touchDmg *= 1.5;
+        e.speed *= 1.5; // 1.5x speed boost for super bosses
+        e.color = '#FF0000'; e.originalColor = '#FF0000'; e.behavior = 'superboss'; // Pure red (fastest)
         e.phaseTimer = 0; // Timer for behavior changes
         e.currentPhase = 0; // Current movement phase
         g.waveBossesSpawned++;
       } else if (g.wave % 5 === 0 && g.wave % 10 !== 0 && Math.random() < 0.1) {
         // Mini-boss every 5 waves (10% chance)
-        e.r *= 1.5; e.hp *= 2.5; e.touchDmg *= 1.5;
-        e.color = '#cc0000'; e.originalColor = '#cc0000'; e.behavior = 'boss';
+        e.r *= 1.3; e.hp *= 2; e.touchDmg *= 1.3;
+        e.color = '#FFCC00'; e.originalColor = '#FFCC00'; e.behavior = 'boss'; // Golden yellow (fast)
       } else {
-        // Check if this is a slow enemy (90 speed or less) that becomes a shooter (20% chance)
-        if (type.speed <= 90 && Math.random() < 0.20) {
+        // First select behavior from available pool based on current wave
+        // Wave 1 = pool 0, Wave 2-3 = pool 1, Wave 4-5 = pool 2, etc.
+        let poolIndex = 0;
+        if (g.wave >= 7) poolIndex = 4;
+        else if (g.wave >= 5) poolIndex = 3;
+        else if (g.wave >= 4) poolIndex = 2;
+        else if (g.wave >= 2) poolIndex = 1;
+        const availableBehaviors = behaviorPools[poolIndex];
+        e.behavior = availableBehaviors[(Math.random() * availableBehaviors.length) | 0];
+        
+        // THEN check if this slow/medium enemy becomes a shooter (25% chance)
+        // This preserves the behavior but adds shooting capability
+        // EXCEPT volatile enemies cannot be shooters (too dangerous combo)
+        if (type.speed <= 120 && Math.random() < 0.25 && e.behavior !== 'volatile') {
           e.isShooter = true;
           e.shootTimer = Math.random() * 2.0; // Random initial delay
           
@@ -2302,83 +3404,124 @@
           const rand = Math.random();
           if (g.wave >= 3 && rand < 0.3) {
             e.shootPattern = 'spread';
-            e.color = '#bb3300'; 
-            e.originalColor = '#bb3300';
-            e.baseColor = '#bb3300'; // Red-orange for spread
+            e.color = '#00FF88'; 
+            e.originalColor = '#00FF88';
+            e.baseColor = '#00FF88'; // Cyan-green for spread shooter (slow)
           } else if (g.wave >= 5 && rand < 0.6) {
             e.shootPattern = 'burst';
             e.burstCount = 0; // Track bursts in sequence
-            e.color = '#990000'; 
-            e.originalColor = '#990000';
-            e.baseColor = '#990000'; // Dark red for burst
+            e.color = '#00FF88'; 
+            e.originalColor = '#00FF88';
+            e.baseColor = '#00FF88'; // Cyan-green for burst shooter (slow)
           } else {
             e.shootPattern = 'single';
-            e.color = '#aa4400'; 
-            e.originalColor = '#aa4400';
-            e.baseColor = '#aa4400'; // Brown for single
+            e.color = '#00FF88'; 
+            e.originalColor = '#00FF88';
+            e.baseColor = '#00FF88'; // Cyan-green for single shooter (slow)
           }
         }
-        
-        // Select behavior from available pool based on current wave
-        const poolIndex = Math.min(Math.floor((g.wave - 1) / 2), behaviorPools.length - 1);
-        const availableBehaviors = behaviorPools[poolIndex];
-        e.behavior = availableBehaviors[(Math.random() * availableBehaviors.length) | 0];
       }
       
-      // Set special colors and stats for specific behaviors
-      if (e.behavior === 'suicide') {
-        // Only set purple color if not already a shooter (shooters keep their color)
+      // Set special colors and stats for specific behaviors (preserve shooter status)
+      if (e.behavior === 'volatile') {
+        // Only set color if not already a shooter (shooters keep their color)
         if (!e.isShooter) {
-          e.color = '#8844ff'; // Purple for suicide crawlers
-          e.originalColor = '#8844ff';
-          e.baseColor = '#8844ff'; // Used during orbiting state
+          e.color = '#FF4400'; // Orange-red for suicide crawlers (very fast)
+          e.originalColor = '#FF4400';
+          e.baseColor = '#FF4400'; // Used during orbiting state
         }
         // Speed cap for suicide crawlers to prevent crazy speeds
-        e.speed = Math.min(e.speed, Math.min(500, 180 + g.wave * 10)); // Wave 6 = 240 max, hard cap at 500
-      } else if (e.behavior === 'slowpush') {
+        e.speed = Math.min(e.speed, Math.min(400, 180 + g.wave * 5)); // More gradual speed increase
+      } else if (e.behavior === 'juggernaut') {
         // Make them extra tanky and slow
         e.hp = Math.ceil(e.hp * 1.8); // 80% more HP
         e.speed *= 0.7; // 30% slower
         e.touchDmg = Math.ceil(e.touchDmg * 1.3); // 30% more damage
-        e.color = '#bbbbbb'; // Even lighter gray for tanks (much more visible)
-        e.originalColor = '#bbbbbb';
-        e.baseColor = '#bbbbbb';
+        e.color = '#CC44FF'; // Magenta for slowpush tanks (slowest)
+        e.originalColor = '#CC44FF';
+        e.baseColor = '#CC44FF';
         e.knockbackStrength = 250; // Knockback force
         
         // Shield system
         const baseShieldHP = 15;
-        const diff = 1 + g.wave * 0.084; // Same scaling as enemy HP (reduced by 30%)
+        const diff = 1 + g.wave * 0.06; // Gentler scaling
         e.shieldHP = Math.ceil(baseShieldHP * diff);
         e.maxShieldHP = e.shieldHP;
         e.hasShield = true;
         
         // Shield direction tracking (90% speed for counterplay)
         e.shieldDirection = { x: 1, y: 0 }; // Initial direction
-      } else if (e.behavior === 'spiralshooter') {
+      } else if (e.behavior === 'vortex') {
         // Make them distinctive and slower
         e.speed = Math.min(500, e.speed * 0.8); // 20% slower for spiral shooters, capped at 500
-        e.color = '#ff8800'; // Bright orange for spiral shooters
-        e.originalColor = '#ff8800';
-        e.baseColor = '#ff8800';
-      } else if (e.behavior === 'charge') {
+        e.color = '#00FFCC'; // Cyan for spiral shooters (slow)
+        e.originalColor = '#00FFCC';
+        e.baseColor = '#00FFCC';
+      } else if (e.behavior === 'berserker') {
         // Speed cap for dash zombies to prevent crazy dash speeds
-        e.speed = Math.min(e.speed, Math.min(500, 150 + g.wave * 8)); // Wave 5 = 190 max, hard cap at 500
-        e.color = '#ffcc00'; // Yellow for charge enemies
-        e.originalColor = '#ffcc00';
-        e.baseColor = '#ffcc00';
-      } else if (e.behavior === 'splitter') {
+        e.speed = Math.min(e.speed, Math.min(400, 150 + g.wave * 4)); // More gradual speed increase
+        e.color = '#FF6600'; // Orange for charge enemies (very fast)
+        e.originalColor = '#FF6600';
+        e.baseColor = '#FF6600';
+      } else if (e.behavior === 'divider') {
         // Make them slightly tankier and distinctive
         e.hp = Math.ceil(e.hp * 1.3); // 30% more HP
         e.r = Math.ceil(e.r * 1.1); // 10% bigger
-        e.color = '#cc44cc'; // Purple-magenta for splitters
-        e.originalColor = '#cc44cc';
-        e.baseColor = '#cc44cc';
-      } else if (e.behavior === 'minelayer') {
+        e.color = '#0088FF'; // Blue for splitters (very slow)
+        e.originalColor = '#0088FF';
+        e.baseColor = '#0088FF';
+      } else if (e.behavior === 'trapper') {
         // Make them slower and distinctive
         e.speed *= 0.8; // 20% slower (plus 30% in behavior = 44% total reduction)
-        e.color = '#ddaa77'; // Even lighter brown for mine layers (much more visible)
-        e.originalColor = '#ddaa77';
-        e.baseColor = '#ddaa77';
+        e.color = '#4444FF'; // Blue-purple for mine layers (very slow)
+        e.originalColor = '#4444FF';
+        e.baseColor = '#4444FF';
+      } else if (e.behavior === 'bomber') {
+        // Grenadiers - throw grenades at player
+        e.speed *= 0.7; // 30% slower, they rely on ranged attacks
+        e.color = '#8844FF'; // Purple for grenadiers (very slow)
+        e.originalColor = '#8844FF';
+        e.baseColor = '#8844FF';
+        e.r *= 1.1; // Slightly bigger
+      } else if (e.behavior === 'maniac') {
+        // Erratic enemies - use yellow-orange for medium-fast chaotic movement
+        if (!e.isShooter) {
+          e.color = '#FFAA00'; // Yellow-orange for erratic (fast bursts)
+          e.originalColor = '#FFAA00';
+          e.baseColor = '#FFAA00';
+        }
+        e.speed *= 1.2; // 20% speed boost for maniacs
+      } else if (e.behavior === 'prowler' || e.behavior === 'serpent') {
+        // Flanking and zigzag patterns with appropriate speed colors
+        if (!e.isShooter) {
+          if (e.behavior === 'prowler') {
+            // Prowlers are fast (40% boost) - use orange color
+            e.color = '#FF8800'; // Orange for fast flanking
+            e.originalColor = '#FF8800';
+            e.baseColor = '#FF8800';
+          } else {
+            // Serpents are medium-fast (30% boost) - use yellow-green
+            e.color = '#AAFF00'; // Yellow-green for medium-fast zigzag
+            e.originalColor = '#AAFF00';
+            e.baseColor = '#AAFF00';
+          }
+        }
+        if (e.behavior === 'prowler') {
+          e.speed *= 1.4; // 40% speed boost for prowlers to flank effectively
+        } else if (e.behavior === 'serpent') {
+          e.speed *= 1.3; // 30% speed boost for serpents
+        }
+      } else if (e.behavior === 'stalker') {
+        // Keep default color unless shooter
+        if (e.isShooter) {
+          // Ensure shooter color is preserved
+          e.color = '#00FF88';
+          e.originalColor = '#00FF88';
+          e.baseColor = '#00FF88';
+        }
+      } else if (e.behavior === 'leaper') {
+        // Make leapers 30% faster base speed
+        e.speed *= 1.3;
       }
       
       // Random spawn animation - DISABLE FADE TO PREVENT INVISIBILITY
@@ -2403,8 +3546,8 @@
       // Large blood burst on death
       spawnBlood(enemy.x, enemy.y, 0, 0, 'death');
       
-      // Suicide crawler explosion - bigger and more dramatic
-      if (enemy.behavior === 'suicide') {
+      // Volatile explosion - bigger and more dramatic
+      if (enemy.behavior === 'volatile') {
         // Extra explosion sound
         beep(80, 0.2, 'sawtooth', 0.15); // Deep explosion boom
         
@@ -2456,7 +3599,7 @@
         const distToPlayer = fastLength(enemy.x - game.player.x, enemy.y - game.player.y);
         if (distToPlayer <= explosionRadius && game.invulTime <= 0) {
           // Apply damage with reduction
-          const explosionDamage = 20; // Increased from 15
+          const explosionDamage = 8; // Base explosion damage
           const actualDamage = Math.ceil(explosionDamage * (1 - game.player.damageReduction));
           game.player.hp -= actualDamage;
           
@@ -2510,7 +3653,7 @@
       }
       
       // Splitter zombie - spawns 2-3 smaller enemies on death
-      if (enemy.behavior === 'splitter') {
+      if (enemy.behavior === 'divider') {
         const childCount = 2 + Math.floor(Math.random() * 2); // 2-3 children
         const spreadAngle = TAU; // Full circle spread
         
@@ -2526,7 +3669,7 @@
             child.vy = fastSin(angle) * randRange(50, 100);
             
             // Child stats - smaller and weaker than parent
-            child.r = Math.max(6, enemy.r * 0.6); // 60% size, minimum 6 radius
+            child.r = Math.max(9, enemy.r * 0.6); // 60% size, minimum 9 radius (increased from 6)
             child.hp = Math.max(1, Math.floor(enemy.hp * 0.4)); // 40% HP, minimum 1
             child.speed = enemy.speed * 1.2; // 20% faster
             child.touchDmg = Math.max(1, Math.floor(enemy.touchDmg * 0.7)); // 70% damage
@@ -2548,7 +3691,7 @@
       }
       
       // Enemy pop/burst effect - satisfying explosion
-      const popParticles = enemy.behavior === 'suicide' ? 20 : 15; // More particles for suicide
+      const popParticles = enemy.behavior === 'volatile' ? 20 : 15; // More particles for volatile
       for (let i = 0; i < popParticles; i++) {
         particles.spawn(p => {
           const angle = (i / popParticles) * TAU + Math.random() * 0.3; // Even spread with variance
@@ -2596,8 +3739,8 @@
         }
       } else {
         // Special drops for specific enemy types
-        if (enemy.behavior === 'minelayer' && Math.random() < 0.005) {
-          // 0.5% chance for minelayers to drop Remote Detonator
+        if ((enemy.behavior === 'trapper' || enemy.behavior === 'bomber') && Math.random() < 0.01) {
+          // 1% chance for minelayers and grenadiers to drop Remote Detonator
           spawnDetonatorPickup(enemy.x, enemy.y);
         } else {
           // Regular enemies: 3% chance to drop any crystal (+20% per lucky upgrade)
@@ -3034,18 +4177,21 @@
     if (keys.has('KeyA')) ax -= 1;
     if (keys.has('KeyD')) ax += 1;
     
-    // Touch movement (left side of screen)
+    // Improved touch movement with virtual joystick
     if (touchMove.active) {
-      const centerX = canvas.width / 4; // Center of left half
-      const centerY = canvas.height / 2;
-      const deadZone = 30; // Minimum touch distance to register movement
-      const touchDx = touchMove.x - centerX;
-      const touchDy = touchMove.y - centerY;
+      const deadZone = 15; // Smaller dead zone for better responsiveness
+      const touchDx = touchMove.x - touchMove.startX;
+      const touchDy = touchMove.y - touchMove.startY;
       const touchDist = fastLength(touchDx, touchDy);
       
       if (touchDist > deadZone) {
-        ax += touchDx / 100; // Convert to movement direction
-        ay += touchDy / 100;
+        // Normalize and scale the input
+        const maxDist = 60; // Maximum joystick distance
+        const scale = Math.min(touchDist, maxDist) / maxDist;
+        const angle = Math.atan2(touchDy, touchDx);
+        
+        ax += Math.cos(angle) * scale * 1.2; // Increased sensitivity
+        ay += Math.sin(angle) * scale * 1.2;
       }
     }
     
@@ -3075,6 +4221,9 @@
     const wantsToSprint = keys.has('ShiftLeft') || keys.has('ShiftRight');
     const canSprint = p.stamina > 0 && p.exhausted <= 0;
     const isSprinting = wantsToSprint && canSprint && (ax || ay);
+    
+    // Store sprinting state for HUD updates
+    p.isSprinting = isSprinting;
     
     if (isSprinting) {
       // Drain stamina: 20% per second (100% in 5 seconds)
@@ -3110,9 +4259,43 @@
     p.x = clamp(p.x + p.vx*dt, p.radius, g.width()-p.radius);
     p.y = clamp(p.y + p.vy*dt, p.radius, g.height()-p.radius);
 
+    // Heat dissipation when not firing
+    if (!mouseDown || p.overheated) {
+      p.heat = Math.max(0, p.heat - p.heatDissipation * dt);
+      
+      // Recovery from overheat state
+      if (p.overheated && p.heat <= p.overheatCooldown) {
+        p.overheated = false;
+      }
+    }
+    
+    // Calculate heat-based penalties
+    let heatSpreadMod = 0;
+    let heatFireRateMod = 1.0;
+    let canFire = true;
+    
+    const weaponHeatPercent = p.heat / p.maxHeat;
+    if (weaponHeatPercent >= 0.5 && weaponHeatPercent < 0.75) {
+      // 50-75% heat: Slight spread increase
+      heatSpreadMod = 0.03;
+    } else if (weaponHeatPercent >= 0.75 && weaponHeatPercent < 0.9) {
+      // 75-90% heat: More spread, 15% slower fire rate
+      heatSpreadMod = 0.06;
+      heatFireRateMod = 1.15;
+    } else if (weaponHeatPercent >= 0.9 && weaponHeatPercent < 1.0) {
+      // 90-100% heat: Heavy spread, 30% slower fire rate, rapid heat gain
+      heatSpreadMod = 0.10;
+      heatFireRateMod = 1.3;
+    } else if (p.heat >= p.maxHeat) {
+      // Overheated: Weapon locked
+      p.overheated = true;
+      p.heat = Math.min(p.heat, p.maxHeat); // Cap at max
+      canFire = false;
+    }
+    
     // shooting
     if (p.fireTimer > 0) p.fireTimer -= dt;
-    if (mouseDown && p.fireTimer <= 0){
+    if (mouseDown && p.fireTimer <= 0 && canFire && !p.overheated){
       const shootVec = normInPlace(mouseX - p.x, mouseY - p.y, vecPool.temp1);
       const dx = shootVec.x, dy = shootVec.y;
       
@@ -3158,8 +4341,9 @@
         // Normal pattern shooting - spawn bullet for each direction
         for (const {dx, dy} of directions) {
           if (totalBullets === 1) {
-            // Single bullet - add slight spread when sprinting
-            const spread = (keys.has('ShiftLeft')||keys.has('ShiftRight')) ? 0.08 : 0.02;
+            // Single bullet - add slight spread when sprinting + heat spread
+            const baseSpread = (keys.has('ShiftLeft')||keys.has('ShiftRight')) ? 0.08 : 0.02;
+            const spread = baseSpread + heatSpreadMod;
             const s = (Math.random()-0.5)*spread;
             const cs = Math.cos(s), sn = Math.sin(s);
             const sx = dx*cs - dy*sn, sy = dx*sn + dy*cs;
@@ -3183,7 +4367,19 @@
         }
       }
       
-      p.fireTimer = p.fireDelay;
+      // Apply fire rate penalty from heat
+      p.fireTimer = p.fireDelay * heatFireRateMod;
+      
+      // Generate heat per trigger pull, NOT per bullet (multi-shot doesn't increase heat)
+      const actualBulletCount = hasUpgrade ? totalBullets * 2 : totalBullets;
+      let heatGenerated = p.heatPerShot; // Fixed heat per shot regardless of bullet count
+      
+      // Extra heat generation when already hot (90%+)
+      if (p.heat >= p.maxHeat * 0.9) {
+        heatGenerated *= 1.5; // 50% more heat when near overheat
+      }
+      
+      p.heat = Math.min(p.maxHeat, p.heat + heatGenerated * p.heatEfficiencyMod);
       shootSound();
     }
 
@@ -3257,7 +4453,7 @@
       e.cadence += dt * 4; // Walking rhythm frequency
       const walkRhythm = 0.8 + 0.2 * fastSin(e.cadence); // 0.6 to 1.0 speed multiplier
       
-      if (e.behavior === 'normal') {
+      if (e.behavior === 'stalker') {
         // Improved gait-like movement toward player
         const gaitPattern = 0.7 + 0.4 * fastSin(e.cadence) + 0.1 * fastSin(e.cadence * 2); // More realistic gait
         const stepSway = fastSin(e.cadence + Math.PI/4) * 8; // Slight left-right sway while walking
@@ -3268,24 +4464,27 @@
         e.vy += dy * e.speed * dt * 2.6 * gaitPattern * freezeMultiplier;
         e.vx += perpX * stepSway * dt * freezeMultiplier; // Add subtle sway
         e.vy += perpY * stepSway * dt * freezeMultiplier;
-      } else if (e.behavior === 'zigzag') {
-        // Zigzag movement with player attraction and cadence
-        e.vx += dx * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
-        e.vy += dy * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
-        e.vx += fastSin(g.t * 8 + e.x * 0.01) * 120 * dt * freezeMultiplier;
-        e.vy += fastCos(g.t * 6 + e.y * 0.01) * 100 * dt * freezeMultiplier;
-      } else if (e.behavior === 'flank') {
-        // Try to approach from sides/behind player
+      } else if (e.behavior === 'serpent') {
+        // Strong zigzag movement - very noticeable serpentine pattern
+        e.vx += dx * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
+        // Much stronger zigzag for clear serpentine movement
+        e.vx += fastSin(g.t * 10 + e.x * 0.01) * 300 * dt * freezeMultiplier; // Increased from 120 to 300
+        e.vy += fastCos(g.t * 8 + e.y * 0.01) * 250 * dt * freezeMultiplier; // Increased from 100 to 250
+      } else if (e.behavior === 'prowler') {
+        // Flanking movement - circles around to attack from sides
         const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
-        const flankAngle = playerAngle + fastSin(g.t * 2 + e.x * 0.005) * Math.PI/3;
+        // Larger flanking angle for more obvious circling
+        const flankAngle = playerAngle + fastSin(g.t * 3 + e.x * 0.005) * Math.PI/2; // Increased angle
         const fx = fastCos(flankAngle);
         const fy = fastSin(flankAngle);
-        e.vx += fx * e.speed * dt * 1.3 * walkRhythm * freezeMultiplier;
-        e.vy += fy * e.speed * dt * 1.3 * walkRhythm * freezeMultiplier;
-        // Still some direct attraction
-        e.vx += dx * e.speed * dt * 0.3 * freezeMultiplier;
-        e.vy += dy * e.speed * dt * 0.3 * freezeMultiplier;
-      } else if (e.behavior === 'charge') {
+        // Faster flanking movement
+        e.vx += fx * e.speed * dt * 2.0 * walkRhythm * freezeMultiplier; // Increased from 1.3 to 2.0
+        e.vy += fy * e.speed * dt * 2.0 * walkRhythm * freezeMultiplier;
+        // Less direct attraction for more flanking
+        e.vx += dx * e.speed * dt * 0.2 * freezeMultiplier; // Reduced from 0.3 to 0.2
+        e.vy += dy * e.speed * dt * 0.2 * freezeMultiplier;
+      } else if (e.behavior === 'berserker') {
         // Enhanced dash zombie with telegraph system
         if (!e.dashState) e.dashState = 'prowling';
         if (!e.dashTimer) e.dashTimer = 2 + Math.random() * 3;
@@ -3333,13 +4532,15 @@
             e.color = e.originalColor; // Restore original color
           }
         }
-      } else if (e.behavior === 'erratic') {
-        // Chaotic movement with some player attraction and subtle cadence
-        const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 2); // Faster, more panicked rhythm
-        e.vx += (Math.random() - 0.5) * 300 * dt * panicRhythm;
-        e.vy += (Math.random() - 0.5) * 300 * dt * panicRhythm;
-        e.vx += dx * e.speed * 1.0 * dt;
-        e.vy += dy * e.speed * 1.0 * dt;
+      } else if (e.behavior === 'maniac') {
+        // Truly chaotic, unpredictable movement - much more erratic
+        const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 3); // Even faster rhythm
+        // Much stronger random movement
+        e.vx += (Math.random() - 0.5) * 800 * dt * panicRhythm; // Increased from 300 to 800
+        e.vy += (Math.random() - 0.5) * 800 * dt * panicRhythm;
+        // Faster base movement toward player
+        e.vx += dx * e.speed * 1.5 * dt * freezeMultiplier; // Increased from 1.0 to 1.5
+        e.vy += dy * e.speed * 1.5 * dt * freezeMultiplier;
       } else if (e.behavior === 'superboss') {
         // Super boss with changing movement phases every 20 seconds
         e.phaseTimer = (e.phaseTimer || 0) + dt;
@@ -3400,23 +4601,23 @@
         const heavyStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.5); // Still rhythmic but faster
         e.vx += dx * e.speed * dt * 1.2 * heavyStep;
         e.vy += dy * e.speed * dt * 1.2 * heavyStep;
-      } else if (e.behavior === 'zerglingRush') {
+      } else if (e.behavior === 'leaper') {
         // Zergling rush behavior - quick leap attacks like player emergency dash
         if (!e.rushTimer) e.rushTimer = Math.random() * 1.5 + 0.5; // Initial delay
         e.rushTimer -= dt;
         
         if (e.rushTimer <= 0) {
           // Perform rush leap toward player
-          const rushSpeed = e.speed * 3; // 3x speed burst
-          e.vx += dx * rushSpeed * dt * 8; // Strong impulse
-          e.vy += dy * rushSpeed * dt * 8;
-          e.rushTimer = 1.5 + Math.random() * 2; // 1.5-3.5 second cooldown
+          const rushSpeed = e.speed * 4; // 4x speed burst (increased from 3x)
+          e.vx += dx * rushSpeed * dt * 10; // Stronger impulse
+          e.vy += dy * rushSpeed * dt * 10;
+          e.rushTimer = 1.0 + Math.random() * 1.5; // 1.0-2.5 second cooldown (faster leaps)
         } else {
-          // Normal movement between rushes (slower)
-          e.vx += dx * e.speed * dt * 0.8 * walkRhythm;
-          e.vy += dy * e.speed * dt * 0.8 * walkRhythm;
+          // Fast movement between rushes (no longer slow!)
+          e.vx += dx * e.speed * dt * 1.8 * walkRhythm; // 1.8x speed (was 0.8x)
+          e.vy += dy * e.speed * dt * 1.8 * walkRhythm;
         }
-      } else if (e.behavior === 'suicide') {
+      } else if (e.behavior === 'volatile') {
         // Suicide crawler - orbits player then charges periodically
         if (!e.chargeState) e.chargeState = 'orbiting';
         if (!e.chargeTimer) e.chargeTimer = 10 + Math.random() * 10; // 10-20 second orbit time
@@ -3500,7 +4701,7 @@
             e.orbitAngle = Math.atan2(e.y - p.y, e.x - p.x); // Start orbit from current position
           }
         }
-      } else if (e.behavior === 'slowpush') {
+      } else if (e.behavior === 'juggernaut') {
         // Slow push - deliberate tanky movement toward player
         const pushStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.4); // Heavy, slow rhythm
         e.vx += dx * e.speed * dt * 0.8 * pushStep * freezeMultiplier; // Slow but persistent
@@ -3522,7 +4723,7 @@
             e.shieldDirection.y /= len;
           }
         }
-      } else if (e.behavior === 'spiralshooter') {
+      } else if (e.behavior === 'vortex') {
         // Spiral shooter - slow movement, rotates aim and shoots in patterns
         e.vx += dx * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier; // Slow movement
         e.vy += dy * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier;
@@ -3544,7 +4745,7 @@
           e.spiralShootTimer = 0.6; // Half frequency (was 0.3)
           beep(320, 0.04, 'triangle', 0.04); // High-pitched spiral sound
         }
-      } else if (e.behavior === 'splitter') {
+      } else if (e.behavior === 'divider') {
         // Splitter zombie - normal movement with slight erratic behavior
         const splitStep = 0.8 + 0.3 * Math.sin(e.cadence * 1.5); // Slightly erratic rhythm
         e.vx += dx * e.speed * dt * 1.0 * splitStep * freezeMultiplier;
@@ -3552,7 +4753,7 @@
         // Add slight random movement for unpredictability
         e.vx += (Math.random() - 0.5) * 50 * dt;
         e.vy += (Math.random() - 0.5) * 50 * dt;
-      } else if (e.behavior === 'minelayer') {
+      } else if (e.behavior === 'trapper') {
         // Mine layer - slow movement, drops mines periodically
         e.vx += dx * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier; // 30% slower
         e.vy += dy * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier;
@@ -3574,9 +4775,11 @@
             mine.isArmed = false; // Not armed immediately
             mine.triggerRadius = 35; // Original radius for triggering
             mine.explosionRadius = 70; // Doubled explosion radius
-            mine.explosionDamage = 15 + game.wave * 2; // Scales with wave
+            mine.explosionDamage = 8 + game.wave * 1; // Scales with wave
             mine.flashTimer = 0;
             mine.isTriggered = false; // New triggered state
+            mine.isGrenade = false; // Explicitly mark as NOT a grenade
+            mine.r = 8; // Standard mine size
             mine.alive = true;
             mine.owner = e; // Track which enemy dropped it
           });
@@ -3585,6 +4788,117 @@
           e.mineDropTimer = 12.0; // Fixed 12 second interval
           beep(180, 0.08, 'square', 0.06); // Mine drop sound
         }
+      } else if (e.behavior === 'bomber') {
+        // Grenadier - uses mixed movement patterns with grenade throwing
+        const currentDist = fastLength(p.x - e.x, p.y - e.y);
+        
+        // Initialize pattern timer if not set
+        if (!e.patternTimer) {
+          e.patternTimer = 0;
+          e.currentPattern = Math.floor(Math.random() * 3);
+        }
+        
+        // Switch patterns every 2-3 seconds
+        e.patternTimer += dt;
+        if (e.patternTimer > 2 + Math.random()) {
+          e.patternTimer = 0;
+          e.currentPattern = (e.currentPattern + 1) % 3;
+        }
+        
+        // Use persistent pattern choice
+        if (e.currentPattern === 0) {
+          // Normal chase pattern with walk rhythm
+          const gaitPattern = 0.7 + 0.4 * fastSin(e.cadence) + 0.1 * fastSin(e.cadence * 2);
+          e.vx += dx * e.speed * dt * 1.2 * gaitPattern * freezeMultiplier;
+          e.vy += dy * e.speed * dt * 1.2 * gaitPattern * freezeMultiplier;
+        } else if (e.currentPattern === 1) {
+          // Zigzag approach
+          e.vx += dx * e.speed * dt * 0.8 * walkRhythm * freezeMultiplier;
+          e.vy += dy * e.speed * dt * 0.8 * walkRhythm * freezeMultiplier;
+          e.vx += fastSin(g.t * 4 + e.x * 0.01) * 60 * dt * freezeMultiplier;
+          e.vy += fastCos(g.t * 3 + e.y * 0.01) * 60 * dt * freezeMultiplier;
+        } else {
+          // Flanking movement
+          const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
+          const flankAngle = playerAngle + fastSin(g.t * 1.5 + e.x * 0.005) * Math.PI/3;
+          const fx = fastCos(flankAngle);
+          const fy = fastSin(flankAngle);
+          e.vx += fx * e.speed * dt * 0.9 * walkRhythm * freezeMultiplier;
+          e.vy += fy * e.speed * dt * 0.9 * walkRhythm * freezeMultiplier;
+          // Some direct attraction
+          e.vx += dx * e.speed * dt * 0.3 * freezeMultiplier;
+          e.vy += dy * e.speed * dt * 0.3 * freezeMultiplier;
+        }
+        
+        // Initialize grenade throwing properties
+        if (!e.grenadeTimer) e.grenadeTimer = 2 + Math.random() * 2;
+        if (!e.grenadesThrown) e.grenadesThrown = 0;
+        const maxGrenades = 12; // Maximum grenades per enemy
+        
+        // Throw grenades periodically (range: 0-600 pixels ONLY)
+        e.grenadeTimer -= dt;
+        if (e.grenadeTimer <= 0 && e.grenadesThrown < maxGrenades) {
+          // STRICT distance check - only throw if within range
+          if (currentDist <= 600 && currentDist > 0) {
+            // Target exact current player position
+            const targetX = p.x;
+            const targetY = p.y;
+            
+            // Calculate grenade physics for proper arc
+            const throwSpeed = 300; // Fixed projectile speed of 300
+            const gravity = 600; // Gravity constant
+            
+            // Spawn grenade (using mine system but with different behavior)
+            mines.spawn(grenade => {
+              // Start grenade at enemy position (no offset for accuracy)
+              grenade.x = e.x;
+              grenade.y = e.y;
+              
+              // Calculate direction to player
+              const throwDx = targetX - e.x;
+              const throwDy = targetY - e.y;
+              const throwDist = Math.sqrt(throwDx * throwDx + throwDy * throwDy);
+              
+              // Set velocity at fixed speed toward player
+              grenade.vx = (throwDx / throwDist) * throwSpeed;
+              grenade.vy = (throwDy / throwDist) * throwSpeed;
+              
+              // Calculate travel time based on distance and speed
+              const travelTime = throwDist / throwSpeed;
+              
+              // Calculate initial upward velocity for proper arc
+              // Using physics: z = vz*t - 0.5*g*t² = 0 when t = travelTime
+              // So: vz = 0.5*g*travelTime
+              grenade.vz = (gravity * travelTime) / 2;
+              grenade.z = 1; // Start slightly above ground
+              grenade.gravity = gravity; // Store gravity for this grenade
+              
+              grenade.fuseTime = 0;
+              grenade.maxFuseTime = travelTime + 0.8; // Explode 0.8s after landing
+              grenade.isArmed = false;
+              grenade.triggerRadius = 0; // No proximity trigger, only timer
+              grenade.explosionRadius = 60; // Slightly smaller than mines
+              grenade.explosionDamage = 10 + game.wave * 0.5; // Scales with wave
+              grenade.flashTimer = 0;
+              grenade.isTriggered = false;
+              grenade.isGrenade = true; // Mark as grenade for special rendering
+              grenade.targetX = targetX; // Where it should land
+              grenade.targetY = targetY;
+              grenade.alive = true;
+              grenade.owner = e;
+              grenade.r = 8; // Same size as mines for consistency
+            });
+          
+            e.grenadesThrown++;
+            beep(400, 0.1, 'sawtooth', 0.08); // Grenade throw sound
+          }
+          // Reset timer regardless of whether we threw (prevents rapid checks)
+          e.grenadeTimer = 3.0 + Math.random() * 2; // 3-5 second interval
+        }
+      } else {
+        // DEFAULT MOVEMENT - Basic pursuit for any unrecognized behavior
+        e.vx += dx * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
       }
       
       // Shooter enemy logic with different patterns
@@ -3748,7 +5062,7 @@
           
           // Shield system - ONLY for slowpush enemies with shields
           let hitsShield = false;
-          if (e.behavior === 'slowpush' && e.hasShield && e.shieldHP > 0 && e.shieldDirection) {
+          if (e.behavior === 'juggernaut' && e.hasShield && e.shieldHP > 0 && e.shieldDirection) {
             // Calculate bullet direction relative to enemy
             const bulletDir = normInPlace(b.x - e.x, b.y - e.y, vecPool.temp2);
             
@@ -3950,7 +5264,7 @@
           hurtSound();
           
           // Suicide crawlers reset to orbiting after hitting player
-          if (e.behavior === 'suicide') {
+          if (e.behavior === 'volatile') {
             e.chargeState = 'orbiting';
             e.chargeTimer = 6 + Math.random() * 6; // 6-12 second orbit after hit
             e.color = e.baseColor || e.originalColor || '#8844ff'; // Back to base with fallbacks
@@ -3958,7 +5272,7 @@
           }
           
           // Slow push enemies apply knockback
-          if (e.behavior === 'slowpush' && e.knockbackStrength) {
+          if (e.behavior === 'juggernaut' && e.knockbackStrength) {
             const knockbackVec = normInPlace(p.x - e.x, p.y - e.y, vecPool.temp1);
             const knockbackForce = e.knockbackStrength;
             
@@ -4002,9 +5316,15 @@
       pickup.vy += 200 * dt; // Reduced gravity for top-down
       pickup.bounceTimer += dt;
       
-      // Update rotation
+      // Update rotation with gradual slowdown
       if (pickup.rotation !== undefined && pickup.rotationSpeed) {
         pickup.rotation += pickup.rotationSpeed * dt;
+        // Apply friction to rotation speed to make it slow down
+        pickup.rotationSpeed *= (1 - 2*dt);
+        // Stop rotation when speed is very low
+        if (Math.abs(pickup.rotationSpeed) < 0.1) {
+          pickup.rotationSpeed = 0;
+        }
       }
       
       // Keep crystals on screen - clamp to bounds
@@ -4039,24 +5359,49 @@
       if (dist < 20) {
         // Handle special pickups first
         if (pickup.type === 'detonator') {
-          // Remote Detonator - trigger all mines
+          // Remote Detonator - trigger all enemy mines
           pickup.alive = false;
           
-          // Detonate all mines by setting their timers to trigger
+          let minesDetonated = 0;
+          
+          // Trigger all enemy mines immediately
           for (const mine of mines.items) {
-            if (mine.alive && mine.detonationTimer > 0.1) {
-              mine.detonationTimer = 0.1; // Set to detonate in 0.1 seconds
+            if (mine.alive && !mine.isTriggered) {
+              mine.isTriggered = true;
+              mine.fuseTime = mine.maxFuseTime - 0.1; // Set to detonate in 0.1 seconds
+              minesDetonated++;
+              
+              // Visual feedback on each mine
+              particles.spawn(part => {
+                part.x = mine.x;
+                part.y = mine.y;
+                part.vx = 0;
+                part.vy = -50;
+                part.life = 0;
+                part.maxLife = 0.5;
+                part.size = 15;
+                part.color = '#ff0000';
+                part.alive = true;
+              });
             }
           }
           
           // Visual/audio feedback
-          beep(1000, 0.15, 'sawtooth', 0.3); // Detonator activation sound
-          spawnBurst(p.x, p.y, 20, '#ff0000'); // Red burst effect
+          if (minesDetonated > 0) {
+            beep(1500, 0.2, 'sawtooth', 0.4); // High pitched activation
+            beep(800, 0.15, 'square', 0.3); // Secondary tone
+            spawnBurst(p.x, p.y, 30, '#ff0000'); // Red burst effect
+            spawnBurst(p.x, p.y, 20, '#ffaa00'); // Orange burst
+          } else {
+            beep(400, 0.1, 'triangle', 0.2); // Low tone if no mines
+          }
           
           // Show notification
           const notification = document.getElementById('powerupNotification');
           if (notification) {
-            notification.textContent = 'REMOTE DETONATOR ACTIVATED!';
+            notification.textContent = minesDetonated > 0 
+              ? `DETONATOR: ${minesDetonated} MINE${minesDetonated > 1 ? 'S' : ''} TRIGGERED!`
+              : 'DETONATOR: NO MINES FOUND';
             notification.style.display = 'block';
             notification.style.animation = 'none';
             void notification.offsetHeight; // Force reflow
@@ -4110,21 +5455,63 @@
       }
     }
 
-    // mines - timed explosives
+    // mines and grenades - timed explosives
     for (const mine of mines.items) {
       if (!mine.alive) continue;
+      
+      // Handle grenade projectile movement
+      if (mine.isGrenade) {
+        // Move grenade horizontally
+        mine.x += mine.vx * dt;
+        mine.y += mine.vy * dt;
+        
+        // Handle vertical movement (arc)
+        if (mine.z !== undefined && mine.z !== null) {
+          mine.z += mine.vz * dt;
+          mine.vz -= (mine.gravity || 600) * dt; // Use grenade's gravity or default
+          
+          // Check if grenade hit the ground
+          if (mine.z <= 0 && mine.vz < 0) {
+            mine.z = 0;
+            // Grenade landed - trigger it if not already triggered
+            if (!mine.isTriggered) {
+              mine.isTriggered = true;
+              mine.fuseTime = mine.maxFuseTime - 0.8; // Start countdown
+              beep(600, 0.08, 'square', 0.1); // Grenade land sound
+              
+              // Stop horizontal movement
+              mine.vx = 0;
+              mine.vy = 0;
+              mine.vz = 0;
+            }
+          }
+        } else {
+          // Fallback for grenades without z coordinate
+          const distToTarget = fastLength(mine.x - mine.targetX, mine.y - mine.targetY);
+          if (distToTarget < 30 && !mine.isTriggered) {
+            mine.isTriggered = true;
+            mine.fuseTime = mine.maxFuseTime - 0.8;
+            beep(600, 0.08, 'square', 0.1);
+            mine.vx = 0;
+            mine.vy = 0;
+          }
+        }
+        
+        // No air resistance for grenades - they need to maintain velocity to hit target
+        // Air resistance would make them fall short
+      }
       
       // Fuse timer
       mine.fuseTime += dt;
       mine.flashTimer += dt;
       
-      // Arm mine after 0.5 seconds (can't be triggered immediately)
-      if (!mine.isArmed && mine.fuseTime >= 0.5) {
+      // Arm mine after 0.5 seconds (can't be triggered immediately) - not for grenades
+      if (!mine.isGrenade && !mine.isArmed && mine.fuseTime >= 0.5) {
         mine.isArmed = true;
       }
       
-      // Check player proximity for armed mines
-      if (mine.isArmed && !mine.isTriggered) {
+      // Check player proximity for armed mines (not grenades)
+      if (!mine.isGrenade && mine.isArmed && !mine.isTriggered) {
         const distToPlayer = fastLength(mine.x - p.x, mine.y - p.y);
         
         // Trigger mine if player steps into trigger radius
@@ -4191,8 +5578,14 @@
           });
         }
         
-        // Reduce mine count for owner
-        if (mine.owner) mine.owner.minesDropped--;
+        // Reduce mine/grenade count for owner
+        if (mine.owner) {
+          if (mine.isGrenade) {
+            mine.owner.grenadesThrown--;
+          } else {
+            mine.owner.minesDropped--;
+          }
+        }
         mine.alive = false;
       }
     }
@@ -4239,8 +5632,10 @@
     // Cache previous values to avoid unnecessary updates
     const newHp = Math.max(0, Math.floor(p.hp));
     const newStamina = Math.floor(p.stamina);
+    const newHeat = Math.floor(p.heat);
     const hpPercent = clamp(p.hp/p.maxHp,0,1)*100;
     const staminaPercent = clamp(p.stamina/100,0,1)*100;
+    const heatPercent = clamp(p.heat/p.maxHeat,0,1)*100;
     
     queueDOMUpdate(() => {
       // Only update if values changed
@@ -4249,17 +5644,97 @@
         hpTxt.textContent = newHp.toString();
       }
       if (hudHpBar._lastPercent !== hpPercent) {
+        // Check if HP is increasing for healing effect
+        if (hudHpBar._lastPercent !== undefined && hpPercent > hudHpBar._lastPercent) {
+          hudHpBar.parentElement.classList.add('healing');
+          clearTimeout(hudHpBar._healingTimeout);
+          hudHpBar._healingTimeout = setTimeout(() => {
+            hudHpBar.parentElement.classList.remove('healing');
+          }, 1500);
+        }
+        // Check if HP is decreasing for damage effect
+        else if (hudHpBar._lastPercent !== undefined && hpPercent < hudHpBar._lastPercent) {
+          hudHpBar.parentElement.classList.add('taking-damage');
+          clearTimeout(hudHpBar._damageTimeout);
+          hudHpBar._damageTimeout = setTimeout(() => {
+            hudHpBar.parentElement.classList.remove('taking-damage');
+          }, 300);
+        }
         hudHpBar._lastPercent = hpPercent;
         hudHpBar.style.width = `${hpPercent}%`;
+        // Add/remove low class for pulsing effect
+        if (hpPercent <= 30) {
+          hudHpBar.parentElement.classList.add('low');
+        } else {
+          hudHpBar.parentElement.classList.remove('low');
+        }
       }
       if (staminaTxt._lastValue !== newStamina) {
         staminaTxt._lastValue = newStamina;
         staminaTxt.textContent = newStamina.toString();
       }
-      if (hudStaminaBar._lastPercent !== staminaPercent) {
-        hudStaminaBar._lastPercent = staminaPercent;
-        hudStaminaBar.style.width = `${staminaPercent}%`;
+      // Always update the bar width directly without transitions
+      hudStaminaBar.style.width = `${staminaPercent}%`;
+      
+      // Handle stamina state classes with proper thresholds
+      if (hudStaminaBar._lastPercent !== undefined) {
+        const diff = staminaPercent - hudStaminaBar._lastPercent;
+        
+        // Only trigger effects for significant changes (>1% difference)
+        if (Math.abs(diff) > 1) {
+          // Clear any existing timeouts
+          clearTimeout(hudStaminaBar._healingTimeout);
+          clearTimeout(hudStaminaBar._usageTimeout);
+          
+          if (diff > 0 && !p.isSprinting) {
+            // Stamina is regenerating
+            hudStaminaBar.parentElement.classList.remove('using-stamina');
+            hudStaminaBar.parentElement.classList.add('healing');
+            hudStaminaBar._healingTimeout = setTimeout(() => {
+              hudStaminaBar.parentElement.classList.remove('healing');
+            }, 1500);
+          } else if (diff < 0 && p.isSprinting) {
+            // Stamina is being used
+            hudStaminaBar.parentElement.classList.remove('healing');
+            hudStaminaBar.parentElement.classList.add('using-stamina');
+            hudStaminaBar._usageTimeout = setTimeout(() => {
+              hudStaminaBar.parentElement.classList.remove('using-stamina');
+            }, 200);
+          }
+        }
       }
+      
+      // Handle low stamina warning
+      if (staminaPercent <= 30) {
+        hudStaminaBar.parentElement.classList.add('low');
+      } else {
+        hudStaminaBar.parentElement.classList.remove('low');
+      }
+      
+      hudStaminaBar._lastPercent = staminaPercent;
+      
+      // Heat bar updates
+      if (heatTxt._lastValue !== newHeat) {
+        heatTxt._lastValue = newHeat;
+        heatTxt.textContent = newHeat.toString();
+      }
+      if (hudHeatBar._lastPercent !== heatPercent) {
+        hudHeatBar._lastPercent = heatPercent;
+        hudHeatBar.style.width = `${heatPercent}%`;
+        
+        // Remove all heat classes first
+        hudHeatBar.parentElement.classList.remove('warning', 'danger', 'overheated');
+        
+        // Add appropriate heat state class
+        if (p.overheated) {
+          hudHeatBar.parentElement.classList.add('overheated');
+        } else if (heatPercent >= 90) {
+          hudHeatBar.parentElement.classList.add('danger');
+        } else if (heatPercent >= 75) {
+          hudHeatBar.parentElement.classList.add('warning');
+        }
+      }
+      
       if (waveTxt._lastValue !== g.wave) {
         waveTxt._lastValue = g.wave;
         waveTxt.textContent = g.wave.toString();
@@ -4396,13 +5871,55 @@
       ctx.stroke();
     }
     
+    // Overheat visual effects
+    if (p.overheated) {
+      // Pulsing red warning glow
+      const overheatPulse = 0.5 + 0.5 * fastSin(g.t * 12);
+      const overheatRadius = p.radius + 12;
+      
+      // Red overheat aura
+      const overheatKey = `overheat_${((overheatPulse*100)|0)}`;
+      let overheatGradient = gradientCache.get(overheatKey);
+      if (!overheatGradient) {
+        overheatGradient = ctx.createRadialGradient(p.x, p.y, p.radius, p.x, p.y, overheatRadius);
+        overheatGradient.addColorStop(0, `rgba(255, 0, 0, ${overheatPulse * 0.6})`);
+        overheatGradient.addColorStop(0.5, `rgba(255, 100, 0, ${overheatPulse * 0.4})`);
+        overheatGradient.addColorStop(1, `rgba(255, 0, 0, 0)`);
+        gradientCache.set(overheatKey, overheatGradient);
+      }
+      ctx.fillStyle = overheatGradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, overheatRadius, 0, TAU);
+      ctx.fill();
+    } else if (p.heat >= 75) {
+      // Warning glow for high heat
+      const heatIntensity = (p.heat - 75) / 25; // 0 to 1 as heat goes 75-100
+      const heatPulse = 0.7 + 0.3 * fastSin(g.t * 8);
+      const heatRadius = p.radius + 6;
+      
+      ctx.fillStyle = `rgba(255, ${150 - heatIntensity * 100}, 0, ${heatPulse * heatIntensity * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, heatRadius, 0, TAU);
+      ctx.fill();
+    }
+    
     // Player invulnerability flash
     if (g.invulTime > 0){
       ctx.globalAlpha = 0.6 + 0.4*fastSin(g.t*40);
     }
     
-    // Main player body
-    ctx.fillStyle = '#00ff00';
+    // Main player body - color changes based on heat
+    if (p.overheated) {
+      ctx.fillStyle = '#ff4444'; // Red when overheated
+    } else if (p.heat >= 90) {
+      ctx.fillStyle = '#ff8800'; // Orange when very hot
+    } else if (p.heat >= 75) {
+      ctx.fillStyle = '#ffaa00'; // Yellow-orange when hot
+    } else if (p.heat >= 50) {
+      ctx.fillStyle = '#88ff00'; // Yellow-green when warm
+    } else {
+      ctx.fillStyle = '#00ff00'; // Normal green
+    }
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius, 0, TAU);
     ctx.fill();
@@ -4464,6 +5981,9 @@
         ctx.arc(e.x, e.y, e.r + 8, 0, TAU);
         ctx.stroke();
         
+        // Draw overlord symbol
+        drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+        
         ctx.restore();
       } else {
         // Normal enemy rendering with shadow
@@ -4512,32 +6032,46 @@
         if (needScaleRestore) {
           ctx.restore(); // Restore scale transform
         }
+        
+        // Draw enemy symbol AFTER scale restore to prevent distortion
+        drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+        
         ctx.restore();
         
         // Shield rendering - ONLY for slowpush enemies
-        if (e.behavior === 'slowpush' && e.hasShield && e.shieldHP > 0) {
+        if (e.behavior === 'juggernaut' && e.hasShield && e.shieldHP > 0) {
           // Use lagged shield direction instead of instant player direction
           const shieldDir = e.shieldDirection || { x: 1, y: 0 };
-          const shieldOffset = e.r + 5; // 5 pixels in front of enemy
+          const shieldOffset = e.r * 1.3; // Shield positioned just outside enemy body
           const shieldX = e.x + shieldDir.x * shieldOffset;
           const shieldY = e.y + shieldDir.y * shieldOffset;
           
-          // Shield dimensions
-          const shieldWidth = e.r * 1.2;
-          const shieldHeight = e.r * 0.8;
+          // Shield dimensions (when properly oriented)
+          const shieldLength = e.r * 1.2;  // Length of shield (perpendicular to direction)
+          const shieldThickness = e.r * 0.8; // Thickness of shield (along direction)
+          
+          // Calculate angle to rotate shield perpendicular to enemy-player line
+          const shieldAngle = Math.atan2(shieldDir.y, shieldDir.x);
           
           // Shield health-based transparency
           const shieldAlpha = Math.max(0.3, e.shieldHP / e.maxShieldHP);
           
           ctx.save();
           ctx.globalAlpha = shieldAlpha;
+          
+          // Translate to shield position and rotate perpendicular
+          ctx.translate(shieldX, shieldY);
+          ctx.rotate(shieldAngle + Math.PI/2); // Rotate 90 degrees to be perpendicular
+          
+          // Draw shield (now properly oriented as a wall)
           ctx.fillStyle = '#cccccc'; // Light gray shield (very visible)
-          ctx.fillRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          ctx.fillRect(-shieldLength/2, -shieldThickness/2, shieldLength, shieldThickness);
           
           // Shield border
           ctx.strokeStyle = '#aaaaaa';
           ctx.lineWidth = 1;
-          ctx.strokeRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          ctx.strokeRect(-shieldLength/2, -shieldThickness/2, shieldLength, shieldThickness);
+          
           ctx.restore();
         }
       }
@@ -4661,25 +6195,76 @@
       ctx.restore();
     }
 
-    // mines - explosive devices
+    // mines and grenades - explosive devices
     for (const mine of mines.items) {
       if (!mine.alive) continue;
       
-      // Mine body
-      ctx.fillStyle = mine.isArmed ? '#ff4400' : '#994400'; // Orange when armed, dark orange when not
-      ctx.beginPath();
-      ctx.arc(mine.x, mine.y, mine.r, 0, TAU);
-      ctx.fill();
-      
-      // Show trigger radius for armed mines (static circle)
-      if (mine.isArmed && !mine.isTriggered) {
-        ctx.strokeStyle = 'rgba(255, 100, 0, 0.3)'; // Faint orange circle
-        ctx.lineWidth = 1;
-        ctx.setLineDash([3, 3]); // Small dashed circle
+      // Different rendering for grenades vs mines
+      if (mine.isGrenade) {
+        // Calculate grenade position with height offset
+        const drawY = mine.y - (mine.z || 0) * 0.5; // Visual height offset
+        const size = mine.r || 6;
+        
+        // Shadow on ground (shows where grenade will land)
+        if (mine.z > 0) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          ctx.beginPath();
+          ctx.ellipse(mine.x, mine.y, size * 0.8, size * 0.4, 0, 0, TAU);
+          ctx.fill();
+        }
+        
+        // Grenade body - red color
+        ctx.fillStyle = mine.isTriggered ? '#ff0000' : '#cc0000'; // Bright red when triggered
+        ctx.strokeStyle = mine.isTriggered ? '#ffaa00' : '#660000';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(mine.x, mine.y, mine.triggerRadius, 0, TAU);
+        ctx.arc(mine.x, drawY, size, 0, TAU);
+        ctx.fill();
         ctx.stroke();
-        ctx.setLineDash([]); // Reset line dash
+        
+        // Add spinning effect
+        ctx.strokeStyle = '#990000';
+        ctx.lineWidth = 1;
+        const spin = mine.fuseTime * 10;
+        ctx.beginPath();
+        ctx.moveTo(mine.x + Math.cos(spin) * size, drawY + Math.sin(spin) * size);
+        ctx.lineTo(mine.x - Math.cos(spin) * size, drawY - Math.sin(spin) * size);
+        ctx.stroke();
+        
+        // Motion trail for flying grenades
+        if ((mine.vx !== 0 || mine.vy !== 0) && mine.z > 0) {
+          // Normalize trail length to prevent huge lines
+          const trailLength = 15; // Fixed trail length in pixels
+          const speed = Math.sqrt(mine.vx * mine.vx + mine.vy * mine.vy);
+          if (speed > 0) {
+            const trailX = (mine.vx / speed) * trailLength;
+            const trailY = (mine.vy / speed) * trailLength;
+            
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)';
+            ctx.lineWidth = size * 0.6;
+            ctx.beginPath();
+            ctx.moveTo(mine.x, drawY);
+            ctx.lineTo(mine.x - trailX, drawY - trailY);
+            ctx.stroke();
+          }
+        }
+      } else {
+        // Regular mine
+        ctx.fillStyle = mine.isArmed ? '#ff4400' : '#994400'; // Orange when armed, dark orange when not
+        ctx.beginPath();
+        ctx.arc(mine.x, mine.y, mine.r, 0, TAU);
+        ctx.fill();
+        
+        // Show trigger radius for armed mines (static circle)
+        if (mine.isArmed && !mine.isTriggered) {
+          ctx.strokeStyle = 'rgba(255, 100, 0, 0.3)'; // Faint orange circle
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]); // Small dashed circle
+          ctx.beginPath();
+          ctx.arc(mine.x, mine.y, mine.triggerRadius, 0, TAU);
+          ctx.stroke();
+          ctx.setLineDash([]); // Reset line dash
+        }
       }
       
       // Flashing effect when triggered and about to explode
@@ -4746,7 +6331,7 @@
     }
 
     // Crystal inventory display under HUD
-    const crystalInventoryY = 240; // Start well below HUD (HUD bottom ~168px + crystal extends 20px up = needs 188px min)
+    const crystalInventoryY = 280; // Moved further down to avoid Wave/Kills text overlap
     const crystalSize = 60; // 50% larger than 40 = 60
     const crystalSpacing = 75; // Adjust spacing for larger crystals
     let inventoryIndex = 0;
@@ -4909,6 +6494,248 @@
     }
   }
 
+  // ===== Enemy Symbol Drawing =====
+  function drawEnemySymbol(ctx, e, x, y, r) {
+    ctx.save();
+    ctx.strokeStyle = '#000000';
+    ctx.fillStyle = '#000000';
+    ctx.lineWidth = Math.max(1, r * 0.15);
+    ctx.globalAlpha = 0.9; // More opaque for better visibility
+    
+    const symbolSize = r * 0.6; // Symbol is 60% of enemy radius
+    
+    // First check if it's a shooter - shooters get priority for crosshair
+    if (e.isShooter) {
+      // Crosshair for shooters - always draw this for shooters
+      ctx.lineWidth = Math.max(2, r * 0.15);
+      ctx.beginPath();
+      ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
+      ctx.moveTo(x - symbolSize * 0.6, y);
+      ctx.lineTo(x + symbolSize * 0.6, y);
+      ctx.moveTo(x, y - symbolSize * 0.6);
+      ctx.lineTo(x, y + symbolSize * 0.6);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
+    
+    // Draw based on behavior type
+    switch(e.behavior) {
+      case 'stalker':
+        // Single dot - basic enemy
+        ctx.beginPath();
+        ctx.arc(x, y, symbolSize * 0.25, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'volatile':
+        // Radiation/danger symbol - exclamation mark !
+        ctx.fillStyle = '#000000';
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        // Main stroke
+        ctx.beginPath();
+        ctx.moveTo(x, y - symbolSize * 0.5);
+        ctx.lineTo(x, y + symbolSize * 0.1);
+        ctx.stroke();
+        // Dot
+        ctx.beginPath();
+        ctx.arc(x, y + symbolSize * 0.35, symbolSize * 0.12, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'berserker':
+        // Forward arrows >>>
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        for(let i = 0; i < 3; i++) {
+          const offset = (i - 1) * symbolSize * 0.3;
+          ctx.beginPath();
+          ctx.moveTo(x + offset - symbolSize * 0.2, y - symbolSize * 0.3);
+          ctx.lineTo(x + offset + symbolSize * 0.2, y);
+          ctx.lineTo(x + offset - symbolSize * 0.2, y + symbolSize * 0.3);
+          ctx.stroke();
+        }
+        break;
+        
+      case 'vortex':
+        // Spiral pattern
+        ctx.lineWidth = Math.max(1.5, r * 0.12);
+        for(let i = 0; i < 3; i++) {
+          const angle = (i / 3) * TAU;
+          ctx.beginPath();
+          ctx.arc(x, y, symbolSize * 0.6, angle, angle + Math.PI * 0.6);
+          ctx.stroke();
+        }
+        break;
+        
+      case 'bomber':
+        // Bomb with fuse
+        ctx.beginPath();
+        ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
+        ctx.fill();
+        // Fuse
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = Math.max(1, r * 0.1);
+        ctx.beginPath();
+        ctx.moveTo(x + symbolSize * 0.3, y - symbolSize * 0.3);
+        ctx.lineTo(x + symbolSize * 0.6, y - symbolSize * 0.6);
+        ctx.stroke();
+        // Spark
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(x + symbolSize * 0.6, y - symbolSize * 0.6, symbolSize * 0.15, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'juggernaut':
+        // Shield shape
+        ctx.lineWidth = Math.max(2, r * 0.2);
+        ctx.beginPath();
+        ctx.moveTo(x, y - symbolSize * 0.6);
+        ctx.lineTo(x - symbolSize * 0.5, y - symbolSize * 0.3);
+        ctx.lineTo(x - symbolSize * 0.5, y + symbolSize * 0.3);
+        ctx.lineTo(x, y + symbolSize * 0.6);
+        ctx.lineTo(x + symbolSize * 0.5, y + symbolSize * 0.3);
+        ctx.lineTo(x + symbolSize * 0.5, y - symbolSize * 0.3);
+        ctx.closePath();
+        ctx.stroke();
+        break;
+        
+      case 'divider':
+        // Y shape with dots
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - symbolSize * 0.4, y - symbolSize * 0.5);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + symbolSize * 0.4, y - symbolSize * 0.5);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y + symbolSize * 0.5);
+        ctx.stroke();
+        // Dots at ends
+        ctx.beginPath();
+        ctx.arc(x - symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+        ctx.arc(x + symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+        ctx.arc(x, y + symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'trapper':
+        // Hexagon mine shape
+        ctx.lineWidth = Math.max(1.5, r * 0.15);
+        ctx.beginPath();
+        for(let i = 0; i < 6; i++) {
+          const angle = (i / 6) * TAU;
+          const px = x + Math.cos(angle) * symbolSize * 0.5;
+          const py = y + Math.sin(angle) * symbolSize * 0.5;
+          if(i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        // Center spike
+        ctx.beginPath();
+        ctx.arc(x, y, symbolSize * 0.15, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'serpent':
+        // Wavy line
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.beginPath();
+        ctx.moveTo(x - symbolSize * 0.6, y);
+        ctx.quadraticCurveTo(x - symbolSize * 0.3, y - symbolSize * 0.4, x, y);
+        ctx.quadraticCurveTo(x + symbolSize * 0.3, y + symbolSize * 0.4, x + symbolSize * 0.6, y);
+        ctx.stroke();
+        break;
+        
+      case 'prowler':
+        // Parentheses ( ) for flanking
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.beginPath();
+        ctx.arc(x - symbolSize * 0.25, y, symbolSize * 0.4, -Math.PI * 0.4, Math.PI * 0.4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x + symbolSize * 0.25, y, symbolSize * 0.4, Math.PI * 0.6, Math.PI * 1.4);
+        ctx.stroke();
+        break;
+        
+      case 'leaper':
+        // Up arrow for jumping
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.beginPath();
+        ctx.moveTo(x, y - symbolSize * 0.5);
+        ctx.lineTo(x - symbolSize * 0.3, y);
+        ctx.moveTo(x, y - symbolSize * 0.5);
+        ctx.lineTo(x + symbolSize * 0.3, y);
+        ctx.moveTo(x, y - symbolSize * 0.5);
+        ctx.lineTo(x, y + symbolSize * 0.5);
+        ctx.stroke();
+        break;
+        
+      case 'maniac':
+        // Chaotic X marks
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.strokeStyle = '#000000';
+        ctx.beginPath();
+        ctx.moveTo(x - symbolSize * 0.4, y - symbolSize * 0.4);
+        ctx.lineTo(x + symbolSize * 0.4, y + symbolSize * 0.4);
+        ctx.moveTo(x + symbolSize * 0.4, y - symbolSize * 0.4);
+        ctx.lineTo(x - symbolSize * 0.4, y + symbolSize * 0.4);
+        ctx.stroke();
+        // Question mark dot
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(x, y + symbolSize * 0.6, symbolSize * 0.1, 0, TAU);
+        ctx.fill();
+        break;
+        
+      case 'boss':
+        // Diamond (two-pointed triangle) for mini-boss
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        // Diamond shape
+        ctx.moveTo(x, y - symbolSize * 0.6); // Top
+        ctx.lineTo(x + symbolSize * 0.5, y); // Right
+        ctx.lineTo(x, y + symbolSize * 0.6); // Bottom
+        ctx.lineTo(x - symbolSize * 0.5, y); // Left
+        ctx.closePath();
+        ctx.stroke();
+        break;
+        
+      case 'superboss':
+        // Three-pointed triangle for super boss
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        // Equilateral triangle
+        const triRadius = symbolSize * 0.6;
+        for(let i = 0; i < 3; i++) {
+          const angle = (i / 3) * TAU - Math.PI/2; // Start from top
+          const px = x + Math.cos(angle) * triRadius;
+          const py = y + Math.sin(angle) * triRadius;
+          if(i === 0) {
+            ctx.moveTo(px, py);
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        ctx.closePath();
+        ctx.stroke();
+        break;
+        
+      default:
+        // Simple dot for unknown behaviors (should never happen)
+        ctx.beginPath();
+        ctx.arc(x, y, symbolSize * 0.3, 0, TAU);
+        ctx.fill();
+    }
+    
+    ctx.restore();
+  }
+
   // ===== Loop (fixed-timestep with interpolation) =====
   let last = performance.now();
   const dtFixed = 1/60;
@@ -4962,6 +6789,441 @@
   }
   requestAnimationFrame(frame);
 
+  // ===== Animated enemy preview system =====
+  let enemyPreviewAnimations = [];
+  
+  function initEnemyPreviews() {
+    // Clear any existing animations
+    enemyPreviewAnimations.forEach(anim => cancelAnimationFrame(anim.id));
+    enemyPreviewAnimations = [];
+    
+    // Get all canvas elements for enemy previews
+    const canvases = document.querySelectorAll('.enemy-preview-canvas');
+    
+    canvases.forEach(canvas => {
+      const ctx = canvas.getContext('2d');
+      const color = canvas.dataset.enemyColor;
+      const behavior = canvas.dataset.enemyBehavior;
+      const isShooter = canvas.dataset.enemyShooter === 'true';
+      const shootPattern = canvas.dataset.shootPattern || 'single';
+      
+      // Set proper scaling for high DPI displays
+      const scale = 2; // 2x resolution for clarity
+      canvas.style.width = '80px';
+      canvas.style.height = '80px';
+      
+      // Animation state for this enemy (coordinates in logical space, not scaled)
+      const animState = {
+        x: 40,
+        y: 40,
+        targetX: 60,
+        targetY: 40,
+        time: 0,
+        radius: behavior === 'superboss' || behavior === 'boss' ? 24 : 16,
+        projectiles: [],
+        lastShot: 0
+      };
+      
+      // Create a mock enemy object for drawing
+      const mockEnemy = {
+        behavior: behavior,
+        isShooter: isShooter,
+        color: color,
+        x: animState.x,
+        y: animState.y,
+        r: animState.radius,
+        hasShield: behavior === 'juggernaut',
+        shieldHP: behavior === 'juggernaut' ? 3 : 0,
+        maxShieldHP: behavior === 'juggernaut' ? 3 : 0,
+        shieldDirection: behavior === 'juggernaut' ? { x: 1, y: 0 } : null
+      };
+      
+      function animate() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Update position with smooth movement
+        animState.time += 0.02;
+        
+        // Behavior-specific movement patterns
+        if (behavior === 'prowler') {
+          // Flanking movement - circles around
+          const angle = animState.time * 2;
+          mockEnemy.x = (40 + Math.cos(angle) * 15) * scale;
+          mockEnemy.y = (40 + Math.sin(angle) * 8) * scale;
+        } else if (behavior === 'serpent') {
+          // Serpent - smooth zigzag
+          const progress = (Math.sin(animState.time) + 1) / 2;
+          mockEnemy.x = (24 + progress * 32) * scale;
+          mockEnemy.y = (40 + Math.sin(animState.time * 3) * 8) * scale;
+        } else if (behavior === 'maniac') {
+          // Maniac - erratic random-ish movement
+          const erraticX = Math.sin(animState.time * 2.7) + Math.sin(animState.time * 4.3) * 0.5;
+          const erraticY = Math.cos(animState.time * 3.1) + Math.sin(animState.time * 5.7) * 0.3;
+          mockEnemy.x = (40 + erraticX * 12) * scale;
+          mockEnemy.y = (40 + erraticY * 8) * scale;
+        } else if (behavior === 'leaper') {
+          // Jumping motion
+          const jumpCycle = animState.time % 2;
+          const progress = (Math.sin(animState.time) + 1) / 2;
+          mockEnemy.x = (24 + progress * 32) * scale;
+          if (jumpCycle < 0.3) {
+            mockEnemy.y = (40 - Math.sin((jumpCycle / 0.3) * Math.PI) * 10) * scale;
+          } else {
+            mockEnemy.y = 40 * scale;
+          }
+        } else {
+          // Default back and forth movement
+          const progress = (Math.sin(animState.time) + 1) / 2;
+          const moveRange = behavior === 'superboss' || behavior === 'boss' ? 16 : 24;
+          mockEnemy.x = (40 - moveRange/2 + progress * moveRange) * scale;
+          mockEnemy.y = 40 * scale;
+        }
+        
+        // Scale the radius for drawing
+        mockEnemy.r = animState.radius * scale;
+        
+        // Handle shooting enemies
+        if (isShooter || behavior === 'vortex') {
+          // Spawn projectiles periodically
+          if (animState.time - animState.lastShot > 1.5) {
+            animState.lastShot = animState.time;
+            
+            if (shootPattern === 'spread') {
+              // Triple spread shot
+              for (let i = -1; i <= 1; i++) {
+                const angle = i * 0.3; // Spread angle
+                animState.projectiles.push({
+                  x: mockEnemy.x / scale,
+                  y: mockEnemy.y / scale,
+                  vx: Math.cos(angle) * 2,
+                  vy: Math.sin(angle) * 2,
+                  life: 1
+                });
+              }
+            } else if (shootPattern === 'burst') {
+              // Burst fire (3 rapid shots)
+              for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                  animState.projectiles.push({
+                    x: mockEnemy.x / scale,
+                    y: mockEnemy.y / scale,
+                    vx: 2,
+                    vy: 0,
+                    life: 1
+                  });
+                }, i * 100); // 100ms between burst shots
+              }
+            } else {
+              // Single shot (default)
+              animState.projectiles.push({
+                x: mockEnemy.x / scale,
+                y: mockEnemy.y / scale,
+                vx: behavior === 'vortex' ? Math.cos(animState.time * 3) * 2 : 2,
+                vy: behavior === 'vortex' ? Math.sin(animState.time * 3) * 2 : 0,
+                life: 1
+              });
+            }
+          }
+        }
+        
+        // Update and draw projectiles
+        animState.projectiles = animState.projectiles.filter(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.02;
+          
+          if (p.life > 0) {
+            ctx.save();
+            ctx.fillStyle = '#ff0000';
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x * scale, p.y * scale, 3 * scale, 0, TAU);
+            ctx.fill();
+            ctx.restore();
+            return true;
+          }
+          return false;
+        });
+        
+        // Update juggernaut shield direction to face "player"
+        if (behavior === 'juggernaut' && mockEnemy.hasShield) {
+          // Simulate player at center-left of the preview area
+          const playerX = 20 * scale;
+          const playerY = 40 * scale;
+          
+          // Calculate direction from juggernaut to "player"
+          const dx = playerX - mockEnemy.x;
+          const dy = playerY - mockEnemy.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          mockEnemy.shieldDirection = { 
+            x: dx / dist, 
+            y: dy / dist 
+          };
+        }
+        
+        // Draw juggernaut shield using the same rendering as in-game
+        if (mockEnemy.behavior === 'juggernaut' && mockEnemy.hasShield && mockEnemy.shieldHP > 0) {
+          const shieldDir = mockEnemy.shieldDirection || { x: 1, y: 0 };
+          const shieldOffset = mockEnemy.r + 5; // 5 pixels in front of enemy
+          const shieldX = mockEnemy.x + shieldDir.x * shieldOffset;
+          const shieldY = mockEnemy.y + shieldDir.y * shieldOffset;
+          
+          // Shield dimensions
+          const shieldWidth = mockEnemy.r * 1.2;
+          const shieldHeight = mockEnemy.r * 0.8;
+          
+          // Shield health-based transparency
+          const shieldAlpha = Math.max(0.3, mockEnemy.shieldHP / mockEnemy.maxShieldHP);
+          
+          ctx.save();
+          ctx.globalAlpha = shieldAlpha;
+          ctx.fillStyle = '#cccccc'; // Light gray shield (very visible)
+          ctx.fillRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          
+          // Shield border
+          ctx.strokeStyle = '#aaaaaa';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(shieldX - shieldWidth/2, shieldY - shieldHeight/2, shieldWidth, shieldHeight);
+          ctx.restore();
+        }
+        
+        // Draw the enemy
+        ctx.save();
+        
+        // Draw enemy body
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(mockEnemy.x, mockEnemy.y, mockEnemy.r, 0, TAU);
+        ctx.fill();
+        
+        // Draw enemy symbol
+        drawEnemySymbol(ctx, mockEnemy, mockEnemy.x, mockEnemy.y, mockEnemy.r);
+        
+        ctx.restore();
+        
+        // Continue animation
+        const animId = requestAnimationFrame(animate);
+        
+        // Store animation reference
+        const animRef = { id: animId, canvas: canvas };
+        const existingIndex = enemyPreviewAnimations.findIndex(a => a.canvas === canvas);
+        if (existingIndex >= 0) {
+          enemyPreviewAnimations[existingIndex] = animRef;
+        } else {
+          enemyPreviewAnimations.push(animRef);
+        }
+      }
+      
+      // Start animation for this canvas
+      animate();
+    });
+  }
+  
+  // ===== Helper function to create enemy legend HTML =====
+  function createEnemyLegendHTML() {
+    return `
+      <div class="enemy-legend">
+        <div class="enemy-category">
+          <h4>⚙️ HOW ENEMIES WORK</h4>
+          <div style="font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px;">
+            <div><strong>COLOR = SPEED</strong> (Red=Fast, Purple=Slow)</div>
+            <div><strong>SYMBOL = BEHAVIOR</strong> (Special ability)</div>
+            <div>Each enemy = 1 base type + 1 behavior</div>
+          </div>
+        </div>
+        
+        <div class="enemy-category">
+          <h4>🏃 SPEED COLORS</h4>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#FF0000" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Red</div>
+              <div class="enemy-desc">Fastest - Run away!</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#FF4400" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Orange-Red</div>
+              <div class="enemy-desc">Very fast</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#FF8800" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Orange</div>
+              <div class="enemy-desc">Fast</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#FFAA00" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Yellow</div>
+              <div class="enemy-desc">Above average</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#AAFF00" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Yellow-Green</div>
+              <div class="enemy-desc">Average speed</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#00FF88" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Cyan</div>
+              <div class="enemy-desc">Below average</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#00CCFF" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Blue</div>
+              <div class="enemy-desc">Slow</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#CC44FF" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Purple</div>
+              <div class="enemy-desc">Very slow</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="enemy-category">
+          <h4>🎯 BEHAVIOR SYMBOLS</h4>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="stalker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">• Stalker</div>
+              <div class="enemy-desc">Basic - Direct pursuit</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="volatile" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">! Volatile</div>
+              <div class="enemy-desc">Explodes on death</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="berserker" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">»»» Berserker</div>
+              <div class="enemy-desc">Charges at player</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="maniac" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">✗ Maniac</div>
+              <div class="enemy-desc">Erratic movement</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="serpent" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">~ Serpent</div>
+              <div class="enemy-desc">Zigzag pattern</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="prowler" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">() Prowler</div>
+              <div class="enemy-desc">Flanking attacks</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="leaper" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">↑ Leaper</div>
+              <div class="enemy-desc">Jump attacks</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="vortex" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">◔ Vortex</div>
+              <div class="enemy-desc">Shoots in spiral pattern</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="divider" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Y Divider</div>
+              <div class="enemy-desc">Splits into 2-3</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="trapper" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">⬢ Trapper</div>
+              <div class="enemy-desc">Lays mines</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="bomber" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">●‾ Bomber</div>
+              <div class="enemy-desc">Throws grenades</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="juggernaut" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">⬡ Juggernaut</div>
+              <div class="enemy-desc">Shield + knockback</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="stalker" data-enemy-shooter="true" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">+ Shooter</div>
+              <div class="enemy-desc">Single projectile</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="stalker" data-enemy-shooter="true" data-shoot-pattern="spread" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">+× Spread Shooter</div>
+              <div class="enemy-desc">Triple spread shot</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#888888" data-enemy-behavior="stalker" data-enemy-shooter="true" data-shoot-pattern="burst" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">+• Burst Shooter</div>
+              <div class="enemy-desc">Rapid 3-shot burst</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="enemy-category">
+          <h4>👑 SPECIAL TYPES</h4>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#800080" data-enemy-behavior="superboss" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Super Boss</div>
+              <div class="enemy-desc">Wave 10/20/30 • 9x HP</div>
+            </div>
+          </div>
+          <div class="enemy-entry">
+            <canvas class="enemy-preview-canvas" data-enemy-color="#FFCC00" data-enemy-behavior="boss" width="160" height="160"></canvas>
+            <div class="enemy-info">
+              <div class="enemy-name">Mini Boss</div>
+              <div class="enemy-desc">Wave 5/15/25 • 2x HP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // ===== Helper function to create controls HTML =====
   function createControlsHTML() {
     return `
@@ -5009,15 +7271,55 @@
       // Clear banner content efficiently
       banner.innerHTML = '';
       
-      // Create pause screen elements with enhanced styling
+      // Create pause screen elements with tabs
       
+      // Tab container
+      const tabContainer = document.createElement('div');
+      tabContainer.className = 'tab-container';
+      
+      const controlsTab = document.createElement('button');
+      controlsTab.className = 'tab-button active';
+      controlsTab.textContent = 'Controls';
+      controlsTab.onclick = () => switchTab('controls');
+      
+      const enemiesTab = document.createElement('button');
+      enemiesTab.className = 'tab-button';
+      enemiesTab.textContent = 'Enemies';
+      enemiesTab.onclick = () => switchTab('enemies');
+      
+      const upgradesTab = document.createElement('button');
+      upgradesTab.className = 'tab-button';
+      upgradesTab.textContent = 'Upgrades';
+      upgradesTab.onclick = () => switchTab('upgrades');
+      
+      tabContainer.appendChild(controlsTab);
+      tabContainer.appendChild(enemiesTab);
+      tabContainer.appendChild(upgradesTab);
+      
+      // Controls panel (default active)
       const controlsDiv = document.createElement('div');
-      controlsDiv.className = 'controls-panel';
+      controlsDiv.id = 'controls-content';
+      controlsDiv.className = 'controls-panel tab-content active';
       controlsDiv.innerHTML = createControlsHTML();
       
-      // Add upgrades section
+      // Enemy legend panel
+      const enemiesDiv = document.createElement('div');
+      enemiesDiv.id = 'enemies-content';
+      enemiesDiv.className = 'controls-panel tab-content';
+      enemiesDiv.innerHTML = createEnemyLegendHTML();
+      
+      // Initialize enemy preview animations when panel is created
+      setTimeout(() => {
+        if (document.querySelector('.enemy-preview-canvas')) {
+          initEnemyPreviews();
+        }
+      }, 100);
+      
+      // Upgrades panel
       const upgradesDiv = document.createElement('div');
-      upgradesDiv.style.cssText = 'margin: 16px 0; padding: 12px; background: rgba(26, 31, 41, 0.7); border-radius: 8px; font-size: 13px;';
+      upgradesDiv.id = 'upgrades-content';
+      upgradesDiv.className = 'controls-panel tab-content';
+      upgradesDiv.style.cssText = 'padding: 12px; font-size: 13px;';
       
       const upgradesTitle = document.createElement('div');
       upgradesTitle.style.marginBottom = '8px';
@@ -5043,7 +7345,31 @@
       startBtn.id = 'startBtn';
       startBtn.textContent = 'Resume';
       
+      // Add tab switching function
+      window.switchTab = function(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Update content panels
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(tabName + '-content').classList.add('active');
+        
+        // Initialize enemy preview animations when switching to enemies tab
+        if (tabName === 'enemies') {
+          setTimeout(() => {
+            initEnemyPreviews();
+          }, 50);
+        }
+      };
+      
+      banner.appendChild(tabContainer);
       banner.appendChild(controlsDiv);
+      banner.appendChild(enemiesDiv);
       banner.appendChild(upgradesDiv);
       banner.appendChild(startBtn);
       // Re-attach event listener to the new Resume button
@@ -5094,6 +7420,16 @@
 
   // ===== Start / Restart =====
   function start(){
+    // Clear all existing game entities before creating new game
+    enemies.items.forEach(e => e.alive = false);
+    bullets.items.forEach(b => b.alive = false);
+    particles.items.forEach(p => p.alive = false);
+    
+    // Clear any pools that might have grown
+    enemies.items.length = 0;
+    bullets.items.length = 0;
+    particles.items.length = 0;
+    
     game = newGame();
     // Animate out existing screens
     if (banner.style.display !== 'none') {
@@ -5110,18 +7446,50 @@
     game.state = STATE.RUN;
     
     // Show mobile controls during gameplay
-    if (isMobile && mobileControls) {
-      mobileControls.style.display = 'block';
+    if (isMobile) {
+      if (mobileControls) mobileControls.style.display = 'block';
+      if (touchZonesElement) touchZonesElement.style.display = 'block';
     }
     // Center player
     game.player.x = canvas.width/2;
     game.player.y = canvas.height/2;
     
-    // Dramatic game start flash effect
-    gameStartOverlay.style.animation = 'gameStartFlash 1.2s ease-out forwards';
+    // Trippy psychedelic game start effect
+    gameStartOverlay.style.opacity = '1';
+    gameStartOverlay.style.display = 'block';
+    
+    // Trigger all the ripple animations by re-adding the elements
+    const rippleContainer = gameStartOverlay.querySelector('.ripple-container');
+    const warpGrid = gameStartOverlay.querySelector('.warp-grid');
+    const realityTear = gameStartOverlay.querySelector('.reality-tear');
+    
+    // Reset animations by removing and re-adding classes
+    const ripples = rippleContainer.innerHTML;
+    rippleContainer.innerHTML = '';
+    warpGrid.style.animation = 'none';
+    realityTear.style.animation = 'none';
+    
     setTimeout(() => {
+      rippleContainer.innerHTML = ripples;
+      warpGrid.style.animation = 'warpGrid 1.8s ease-out';
+      realityTear.style.animation = 'realityTear 1.8s ease-in-out';
+    }, 10);
+    
+    // Add screen shake for extra impact
+    canvas.style.animation = 'screenShake 0.5s ease-out';
+    setTimeout(() => {
+      canvas.style.animation = '';
+    }, 500);
+    
+    // Hide overlay after animation completes
+    setTimeout(() => {
+      gameStartOverlay.style.transition = 'opacity 0.5s ease-out';
       gameStartOverlay.style.opacity = '0';
-    }, 1200);
+      setTimeout(() => {
+        gameStartOverlay.style.display = 'none';
+        gameStartOverlay.style.transition = '';
+      }, 500);
+    }, 1800);
     // Clear pools
     for (const it of bullets.items) it.alive = false;
     for (const it of enemies.items) it.alive = false;
@@ -5168,6 +7536,15 @@
 
   startBtn.addEventListener('click', () => { 
     initAudio(); 
+    
+    // Check orientation before starting on mobile
+    if (isMobile && window.innerHeight > window.innerWidth) {
+      if (orientationWarning) {
+        orientationWarning.classList.add('show');
+      }
+      return; // Don't start if in portrait
+    }
+    
     if (game && game.state === STATE.PAUSE) {
       // Resume from pause
       togglePause();
