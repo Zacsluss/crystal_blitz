@@ -207,8 +207,8 @@ python -m http.server 8000  # Optional local server
 
 ## 🎯 **Project Stats**
 
-- **5,153** lines of optimized code
-- **188KB** file size (25% smaller after optimization!)
+- **7,830** lines of optimized code
+- **225KB** file size (highly optimized!)
 - **0** dependencies
 - **0** build steps
 - **100%** browser compatible
