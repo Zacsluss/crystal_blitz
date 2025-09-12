@@ -20,7 +20,7 @@
 **Crystal Blitz** is a single-file HTML5 arena survival shooter game where players face endless waves of increasingly difficult enemies. The game features a robust crystal-based powerup system, intelligent enemy AI, and progressive difficulty scaling.
 
 ### Key Features
-- **Single-File Architecture**: Entire game contained in one HTML file (5116 lines)
+- **Single-File Architecture**: Entire game contained in one HTML file (7,830 lines)
 - **No External Dependencies**: Self-contained with procedural audio, no external assets
 - **Cross-Platform**: Works on desktop and mobile browsers
 - **Performance Optimized**: Adaptive quality system, object pooling, spatial partitioning
@@ -31,7 +31,7 @@
 - **Rendering**: HTML5 Canvas 2D API
 - **Audio**: Web Audio API (procedural sound generation)
 - **Build**: None required (single HTML file)
-- **Size**: ~250KB uncompressed
+- **Size**: ~225KB uncompressed
 
 ---
 
@@ -628,11 +628,11 @@ performanceLevel: 0.3 to 1.0
 Crystal_Blitz.html
 ├── <head>
 │   ├── Meta tags
-│   └── <style> (1072 lines CSS)
+│   └── <style> (2,250 lines CSS)
 ├── <body>
 │   ├── Canvas element
 │   ├── UI containers
-│   └── <script> (3859 lines JS)
+│   └── <script> (5,580 lines JS)
 ```
 
 #### Module Pattern
@@ -851,6 +851,5 @@ This documentation serves as a complete reference for understanding, modifying, 
 
 ---
 
-*Generated with Claude Code*
-*Game Version: 1.0.0*
-*Documentation Date: 2025*
+*Game Version: 2.0.0*
+*Documentation Date: December 2024*
