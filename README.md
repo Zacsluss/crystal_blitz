@@ -13,8 +13,8 @@
   ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
   ![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
   ![Web Audio](https://img.shields.io/badge/Web_Audio_API-5A9FD4?style=flat-square&logo=webaudio&logoColor=white)
-  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-7,704-brightgreen?style=flat-square)
-  ![File Size](https://img.shields.io/badge/File_Size-283KB-blue?style=flat-square)
+  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-8,500+-brightgreen?style=flat-square)
+  ![File Size](https://img.shields.io/badge/File_Size-310KB-blue?style=flat-square)
   ![Performance](https://img.shields.io/badge/Performance-60_FPS-green?style=flat-square)
   
   <br>
@@ -41,7 +41,7 @@ open Crystal_Blitz.html  # That's it!
 
 ## 🎯 **What Makes This Special**
 
-> A technical demonstration of advanced web development - achieving AAA game performance in a single 283KB HTML file with no build process, no dependencies, and no external assets.
+> A technical demonstration of advanced web development - achieving AAA game performance in a single 310KB HTML file with no build process, no dependencies, and no external assets.
 
 ### 🌟 **Core Features**
 
@@ -50,11 +50,12 @@ open Crystal_Blitz.html  # That's it!
 <td width="50%">
 
 ### ⚔️ **Gameplay**
-- 11 unique crystal powerups
+- 11 unique crystal powerups with distinct visuals
 - 17 permanent upgrades  
 - 12+ evolving enemy behaviors
 - Boss battles every 10 waves
 - Dynamic difficulty (15→90 enemies)
+- Bipedal footstep tracking system
 
 </td>
 <td width="50%">
@@ -65,6 +66,7 @@ open Crystal_Blitz.html  # That's it!
 - O(1) spatial collision detection
 - Zero garbage collection
 - Cross-platform + touch controls
+- Enhanced UI with glassmorphism
 
 </td>
 </tr>
@@ -76,17 +78,17 @@ open Crystal_Blitz.html  # That's it!
 
 <div align="center">
 
-| Crystal | Effect | Duration | Rarity |
-|---------|--------|----------|--------|
-| 🎯 **Homing** | Auto-targeting bullets | 25 shots | Ultra Rare |
-| 💥 **Explosive** | Area damage | 50 shots | Common |
-| ⚡ **Lightning** | Chain damage | 50 shots | Common |
-| ❄️ **Freeze** | Slows 50% | 50 shots | Common |
-| 🔥 **Shrapnel** | Shotgun spread | 50 shots | Common |
-| 🏀 **Ricochet** | Wall bouncing | 50 shots | Common |
-| 💀 **Cluster** | Split fragments | 50 shots | Common |
-| 🔍 **Seeking** | Curves to enemies | 50 shots | Common |
-| 🔫 **Multi-Shot** | 2x/3x/4x bullets | 50 shots | Common |
+| Crystal | Effect | Visual | Duration | Rarity |
+|---------|--------|--------|----------|--------|
+| 🎯 **Homing** | Auto-targeting bullets | Golden star with aura | 25 shots | Ultra Rare |
+| 💥 **Explosive** | Area damage | Red hexagon | 50 shots | Common |
+| ⚡ **Lightning** | Chain damage | Yellow/blue bolt | 50 shots | Common |
+| ❄️ **Freeze** | Slows 50% | Cyan snowflake | 50 shots | Common |
+| 🔥 **Shotgun** | Wide spread | Brown pentagon | 50 shots | Common |
+| 🏀 **Ricochet** | Wall bouncing | Pink triangle | 50 shots | Common |
+| 💀 **Cluster** | Split fragments | Orange square | 50 shots | Common |
+| 🔍 **Seeking** | Curves to enemies | Red arrow | 50 shots | Common |
+| 🔫 **Multi-Shot** | 2x/3x/4x bullets | Diamond shapes | 50 shots | Common |
 
 </div>
 
@@ -133,8 +135,7 @@ open Crystal_Blitz.html  # That's it!
 - **Mouse** - Aim/Shoot
 - **Shift** - Sprint
 - **Space** - Leap
-- **P** - Pause
-- **L** - Crystal Legend
+- **P** - Pause Menu (with Crystals/Enemies/Upgrades tabs)
 
 </td>
 <td width="50%">
@@ -149,6 +150,32 @@ open Crystal_Blitz.html  # That's it!
 </td>
 </tr>
 </table>
+
+---
+
+## 🆕 **Latest Updates (v2.0)**
+
+### Visual Enhancements
+- **Crystal System Overhaul**: Each crystal now has unique shapes and visual effects
+  - Homing crystals feature golden star shapes with pulsing auras
+  - Lightning crystals use yellow-to-blue gradients with bolt shapes
+  - All crystals have multi-layered effects with particles and glow
+- **Footstep System**: Bipedal tracking with realistic fade effects for all entities
+- **Hexagonal Floor Pattern**: Dynamic gradient-based floor tiles for depth
+- **Blood Effects**: Improved blood stain fading with gradual alpha transitions
+
+### UI Improvements
+- **Pause Menu Redesign**: Tabbed interface with Controls, Enemies, Crystals, and Upgrades
+- **Options Menu**: Added to start screen with crystal and enemy previews
+- **Glassmorphism Effects**: Modern UI with blur effects and animations
+- **Responsive Menus**: All menus now scale with viewport (90vh x 90vw)
+- **HUD Crystal Display**: Shows actual crystal shapes and gradients in inventory
+
+### Bug Fixes
+- Fixed canvas transform accumulation causing screen rotation at wave 7
+- Resolved CSS specificity conflicts in pause menu buttons
+- Fixed blood stain sudden disappearance issue
+- Improved enemy spawn animations to prevent visibility issues
 
 ---
 
@@ -207,8 +234,8 @@ python -m http.server 8000  # Optional local server
 
 ## 🎯 **Project Stats**
 
-- **7,704** lines of optimized code
-- **283KB** file size (enhanced with glassmorphism UI!)
+- **8,500+** lines of optimized code
+- **310KB** file size (enhanced visuals & UI!)
 - **0** dependencies
 - **0** build steps
 - **100%** browser compatible
@@ -221,10 +248,11 @@ This game features cutting-edge performance optimizations:
 - **Zero Garbage Collection**: Eliminated string concatenation and array allocations in game loop
 - **Gradient Caching**: All gradients cached with LRU eviction
 - **Particle Limits**: Hard caps prevent performance degradation (500 particles, 200 blood stains)
-- **Object Pooling**: Pre-allocated pools for all game entities
+- **Object Pooling**: Pre-allocated pools for all game entities (footsteps, particles, blood)
 - **DOM Update Batching**: Minimized reflows with requestAnimationFrame batching
 - **Value Caching**: HUD only updates when values actually change
 - **LRU Trig Cache**: Cached sin/cos calculations with smart eviction
+- **Transform Reset**: Canvas transform matrix reset each frame to prevent accumulation bugs
 
 ---
 
