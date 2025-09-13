@@ -231,17 +231,266 @@
       font-size: 12px;
     }
     #crystalLegend {
+      display: none !important; /* Deprecated - now in pause menu */
+    }
+    #optionsPanel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%,
+        transparent 30%,
+        rgba(90, 242, 199, 0.4) 50%,
+        transparent 70%,
+        transparent 100%
+      );
+      opacity: 0;
+      animation: topShimmer 6s infinite;
+    }
+    #optionsPanel {
       position: fixed;
-      right: 12px;
-      bottom: 12px;
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      padding: 10px 12px;
-      border-radius: 10px;
-      box-shadow: 0 6px 14px var(--shadow);
-      user-select: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: radial-gradient(1200px 700px at 40% 35%, rgba(90,242,199,0.04), transparent),
+                  linear-gradient(180deg, rgba(18, 22, 29, 0.45), rgba(15, 19, 25, 0.35));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px 28px;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      /* Match banner sizing for consistency */
+      width: min(90vw, 750px);
+      height: min(90vh, 650px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: optionsFadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                 glassUnderglow 8s ease-in-out infinite;
+    }
+    #optionsPanel .tab-container {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(90, 242, 199, 0.15);
+      padding-bottom: 12px;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: titleSlideIn 0.6s ease-out 0.3s forwards;
+    }
+    #optionsPanel .tab-button {
+      background: rgba(90, 242, 199, 0.08);
+      border: 1px solid rgba(90, 242, 199, 0.2);
+      color: var(--muted);
+      padding: 10px 20px;
+      cursor: pointer;
       font-size: 14px;
-      max-width: 280px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(8px);
+    }
+    #optionsPanel .tab-button:hover {
+      color: var(--fg);
+      background: rgba(90, 242, 199, 0.15);
+      border-color: rgba(90, 242, 199, 0.4);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(90, 242, 199, 0.25);
+    }
+    #optionsPanel .tab-button.active {
+      color: #002e24;
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(90, 242, 199, 0.35),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    #optionsPanel .tab-button.active:hover {
+      filter: brightness(1.1);
+    }
+    #optionsPanel .tab-content {
       display: none;
+    }
+    #optionsPanel .tab-content.active {
+      display: block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: contentFadeIn 0.5s ease-out 0.5s forwards;
+    }
+    /* Override controls-panel opacity for options menu */
+    #optionsPanel .controls-panel {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      animation: none !important;
+      background: radial-gradient(ellipse at top, rgba(90, 242, 199, 0.03), transparent),
+                  linear-gradient(135deg, rgba(26, 31, 41, 0.6), rgba(18, 22, 29, 0.5));
+      border: 1px solid rgba(90, 242, 199, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+    @keyframes contentFadeIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px);
+        filter: blur(4px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+    @keyframes optionsFadeIn {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8) rotate(-1deg); 
+        filter: blur(8px); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        filter: blur(0px); 
+      }
+    }
+    @keyframes optionsFadeOut {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        filter: blur(0px); 
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.9) rotate(1deg); 
+        filter: blur(4px); 
+      }
+    }
+    #optionsPanel button#optionsBackBtn {
+      margin-top: 24px;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(90, 242, 199, 0.1), rgba(90, 242, 199, 0.05));
+      color: var(--accent);
+      border: 1px solid rgba(90, 242, 199, 0.3);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+      animation: buttonSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(8px);
+    }
+    #optionsPanel button#optionsBackBtn:hover {
+      background: linear-gradient(135deg, rgba(90, 242, 199, 0.2), rgba(90, 242, 199, 0.1));
+      border-color: var(--accent);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(90, 242, 199, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    #optionsPanel button#optionsBackBtn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    /* Custom scrollbar styling for Options panel */
+    #optionsPanel::-webkit-scrollbar {
+      width: 12px;
+    }
+    #optionsPanel::-webkit-scrollbar-track {
+      background: rgba(18, 22, 29, 0.6);
+      border-radius: 6px;
+      border: 1px solid rgba(90, 242, 199, 0.1);
+    }
+    #optionsPanel::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.3), rgba(90, 242, 199, 0.15));
+      border-radius: 6px;
+      border: 1px solid rgba(90, 242, 199, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    #optionsPanel::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.4), rgba(90, 242, 199, 0.25));
+      border-color: rgba(90, 242, 199, 0.3);
+    }
+    #optionsPanel::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.5), rgba(90, 242, 199, 0.35));
+    }
+    
+    /* Firefox scrollbar */
+    #optionsPanel {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(90, 242, 199, 0.3) rgba(18, 22, 29, 0.6);
+    }
+    
+    /* Also style banner scrollbar for pause menu */
+    #banner::-webkit-scrollbar {
+      width: 12px;
+    }
+    #banner::-webkit-scrollbar-track {
+      background: rgba(18, 22, 29, 0.6);
+      border-radius: 6px;
+      border: 1px solid rgba(90, 242, 199, 0.1);
+    }
+    #banner::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.3), rgba(90, 242, 199, 0.15));
+      border-radius: 6px;
+      border: 1px solid rgba(90, 242, 199, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    #banner::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.4), rgba(90, 242, 199, 0.25));
+      border-color: rgba(90, 242, 199, 0.3);
+    }
+    #banner::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(180deg, rgba(90, 242, 199, 0.5), rgba(90, 242, 199, 0.35));
+    }
+    #banner {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(90, 242, 199, 0.3) rgba(18, 22, 29, 0.6);
+    }
+    /* Crystal and Enemy Legend Styling */
+    #optionsPanel .crystal-legend,
+    #optionsPanel .enemy-legend {
+      padding: 20px !important;
+      background: radial-gradient(ellipse at center, rgba(90, 242, 199, 0.02), transparent);
+    }
+    #optionsPanel .crystal-category,
+    #optionsPanel .enemy-category {
+      margin-bottom: 16px !important;
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(18, 22, 29, 0.4), rgba(15, 19, 25, 0.3));
+      border-radius: 8px;
+      border: 1px solid rgba(90, 242, 199, 0.1);
+    }
+    #optionsPanel .crystal-category h4,
+    #optionsPanel .enemy-category h4 {
+      margin: 0 0 12px 0 !important;
+      font-size: 14px !important;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    #optionsPanel .crystal-item,
+    #optionsPanel .enemy-item {
+      padding: 6px 8px;
+      margin: 6px 0 !important;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    #optionsPanel .crystal-item:hover,
+    #optionsPanel .enemy-item:hover {
+      background: rgba(90, 242, 199, 0.05);
+      border-color: rgba(90, 242, 199, 0.2);
+      transform: translateX(4px);
     }
     #crystalLegend h3 {
       margin: 0 0 8px 0;
@@ -289,6 +538,7 @@
       animation: topShimmer 6s infinite;
     }
     
+    /* Unified responsive menu system */
     #banner {
       position: fixed;
       left: 50%;
@@ -305,10 +555,13 @@
                   inset 0 1px 0 rgba(255, 255, 255, 0.05),
                   inset 0 -1px 0 rgba(0, 0, 0, 0.1);
       text-align: center;
-      max-width: 700px;
+      /* Responsive sizing - all menus same size */
+      width: min(90vw, 750px);
+      height: min(90vh, 650px);
       line-height: 1.5;
       opacity: 0;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       animation: menuFadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
                  glassUnderglow 8s ease-in-out infinite;
     }
@@ -349,6 +602,21 @@
     }
     #banner button:active {
       transform: translateY(0px) scale(0.98);
+    }
+    #banner button + button {
+      margin-top: 12px;
+      background: linear-gradient(135deg, rgba(90, 242, 199, 0.15), rgba(90, 242, 199, 0.08));
+      color: var(--accent);
+      border: 1px solid rgba(90, 242, 199, 0.3);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    #banner button + button:hover {
+      background: linear-gradient(135deg, rgba(90, 242, 199, 0.25), rgba(90, 242, 199, 0.15));
+      border-color: var(--accent);
+      filter: none;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 24px rgba(90, 242, 199, 0.3);
     }
     .controls-panel {
       margin: 16px 0;
@@ -434,26 +702,50 @@
       background: rgba(90, 242, 199, 0.15);
       color: var(--fg);
     }
+    
+    /* CRITICAL FIX: Pause menu specific button styles with HIGHER SPECIFICITY */
+    #pauseBanner .tab-button {
+      background: rgba(0, 0, 0, 0.5);
+      color: var(--muted);
+      border-color: var(--border);
+      transition: all 0.2s;
+    }
+    #pauseBanner .tab-button.active {
+      background: rgba(90, 242, 199, 0.3) !important;
+      color: var(--accent) !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 20px rgba(90, 242, 199, 0.4),
+                  inset 0 0 10px rgba(90, 242, 199, 0.2);
+    }
+    #pauseBanner .tab-button:hover:not(.active) {
+      background: rgba(90, 242, 199, 0.15);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
     .tab-content {
       display: none;
     }
     .tab-content.active {
       display: block;
     }
-    /* Enemy legend styles */
-    .enemy-legend {
+    /* Enemy and Crystal legend styles */
+    .enemy-legend,
+    .crystal-legend {
       max-height: 400px;
       overflow-y: auto;
       padding-right: 8px;
     }
-    .enemy-legend::-webkit-scrollbar {
+    .enemy-legend::-webkit-scrollbar,
+    .crystal-legend::-webkit-scrollbar {
       width: 6px;
     }
-    .enemy-legend::-webkit-scrollbar-track {
+    .enemy-legend::-webkit-scrollbar-track,
+    .crystal-legend::-webkit-scrollbar-track {
       background: rgba(26, 31, 41, 0.5);
       border-radius: 3px;
     }
-    .enemy-legend::-webkit-scrollbar-thumb {
+    .enemy-legend::-webkit-scrollbar-thumb,
+    .crystal-legend::-webkit-scrollbar-thumb {
       background: rgba(90, 242, 199, 0.5);
       border-radius: 3px;
     }
@@ -547,6 +839,9 @@
                   inset 0 1px 0 rgba(255, 255, 255, 0.05),
                   inset 0 -1px 0 rgba(0, 0, 0, 0.1);
       text-align: center;
+      /* Match other menu sizing */
+      width: min(90vw, 750px);
+      height: min(90vh, 650px);
       line-height: 1.4;
       opacity: 0;
       overflow: hidden;
@@ -2081,12 +2376,6 @@
       </div>
       <div class="control-row">
         <div class="control-keys">
-          <kbd>L</kbd>
-        </div>
-        <div class="control-desc">Crystal legend</div>
-      </div>
-      <div class="control-row">
-        <div class="control-keys">
           <kbd>F11</kbd>
         </div>
         <div class="control-desc">Toggle fullscreen</div>
@@ -2095,6 +2384,10 @@
         💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
     </div>
     <button id="startBtn">Start</button>
+    <button id="optionsBtn">Options</button>
+  </div>
+  <div id="optionsPanel" class="panel" style="display:none;">
+    <!-- Options content will be dynamically created -->
   </div>
   <div id="gameOver">
     <h2>Game Over</h2>
@@ -2161,7 +2454,7 @@
       <div class="crystal-desc">Bounces off walls</div>
     </div>
     <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #000080;"></div>
+      <div class="crystal-color" style="background-color: #00BFFF;"></div>
       <div class="crystal-name">Lightning</div>
       <div class="crystal-desc">Chains to enemies</div>
     </div>
@@ -2267,6 +2560,8 @@
   const waveAnnouncement = getElement('waveAnnouncement');
   const powerupDialog = getElement('powerupDialog');
   const crystalLegend = getElement('crystalLegend');
+  const optionsPanel = getElement('optionsPanel');
+  const optionsBtn = getElement('optionsBtn');
 
   // Grouped elements (powerup options, titles, descriptions)
   const powerupOptions = [1, 2, 3].map(i => getElement(`powerupOption${i}`));
@@ -2331,10 +2626,6 @@
   let touchIndicatorRight = null;
   window.addEventListener('keydown', e => {
     if (e.code === 'KeyP'){ togglePause(); return; }
-    if (e.code === 'KeyL'){ 
-      crystalLegend.style.display = crystalLegend.style.display === 'block' ? 'none' : 'block';
-      return;
-    }
     if (e.code === 'F11'){ 
       e.preventDefault();
       if (!document.fullscreenElement) {
@@ -3260,8 +3551,10 @@
   // ===== Object Pools =====
   const MAX_PARTICLES = 500; // Hard cap on total particles
   const MAX_BLOOD_STAINS = 200; // Hard cap on blood stains
+  const MAX_FOOTSTEPS = 300; // Hard cap on footstep marks
   let activeParticleCount = 0;
   let activeBloodStainCount = 0;
+  let activeFootstepCount = 0;
   
   function makePool(createFn, initial=0){
     const items = [];
@@ -3358,7 +3651,11 @@
   }));
 
   const bloodStains = makePool(() => ({
-    alive:false, x:0, y:0, life:0, maxLife:15.0, size:2, alpha:1.0, vx:0, vy:0, settled:false
+    alive:false, x:0, y:0, life:0, maxLife:6.0, size:2, alpha:1.0, vx:0, vy:0, settled:false
+  }));
+
+  const footsteps = makePool(() => ({
+    alive:false, x:0, y:0, life:0, maxLife:3.0, size:6, alpha:0.3, angle:0, isPlayer:false, isLeft:false
   }));
 
   const enemyBullets = makePool(() => ({
@@ -3373,13 +3670,13 @@
 
   // Bullet powerup types
   const bulletPowerups = [
-    {type: 'upgrade', color: '#00BFFF', shots: 50, name: 'Dual Shot'},
-    {type: 'triple', color: '#32CD32', shots: 50, name: 'Triple Shot'},
+    {type: 'upgrade', color: '#32CD32', shots: 50, name: 'Dual Shot'},
+    {type: 'triple', color: '#00BFFF', shots: 50, name: 'Triple Shot'},
     {type: 'quad', color: '#FF1493', shots: 50, name: 'Quad Shot'},
     {type: 'homing', color: '#FFD700', shots: 25, name: 'Homing'},
     {type: 'explosive', color: '#FF4500', shots: 50, name: 'Explosive'},
     {type: 'ricochet', color: '#FF69B4', shots: 50, name: 'Ricochet'},
-    {type: 'lightning', color: '#000080', shots: 50, name: 'Lightning'},
+    {type: 'lightning', color: '#00BFFF', shots: 50, name: 'Lightning'},
     {type: 'freeze', color: '#00CED1', shots: 50, name: 'Freeze Shot'},
     {type: 'shotgun', color: '#8B4513', shots: 50, name: 'Shrapnel'},
     {type: 'cluster', color: '#FFA500', shots: 50, name: 'Cluster'},
@@ -3848,9 +4145,9 @@
           stain.vy = Math.sin(angle) * randRange(20, 80);
           
           stain.life = 0;
-          stain.maxLife = 15.0;
+          stain.maxLife = 6.0;
           stain.size = randRange(1, 4); // Smaller individual droplets
-          stain.alpha = 1.0;
+          stain.alpha = 0.8;
           stain.settled = false;
           stain.alive = true;
         });
@@ -4276,6 +4573,39 @@
     }
   }
 
+  // Footstep spawning function
+  function spawnFootstep(x, y, angle, isPlayer = false, entity = null) {
+    // Check footstep cap
+    let activeFootsteps = 0;
+    for (const f of footsteps.items) {
+      if (f.alive) activeFootsteps++;
+    }
+    if (activeFootsteps >= MAX_FOOTSTEPS) return;
+    
+    // Track which foot for alternating steps
+    if (!entity.nextFoot) entity.nextFoot = false;
+    const isLeft = entity.nextFoot;
+    entity.nextFoot = !entity.nextFoot;
+    
+    // Calculate perpendicular offset for left/right foot placement
+    const perpOffset = isPlayer ? 4 : 3;
+    const perpX = Math.cos(angle + Math.PI/2) * perpOffset * (isLeft ? 1 : -1);
+    const perpY = Math.sin(angle + Math.PI/2) * perpOffset * (isLeft ? 1 : -1);
+    
+    footsteps.spawn(f => {
+      f.x = x + perpX;
+      f.y = y + perpY;
+      f.life = 0;
+      f.maxLife = 3.0; // Moderate fade time
+      f.size = isPlayer ? 7 : 5; // Slightly larger
+      f.alpha = 0.35; // More opaque start
+      f.angle = angle; // Direction of movement
+      f.isPlayer = isPlayer;
+      f.isLeft = isLeft;
+      f.alive = true;
+    });
+  }
+
   // ===== Gradient Cache (for performance) =====
   const gradientCache = new Map();
   const MAX_GRADIENT_CACHE_SIZE = 100;
@@ -4371,7 +4701,7 @@
     if (ax || ay){
       const moveVec = normInPlace(ax, ay, vecPool.temp1);
       const nx = moveVec.x, ny = moveVec.y;
-      const waveSpeedBonus = g.wave * 0.2; // +0.2 speed per wave
+      const waveSpeedBonus = g.wave * 0.4; // +0.4 speed per wave
       const adrenalineBonus = (p.adrenalineTimer > 0) ? 1.2 : 1.0; // +20% speed during adrenaline
       const baseSpeed = (p.speed + waveSpeedBonus) * adrenalineBonus;
       const speed = Math.min(500, isSprinting ? baseSpeed*1.6 : baseSpeed); // Hard cap at 500
@@ -4384,6 +4714,19 @@
     // integrate
     p.x = clamp(p.x + p.vx*dt, p.radius, g.width()-p.radius);
     p.y = clamp(p.y + p.vy*dt, p.radius, g.height()-p.radius);
+    
+    // Spawn footsteps when moving
+    if (!p.footstepTimer) p.footstepTimer = 0;
+    const playerSpeed = fastLength(p.vx, p.vy);
+    if (playerSpeed > 30) { // Only spawn when actually moving
+      p.footstepTimer -= dt;
+      if (p.footstepTimer <= 0) {
+        const moveAngle = Math.atan2(p.vy, p.vx);
+        spawnFootstep(p.x, p.y, moveAngle, true, p);
+        // Faster footsteps when sprinting
+        p.footstepTimer = isSprinting ? 0.15 : 0.25;
+      }
+    }
 
     // Heat dissipation when not firing
     if (!mouseDown || p.overheated) {
@@ -5064,6 +5407,19 @@
       // clamp bounds
       e.x = clamp(e.x, e.r, g.width()-e.r);
       e.y = clamp(e.y, e.r, g.height()-e.r);
+      
+      // Spawn footsteps for enemies
+      if (!e.footstepTimer) e.footstepTimer = 0;
+      const enemySpeed = fastLength(e.vx, e.vy);
+      if (enemySpeed > 20) { // Lower threshold for enemies
+        e.footstepTimer -= dt;
+        if (e.footstepTimer <= 0) {
+          const moveAngle = Math.atan2(e.vy, e.vx);
+          spawnFootstep(e.x, e.y, moveAngle, false, e);
+          // Enemy footstep frequency based on speed
+          e.footstepTimer = 0.3 - Math.min(0.1, enemySpeed * 0.0005);
+        }
+      }
       g.grid.insert(e);
     }
     
@@ -5736,9 +6092,35 @@
       }
       
       stain.life += dt;
-      // Start fading after 3 seconds, fully gone at 15 seconds
-      stain.alpha = stain.life > 3 ? 1.0 - ((stain.life - 3) / 12) : 1.0;
+      // Fade similar to footsteps but slower (6 seconds total)
+      const fadeProgress = stain.life / stain.maxLife;
+      if (fadeProgress < 0.6) {
+        // First 60% of lifetime (0-3.6 seconds): Stay mostly visible
+        stain.alpha = 0.8 * (1.0 - fadeProgress * 0.2);
+      } else {
+        // Last 40% of lifetime (3.6-6 seconds): Quick fade
+        stain.alpha = 0.8 * 0.8 * (1.0 - (fadeProgress - 0.6) / 0.4);
+      }
       if (stain.life >= stain.maxLife) stain.alive = false;
+    }
+    
+    // Update footsteps
+    for (const footstep of footsteps.items) {
+      if (!footstep.alive) continue;
+      
+      footstep.life += dt;
+      // Fade out with easing - stays visible longer, then fades quickly
+      const fadeProgress = footstep.life / footstep.maxLife;
+      if (fadeProgress < 0.6) {
+        // Stay mostly visible for first 60%
+        footstep.alpha = 0.35 * (1.0 - fadeProgress * 0.3);
+      } else {
+        // Quick fade in last 40%
+        footstep.alpha = 0.35 * 0.7 * (1.0 - (fadeProgress - 0.6) / 0.4);
+      }
+      if (footstep.life >= footstep.maxLife) {
+        footstep.alive = false;
+      }
     }
 
     // particles
@@ -5901,13 +6283,16 @@
     // Reset render state for new frame
     resetRenderState();
     
+    // CRITICAL: Reset canvas transform to prevent accumulation bugs
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    
     // Clear gradient cache if it gets too large
     if (gradientCache.size > MAX_GRADIENT_CACHE_SIZE) {
       gradientCache.clear();
     }
     
     // clear
-    setFillStyle('#0b0d10');
+    setFillStyle('#0d1015');
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
     // Draw cached background grid (only when needed)
@@ -5919,51 +6304,162 @@
       bgCanvas.width = canvas.width;
       bgCanvas.height = canvas.height;
       
-      // Draw grid to offscreen canvas
+      // Draw hexagonal tile floor to offscreen canvas
       bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-      bgCtx.globalAlpha = 0.07;
-      bgCtx.strokeStyle = '#1a1f29';
-      bgCtx.lineWidth = 1;
-      const step = 64;
-      bgCtx.beginPath();
-      for (let x = (canvas.width%step); x < canvas.width; x += step){
-        bgCtx.moveTo(x, 0); bgCtx.lineTo(x, canvas.height);
+      
+      // Hexagon parameters
+      const hexRadius = 28;
+      const hexWidth = hexRadius * 2;
+      const hexHeight = Math.sqrt(3) * hexRadius;
+      const horizontalSpacing = hexWidth * 0.75;
+      const verticalSpacing = hexHeight;
+      
+      // Helper function to draw a hexagon
+      function drawHex(cx, cy, radius, isDamaged) {
+        bgCtx.save();
+        
+        // Create gradient for depth effect
+        const gradient = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        if (isDamaged) {
+          // Darker damaged tiles
+          gradient.addColorStop(0, '#0c0e12');
+          gradient.addColorStop(1, '#090b0e');
+        } else {
+          // Normal tiles with subtle gradient
+          gradient.addColorStop(0, '#111519');
+          gradient.addColorStop(0.7, '#0f1318');
+          gradient.addColorStop(1, '#0d1015');
+        }
+        
+        // Fill hexagon
+        bgCtx.fillStyle = gradient;
+        bgCtx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 6;
+          const x = cx + radius * Math.cos(angle);
+          const y = cy + radius * Math.sin(angle);
+          if (i === 0) bgCtx.moveTo(x, y);
+          else bgCtx.lineTo(x, y);
+        }
+        bgCtx.closePath();
+        bgCtx.fill();
+        
+        // Subtle border
+        bgCtx.strokeStyle = '#151a20';
+        bgCtx.lineWidth = 0.5;
+        bgCtx.globalAlpha = 0.3;
+        bgCtx.stroke();
+        
+        bgCtx.restore();
       }
-      for (let y = (canvas.height%step); y < canvas.height; y += step){
-        bgCtx.moveTo(0, y); bgCtx.lineTo(canvas.width, y);
+      
+      // Draw hexagonal grid
+      const cols = Math.ceil(canvas.width / horizontalSpacing) + 2;
+      const rows = Math.ceil(canvas.height / verticalSpacing) + 2;
+      
+      for (let row = -1; row < rows; row++) {
+        for (let col = -1; col < cols; col++) {
+          const x = col * horizontalSpacing;
+          const y = row * verticalSpacing + (col % 2) * (hexHeight / 2);
+          
+          // 5% chance for damaged/darker tile
+          const isDamaged = Math.random() < 0.05;
+          drawHex(x, y, hexRadius, isDamaged);
+        }
       }
-      bgCtx.stroke();
+      
       bgNeedsRedraw = false;
     }
     // Blit pre-drawn background
     ctx.drawImage(bgCanvas, 0, 0);
 
-    // blood stains - batched rendering to reduce save/restore overhead
+    // blood stains - individual rendering for proper alpha fading
     ctx.save();
     
-    // Batch settled stains
-    setFillStyle('#600000');
-    setGlobalAlpha(0.64); // 0.8 * 0.8 average
-    ctx.beginPath();
+    // Draw settled stains with individual alpha
     for (const stain of bloodStains.items){
       if (!stain.alive || !stain.settled) continue;
-      ctx.moveTo(stain.x + stain.size * 1.5, stain.y);
+      ctx.fillStyle = '#600000';
+      ctx.globalAlpha = stain.alpha * 0.8; // Apply individual fade
+      ctx.beginPath();
       ctx.arc(stain.x, stain.y, stain.size * 1.5, 0, TAU);
+      ctx.fill();
     }
-    ctx.fill();
     
-    // Batch moving droplets  
-    setFillStyle('#cc0000');
-    setGlobalAlpha(0.72); // 0.9 * 0.8 average
-    ctx.beginPath();
+    // Draw moving droplets with individual alpha
     for (const stain of bloodStains.items){
       if (!stain.alive || stain.settled) continue;
-      ctx.moveTo(stain.x + stain.size, stain.y);
+      ctx.fillStyle = '#cc0000';
+      ctx.globalAlpha = stain.alpha * 0.9; // Apply individual fade
+      ctx.beginPath();
       ctx.arc(stain.x, stain.y, stain.size, 0, TAU);
+      ctx.fill();
     }
-    ctx.fill();
     
-    ctx.restore();
+    // Draw footsteps with sophisticated appearance
+    for (const footstep of footsteps.items) {
+      if (!footstep.alive || footstep.alpha <= 0) continue;
+      
+      ctx.save();
+      ctx.translate(footstep.x, footstep.y);
+      ctx.rotate(footstep.angle);
+      
+      // Subtle outer glow/shadow for depth
+      ctx.fillStyle = '#0a0a0a'; // Very dark shadow
+      ctx.globalAlpha = footstep.alpha * 0.3;
+      
+      // Shadow slightly larger and offset
+      ctx.save();
+      ctx.scale(1.15, 1.15);
+      ctx.translate(1, 1);
+      
+      // Shadow foot pad
+      ctx.beginPath();
+      ctx.ellipse(-footstep.size * 0.2, 0, footstep.size * 0.35, footstep.size * 0.7, 0, 0, TAU);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(footstep.size * 0.3, 0, footstep.size * 0.25, footstep.size * 0.35, 0, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+      
+      // Main footprint with gradient
+      const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, footstep.size);
+      gradient.addColorStop(0, '#4a3a28'); // Lighter tan center
+      gradient.addColorStop(0.7, '#3d2f1f'); // Dark tan
+      gradient.addColorStop(1, '#2a2015'); // Darker edge
+      
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = footstep.alpha;
+      
+      // Draw a realistic footprint shape
+      // Main foot pad (heel to ball)
+      ctx.beginPath();
+      ctx.ellipse(-footstep.size * 0.2, 0, footstep.size * 0.35, footstep.size * 0.7, 0, 0, TAU);
+      ctx.fill();
+      
+      // Toe area (smaller circle at front)
+      ctx.beginPath();
+      ctx.ellipse(footstep.size * 0.3, 0, footstep.size * 0.25, footstep.size * 0.35, 0, 0, TAU);
+      ctx.fill();
+      
+      // Small toe marks with slightly different color
+      if (footstep.isPlayer) {
+        ctx.fillStyle = '#3a2c1c'; // Slightly different shade for toes
+        ctx.globalAlpha = footstep.alpha * 0.9;
+        // Player gets slightly more detailed footprints
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          const toeX = footstep.size * 0.5 + i * footstep.size * 0.08;
+          const toeY = (i - 1) * footstep.size * 0.12;
+          ctx.arc(toeX, toeY, footstep.size * 0.06, 0, TAU);
+          ctx.fill();
+        }
+      }
+      
+      ctx.restore();
+    }
+    
+    ctx.restore(); // Restore the save from line 6374 (blood stains and footsteps section)
 
     // draw player with leap glow
     const p = g.player;
@@ -6116,7 +6612,6 @@
         ctx.save();
         
         // Apply spawn animation - ENSURE MINIMUM VISIBILITY
-        let needScaleRestore = false;
         if (e.spawnTimer && e.spawnTimer > 0) {
           const progress = Math.max(0.3, 1 - (e.spawnTimer / 0.5)); // MINIMUM 30% visibility
           if (e.spawnAnimation === 'fade') {
@@ -6126,41 +6621,73 @@
             ctx.translate(e.x, e.y);
             ctx.scale(progress, progress);
             ctx.translate(-e.x, -e.y);
-            needScaleRestore = true;
+            
+            // Draw the enemy while scaled
+            // SIMPLE COLOR SYSTEM - ALWAYS HAVE A VALID COLOR
+            let renderColor = '#ff4444'; // Default bright red - ALWAYS visible
+            
+            // Get the color, with multiple fallbacks
+            if (e.color && e.color !== '' && e.color !== 'undefined' && e.color !== 'null') {
+              renderColor = e.color;
+            } else if (e.originalColor && e.originalColor !== '' && e.originalColor !== 'undefined') {
+              renderColor = e.originalColor;
+            } else if (e.baseColor && e.baseColor !== '' && e.baseColor !== 'undefined') {
+              renderColor = e.baseColor;
+            }
+            
+            // Apply crit flash if needed
+            if (e.critFlashTimer > 0) {
+              renderColor = '#ffff88';
+            }
+            
+            // ALWAYS use a valid color
+            ctx.fillStyle = renderColor;
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.r, 0, TAU);
+            ctx.fill();
+            
+            ctx.restore(); // ALWAYS restore after scale
+            
+            // Draw enemy symbol AFTER scale restore to prevent distortion
+            drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+          } else {
+            // No scale animation, draw normally
+            let renderColor = '#ff4444';
+            if (e.color && e.color !== '' && e.color !== 'undefined' && e.color !== 'null') {
+              renderColor = e.color;
+            } else if (e.originalColor && e.originalColor !== '' && e.originalColor !== 'undefined') {
+              renderColor = e.originalColor;
+            } else if (e.baseColor && e.baseColor !== '' && e.baseColor !== 'undefined') {
+              renderColor = e.baseColor;
+            }
+            if (e.critFlashTimer > 0) {
+              renderColor = '#ffff88';
+            }
+            ctx.fillStyle = renderColor;
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.r, 0, TAU);
+            ctx.fill();
+            drawEnemySymbol(ctx, e, e.x, e.y, e.r);
           }
-        }
-        
-        // SIMPLE COLOR SYSTEM - ALWAYS HAVE A VALID COLOR
-        let renderColor = '#ff4444'; // Default bright red - ALWAYS visible
-        
-        // Get the color, with multiple fallbacks
-        if (e.color && e.color !== '' && e.color !== 'undefined' && e.color !== 'null') {
-          renderColor = e.color;
-        } else if (e.originalColor && e.originalColor !== '' && e.originalColor !== 'undefined') {
-          renderColor = e.originalColor;
-        } else if (e.baseColor && e.baseColor !== '' && e.baseColor !== 'undefined') {
-          renderColor = e.baseColor;
         } else {
-          // Removed console.warn that was causing performance issues
+          // No spawn animation at all
+          let renderColor = '#ff4444';
+          if (e.color && e.color !== '' && e.color !== 'undefined' && e.color !== 'null') {
+            renderColor = e.color;
+          } else if (e.originalColor && e.originalColor !== '' && e.originalColor !== 'undefined') {
+            renderColor = e.originalColor;
+          } else if (e.baseColor && e.baseColor !== '' && e.baseColor !== 'undefined') {
+            renderColor = e.baseColor;
+          }
+          if (e.critFlashTimer > 0) {
+            renderColor = '#ffff88';
+          }
+          ctx.fillStyle = renderColor;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, TAU);
+          ctx.fill();
+          drawEnemySymbol(ctx, e, e.x, e.y, e.r);
         }
-        
-        // Apply crit flash if needed
-        if (e.critFlashTimer > 0) {
-          renderColor = '#ffff88';
-        }
-        
-        // ALWAYS use a valid color
-        ctx.fillStyle = renderColor;
-        ctx.beginPath();
-        ctx.arc(e.x, e.y, e.r, 0, TAU);
-        ctx.fill();
-        
-        if (needScaleRestore) {
-          ctx.restore(); // Restore scale transform
-        }
-        
-        // Draw enemy symbol AFTER scale restore to prevent distortion
-        drawEnemySymbol(ctx, e, e.x, e.y, e.r);
         
         ctx.restore();
         
@@ -6301,21 +6828,201 @@
         ctx.fillStyle = '#ffff00';
         ctx.fillRect(pickup.x - 3, pickup.y - 3, 6, 6);
       } else {
-        // Regular crystal drawing
-        ctx.fillStyle = powerup ? powerup.color : '#ffffff';
-        ctx.strokeStyle = pickup.type === 'homing' ? '#FFFFFF' : '#ffffff';
+        // Enhanced crystal drawing with multi-layered structure
+        const size = pickup.type === 'homing' ? 15 : 12;
+        const baseColor = powerup ? powerup.color : '#ffffff';
+        
+        // 1. Different crystal shapes for different types
+        const gradient = ctx.createRadialGradient(pickup.x, pickup.y, 0, pickup.x, pickup.y, size);
+        
+        // Parse color and create gradient (darker edges to lighter center)
+        if (pickup.type === 'homing') {
+          // Special gradient for homing
+          gradient.addColorStop(0, '#ffffff');
+          gradient.addColorStop(0.5, baseColor);
+          gradient.addColorStop(1, baseColor + '88');
+        } else if (pickup.type === 'lightning') {
+          // Yellow/blue gradient for lightning
+          gradient.addColorStop(0, '#FFFF00');
+          gradient.addColorStop(0.3, '#FFD700');
+          gradient.addColorStop(0.6, '#87CEEB');
+          gradient.addColorStop(1, '#87CEEB66');
+        } else {
+          gradient.addColorStop(0, baseColor);
+          gradient.addColorStop(0.7, baseColor + 'cc');
+          gradient.addColorStop(1, baseColor + '66');
+        }
+        
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = pickup.type === 'homing' ? '#FFFFFF' : '#ffffff88';
         ctx.lineWidth = pickup.type === 'homing' ? 2 : 1;
         
-        // Draw diamond shape (larger for homing)
+        // Draw different shapes based on crystal type
         ctx.beginPath();
-        const size = pickup.type === 'homing' ? 15 : 12; // 50% larger (was 10:8, now 15:12)
-        ctx.moveTo(pickup.x, pickup.y - size);
-        ctx.lineTo(pickup.x + size, pickup.y);
-        ctx.lineTo(pickup.x, pickup.y + size);
-        ctx.lineTo(pickup.x - size, pickup.y);
+        
+        if (pickup.type === 'homing') {
+          // Star shape for homing
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2;
+            const radius = i % 2 === 0 ? size : size * 0.5;
+            const x = pickup.x + Math.cos(angle) * radius;
+            const y = pickup.y + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (pickup.type === 'explosive') {
+          // Hexagon for explosive
+          for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI / 3) - Math.PI / 6;
+            const x = pickup.x + Math.cos(angle) * size;
+            const y = pickup.y + Math.sin(angle) * size;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (pickup.type === 'lightning') {
+          // Lightning bolt shape - simple zig-zag
+          ctx.moveTo(pickup.x - size*0.3, pickup.y - size);
+          ctx.lineTo(pickup.x + size*0.2, pickup.y - size*0.3);
+          ctx.lineTo(pickup.x - size*0.1, pickup.y);
+          ctx.lineTo(pickup.x + size*0.3, pickup.y + size);
+          ctx.lineTo(pickup.x - size*0.2, pickup.y + size*0.3);
+          ctx.lineTo(pickup.x, pickup.y);
+          // Don't manually close - let closePath() handle it
+        } else if (pickup.type === 'freeze') {
+          // Snowflake shape (6-pointed star)
+          for (let i = 0; i < 12; i++) {
+            const angle = (i * Math.PI / 6) - Math.PI / 2;
+            const radius = i % 2 === 0 ? size : size * 0.4;
+            const x = pickup.x + Math.cos(angle) * radius;
+            const y = pickup.y + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (pickup.type === 'ricochet') {
+          // Triangle for ricochet
+          ctx.moveTo(pickup.x, pickup.y - size);
+          ctx.lineTo(pickup.x + size * 0.866, pickup.y + size * 0.5);
+          ctx.lineTo(pickup.x - size * 0.866, pickup.y + size * 0.5);
+        } else if (pickup.type === 'shotgun') {
+          // Wide rectangle for shotgun
+          ctx.rect(pickup.x - size * 1.2, pickup.y - size * 0.5, size * 2.4, size);
+        } else if (pickup.type === 'cluster') {
+          // Three overlapping circles for cluster
+          ctx.arc(pickup.x - size*0.4, pickup.y, size*0.6, 0, TAU);
+          ctx.moveTo(pickup.x + size*0.4 + size*0.6, pickup.y - size*0.3);
+          ctx.arc(pickup.x + size*0.4, pickup.y - size*0.3, size*0.6, 0, TAU);
+          ctx.moveTo(pickup.x + size*0.4 + size*0.6, pickup.y + size*0.3);
+          ctx.arc(pickup.x + size*0.4, pickup.y + size*0.3, size*0.6, 0, TAU);
+        } else if (pickup.type === 'seeking') {
+          // Cool stylized arrow with swept-back wings
+          // Arrow tip
+          ctx.moveTo(pickup.x, pickup.y - size);
+          // Right wing
+          ctx.lineTo(pickup.x + size*0.8, pickup.y - size*0.2);
+          ctx.lineTo(pickup.x + size*0.5, pickup.y);
+          // Right shaft indent
+          ctx.lineTo(pickup.x + size*0.3, pickup.y - size*0.1);
+          // Shaft
+          ctx.lineTo(pickup.x + size*0.2, pickup.y + size*0.6);
+          // Right tail fin
+          ctx.lineTo(pickup.x + size*0.6, pickup.y + size*0.8);
+          ctx.lineTo(pickup.x + size*0.2, pickup.y + size);
+          // Bottom center
+          ctx.lineTo(pickup.x, pickup.y + size*0.7);
+          // Left tail fin
+          ctx.lineTo(pickup.x - size*0.2, pickup.y + size);
+          ctx.lineTo(pickup.x - size*0.6, pickup.y + size*0.8);
+          // Left shaft
+          ctx.lineTo(pickup.x - size*0.2, pickup.y + size*0.6);
+          // Left shaft indent
+          ctx.lineTo(pickup.x - size*0.3, pickup.y - size*0.1);
+          // Left wing
+          ctx.lineTo(pickup.x - size*0.5, pickup.y);
+          ctx.lineTo(pickup.x - size*0.8, pickup.y - size*0.2);
+        } else {
+          // Default diamond shape (for dual, triple, quad)
+          ctx.moveTo(pickup.x, pickup.y - size);
+          ctx.lineTo(pickup.x + size, pickup.y);
+          ctx.lineTo(pickup.x, pickup.y + size);
+          ctx.lineTo(pickup.x - size, pickup.y);
+        }
+        
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        
+        // 2. Pulsing inner glow based on crystal type
+        let pulseSpeed = 4;
+        let pulseIntensity = 0.3;
+        
+        // Different pulse patterns for different crystal types
+        if (pickup.type === 'homing') {
+          pulseSpeed = 8; // Fast pulse for homing
+          pulseIntensity = 0.5;
+        } else if (pickup.type === 'explosive') {
+          pulseSpeed = 3; // Slow, intense pulse
+          pulseIntensity = 0.4;
+        } else if (pickup.type === 'lightning') {
+          pulseSpeed = 10; // Very fast flicker
+          pulseIntensity = 0.6;
+        } else if (pickup.type === 'freeze') {
+          pulseSpeed = 2; // Very slow, gentle
+          pulseIntensity = 0.2;
+        }
+        
+        const pulse = Math.sin(game.t * pulseSpeed) * pulseIntensity + (1 - pulseIntensity);
+        const coreSize = size * 0.3 * pulse;
+        
+        ctx.save();
+        ctx.globalAlpha = 0.8;
+        const coreGradient = ctx.createRadialGradient(pickup.x, pickup.y, 0, pickup.x, pickup.y, coreSize);
+        coreGradient.addColorStop(0, '#ffffff');
+        coreGradient.addColorStop(0.5, baseColor);
+        coreGradient.addColorStop(1, baseColor + '00');
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(pickup.x, pickup.y, coreSize, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+        
+        // 3. Particle effects (sparkles/energy wisps)
+        // Initialize particle timer if not exists
+        if (!pickup.particleTimer) pickup.particleTimer = 0;
+        pickup.particleTimer += 0.016; // Approximate dt
+        
+        // Spawn sparkle particles periodically
+        const particleInterval = pickup.type === 'lightning' ? 0.15 : 0.3; // Lightning spawns more frequently
+        if (pickup.particleTimer > particleInterval) {
+          pickup.particleTimer = 0;
+          
+          // Spawn more particles for lightning
+          const particleCount = pickup.type === 'homing' ? 3 : 
+                               pickup.type === 'lightning' ? 4 : 2;
+          for (let i = 0; i < particleCount; i++) {
+            particles.spawn(p => {
+              const angle = Math.random() * TAU;
+              const distance = size + Math.random() * 10;
+              p.x = pickup.x + Math.cos(angle) * distance;
+              p.y = pickup.y + Math.sin(angle) * distance;
+              
+              // Energy wisps float upward
+              p.vx = (Math.random() - 0.5) * 20;
+              p.vy = -30 - Math.random() * 20; // Upward movement
+              
+              p.life = 0;
+              p.maxLife = 0.8 + Math.random() * 0.4;
+              p.size = 1 + Math.random() * 2;
+              // Use bright cyan for lightning particles for visibility
+              p.color = pickup.type === 'homing' ? '#ffffff' : 
+                       pickup.type === 'lightning' ? '#00FFFF' : 
+                       baseColor;
+              p.hasGravity = false;
+              p.alive = true;
+            });
+          }
+        }
+        
       }
       
       ctx.restore();
@@ -6478,11 +7185,17 @@
         // Add pulsing glow
         // No shadow effects
         
-        ctx.fillStyle = '#00BFFF'; // Dual shot color
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
+        // Create gradient for dual shot
+        const dualGradient = ctx.createRadialGradient(x, y, 0, x, y, crystalSize/2);
+        dualGradient.addColorStop(0, '#00BFFF');
+        dualGradient.addColorStop(0.7, '#00BFFFcc');
+        dualGradient.addColorStop(1, '#00BFFF66');
         
-        // Draw diamond shape
+        ctx.fillStyle = dualGradient;
+        ctx.strokeStyle = '#ffffff88';
+        ctx.lineWidth = 1.5;
+        
+        // Draw diamond shape for dual shot
         ctx.beginPath();
         ctx.moveTo(x, y - crystalSize/2);
         ctx.lineTo(x + crystalSize/2, y);
@@ -6523,11 +7236,30 @@
           // Add pulsing glow
           // No shadow effects
           
-          ctx.fillStyle = powerup ? powerup.color : '#ffffff';
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 2;
+          // Create gradient for pattern crystals
+          const patternGradient = ctx.createRadialGradient(x, y, 0, x, y, crystalSize/2);
+          const baseColor = powerup ? powerup.color : '#ffffff';
           
-          // Draw diamond shape
+          if (pattern === 'triple') {
+            // Use swapped color for triple (green)
+            patternGradient.addColorStop(0, '#32CD32');
+            patternGradient.addColorStop(0.7, '#32CD32cc');
+            patternGradient.addColorStop(1, '#32CD3266');
+          } else if (pattern === 'quad') {
+            patternGradient.addColorStop(0, baseColor);
+            patternGradient.addColorStop(0.7, baseColor + 'cc');
+            patternGradient.addColorStop(1, baseColor + '66');
+          } else {
+            patternGradient.addColorStop(0, baseColor);
+            patternGradient.addColorStop(0.7, baseColor + 'cc');
+            patternGradient.addColorStop(1, baseColor + '66');
+          }
+          
+          ctx.fillStyle = patternGradient;
+          ctx.strokeStyle = '#ffffff88';
+          ctx.lineWidth = 1.5;
+          
+          // Draw diamond shape for patterns
           ctx.beginPath();
           ctx.moveTo(x, y - crystalSize/2);
           ctx.lineTo(x + crystalSize/2, y);
@@ -6591,16 +7323,108 @@
             ctx.fill();
           }
           
-          ctx.fillStyle = powerup ? powerup.color : '#ffffff';
-          ctx.strokeStyle = effect === 'homing' ? '#FFFF99' : '#ffffff';
-          ctx.lineWidth = effect === 'homing' ? 3 : 2;
+          // Create gradient based on crystal type
+          const effectGradient = ctx.createRadialGradient(x, y, 0, x, y, crystalSize/2);
+          const baseColor = powerup ? powerup.color : '#ffffff';
           
-          // Draw diamond shape
+          if (effect === 'homing') {
+            // Golden gradient for homing
+            effectGradient.addColorStop(0, '#ffffff');
+            effectGradient.addColorStop(0.5, '#FFD700');
+            effectGradient.addColorStop(1, '#FFD70088');
+          } else if (effect === 'lightning') {
+            // Yellow/blue gradient for lightning
+            effectGradient.addColorStop(0, '#FFFF00');
+            effectGradient.addColorStop(0.3, '#FFD700');
+            effectGradient.addColorStop(0.6, '#87CEEB');
+            effectGradient.addColorStop(1, '#87CEEB66');
+          } else {
+            effectGradient.addColorStop(0, baseColor);
+            effectGradient.addColorStop(0.7, baseColor + 'cc');
+            effectGradient.addColorStop(1, baseColor + '66');
+          }
+          
+          ctx.fillStyle = effectGradient;
+          ctx.strokeStyle = effect === 'homing' ? '#FFFFFF' : '#ffffff88';
+          ctx.lineWidth = effect === 'homing' ? 2 : 1.5;
+          
+          // Draw different shapes based on crystal type
           ctx.beginPath();
-          ctx.moveTo(x, y - crystalSize/2);
-          ctx.lineTo(x + crystalSize/2, y);
-          ctx.lineTo(x, y + crystalSize/2);
-          ctx.lineTo(x - crystalSize/2, y);
+          
+          if (effect === 'homing') {
+            // Star shape for homing
+            for (let i = 0; i < 8; i++) {
+              const angle = (i * Math.PI / 4) - Math.PI / 2;
+              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/4;
+              const px = x + Math.cos(angle) * radius;
+              const py = y + Math.sin(angle) * radius;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+          } else if (effect === 'explosive') {
+            // Hexagon for explosive
+            for (let i = 0; i < 6; i++) {
+              const angle = (i * Math.PI / 3) - Math.PI / 6;
+              const px = x + Math.cos(angle) * crystalSize/2;
+              const py = y + Math.sin(angle) * crystalSize/2;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+          } else if (effect === 'lightning') {
+            // Lightning bolt shape
+            ctx.moveTo(x - crystalSize/2*0.3, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2*0.2, y - crystalSize/2*0.3);
+            ctx.lineTo(x - crystalSize/2*0.1, y);
+            ctx.lineTo(x + crystalSize/2*0.3, y + crystalSize/2);
+            ctx.lineTo(x - crystalSize/2*0.2, y + crystalSize/2*0.3);
+            ctx.lineTo(x, y);
+          } else if (effect === 'freeze') {
+            // Snowflake shape (6-pointed star)
+            for (let i = 0; i < 12; i++) {
+              const angle = (i * Math.PI / 6) - Math.PI / 2;
+              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/4;
+              const px = x + Math.cos(angle) * radius;
+              const py = y + Math.sin(angle) * radius;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+          } else if (effect === 'ricochet') {
+            // Triangle for ricochet
+            ctx.moveTo(x, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2 * 0.866, y + crystalSize/2 * 0.5);
+            ctx.lineTo(x - crystalSize/2 * 0.866, y + crystalSize/2 * 0.5);
+          } else if (effect === 'seeking') {
+            // Stylized arrow pointing upward
+            ctx.moveTo(x, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2*0.3, y);
+            ctx.lineTo(x + crystalSize/2*0.15, y);
+            ctx.lineTo(x + crystalSize/2*0.15, y + crystalSize/2);
+            ctx.lineTo(x - crystalSize/2*0.15, y + crystalSize/2);
+            ctx.lineTo(x - crystalSize/2*0.15, y);
+            ctx.lineTo(x - crystalSize/2*0.3, y);
+          } else if (effect === 'shotgun') {
+            // Pentagon for shotgun
+            for (let i = 0; i < 5; i++) {
+              const angle = (i * Math.PI * 2 / 5) - Math.PI / 2;
+              const px = x + Math.cos(angle) * crystalSize/2;
+              const py = y + Math.sin(angle) * crystalSize/2;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+          } else if (effect === 'cluster') {
+            // Square for cluster
+            ctx.moveTo(x - crystalSize/2, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2, y + crystalSize/2);
+            ctx.lineTo(x - crystalSize/2, y + crystalSize/2);
+          } else {
+            // Default diamond for unknown types
+            ctx.moveTo(x, y - crystalSize/2);
+            ctx.lineTo(x + crystalSize/2, y);
+            ctx.lineTo(x, y + crystalSize/2);
+            ctx.lineTo(x - crystalSize/2, y);
+          }
+          
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
@@ -7147,10 +7971,328 @@
     });
   }
   
+  // Track crystal preview animations
+  let crystalPreviewAnimations = [];
+  let crystalAnimationsRunning = false;
+  
+  // Initialize crystal preview animations
+  function initCrystalPreviews() {
+    // Don't reinitialize if already running
+    if (crystalAnimationsRunning) {
+      return;
+    }
+    
+    // Clear any existing animations first
+    crystalPreviewAnimations.forEach(anim => anim.stop());
+    crystalPreviewAnimations = [];
+    crystalAnimationsRunning = true;
+    
+    // Get all canvas elements for crystal previews
+    const canvases = document.querySelectorAll('.crystal-preview-canvas');
+    
+    canvases.forEach(canvas => {
+      const ctx = canvas.getContext('2d');
+      const type = canvas.dataset.crystalType;
+      const color = canvas.dataset.crystalColor;
+      
+      // Center point for crystal (2x bigger)
+      const centerX = 50;  // Updated for 100x100 canvas
+      const centerY = 50;  // Updated for 100x100 canvas
+      const size = type === 'homing' ? 30 : 24;  // Doubled from 15:12
+      
+      // Animation state
+      let rotation = 0;
+      let time = 0;
+      let particleTimer = 0.29; // Start near spawn time to trigger particles quickly
+      const particles = [];
+      
+      let animId = null;
+      let animationActive = true;
+      
+      function drawCrystal() {
+        // Validate canvas is still in DOM
+        if (!document.body.contains(canvas)) {
+          animationActive = false;
+          if (animId) cancelAnimationFrame(animId);
+          return;
+        }
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Update particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx * 0.016;
+          p.y += p.vy * 0.016;
+          p.life += 0.016;
+          if (p.life > p.maxLife) {
+            particles.splice(i, 1);
+          }
+        }
+        
+        // Save context state
+        ctx.save();
+        
+        // Apply slow rotation
+        ctx.translate(centerX, centerY);
+        ctx.rotate(rotation);
+        ctx.translate(-centerX, -centerY);
+        
+        // Special golden glow for homing crystals (before main crystal)
+        if (type === 'homing') {
+          const glowIntensity = 0.7 + 0.3 * Math.sin(time * 15);
+          const glowSize = 35 + 10 * Math.sin(time * 8);
+          
+          const outerGlow = ctx.createRadialGradient(centerX, centerY, 8, centerX, centerY, glowSize);
+          outerGlow.addColorStop(0, `rgba(255,215,0,${glowIntensity * 0.8})`);
+          outerGlow.addColorStop(0.5, `rgba(255,215,0,${glowIntensity * 0.4})`);
+          outerGlow.addColorStop(1, 'rgba(255,215,0,0)');
+          
+          ctx.save();
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = outerGlow;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, glowSize, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        
+        // Create gradient for crystal
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size);
+        
+        if (type === 'homing') {
+          // Golden gradient for homing (matching in-game)
+          gradient.addColorStop(0, '#ffffff');
+          gradient.addColorStop(0.5, '#FFD700');
+          gradient.addColorStop(1, '#FFD70088');
+        } else if (type === 'lightning') {
+          // Yellow/blue gradient for lightning
+          gradient.addColorStop(0, '#FFFF00');
+          gradient.addColorStop(0.3, '#FFD700');
+          gradient.addColorStop(0.6, '#87CEEB');
+          gradient.addColorStop(1, '#87CEEB66');
+        } else {
+          // Convert hex to proper alpha format
+          gradient.addColorStop(0, color);
+          gradient.addColorStop(0.7, color + (color.length === 7 ? 'cc' : ''));
+          gradient.addColorStop(1, color + (color.length === 7 ? '66' : ''));
+        }
+        
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = type === 'homing' ? '#FFFFFF' : '#ffffff88';
+        ctx.lineWidth = type === 'homing' ? 2 : 1;
+        
+        // Draw different shapes based on crystal type
+        ctx.beginPath();
+        
+        if (type === 'homing') {
+          // Star shape for homing
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2;
+            const radius = i % 2 === 0 ? size : size * 0.5;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (type === 'explosive') {
+          // Hexagon for explosive
+          for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI / 3) - Math.PI / 6;
+            const x = centerX + Math.cos(angle) * size;
+            const y = centerY + Math.sin(angle) * size;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (type === 'lightning') {
+          // Lightning bolt shape - simple zig-zag
+          ctx.moveTo(centerX - size*0.3, centerY - size);
+          ctx.lineTo(centerX + size*0.2, centerY - size*0.3);
+          ctx.lineTo(centerX - size*0.1, centerY);
+          ctx.lineTo(centerX + size*0.3, centerY + size);
+          ctx.lineTo(centerX - size*0.2, centerY + size*0.3);
+          ctx.lineTo(centerX, centerY);
+          // Don't manually close - let closePath() handle it
+        } else if (type === 'freeze') {
+          // Snowflake shape (6-pointed star)
+          for (let i = 0; i < 12; i++) {
+            const angle = (i * Math.PI / 6) - Math.PI / 2;
+            const radius = i % 2 === 0 ? size : size * 0.4;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        } else if (type === 'ricochet') {
+          // Triangle for ricochet
+          ctx.moveTo(centerX, centerY - size);
+          ctx.lineTo(centerX + size * 0.866, centerY + size * 0.5);
+          ctx.lineTo(centerX - size * 0.866, centerY + size * 0.5);
+        } else if (type === 'shotgun') {
+          // Wide rectangle for shotgun
+          ctx.rect(centerX - size * 1.2, centerY - size * 0.5, size * 2.4, size);
+        } else if (type === 'cluster') {
+          // Three overlapping circles for cluster
+          ctx.arc(centerX - size*0.4, centerY, size*0.6, 0, Math.PI * 2);
+          ctx.moveTo(centerX + size*0.4 + size*0.6, centerY - size*0.3);
+          ctx.arc(centerX + size*0.4, centerY - size*0.3, size*0.6, 0, Math.PI * 2);
+          ctx.moveTo(centerX + size*0.4 + size*0.6, centerY + size*0.3);
+          ctx.arc(centerX + size*0.4, centerY + size*0.3, size*0.6, 0, Math.PI * 2);
+        } else if (type === 'seeking') {
+          // Cool stylized arrow with swept-back wings
+          // Arrow tip
+          ctx.moveTo(centerX, centerY - size);
+          // Right wing
+          ctx.lineTo(centerX + size*0.8, centerY - size*0.2);
+          ctx.lineTo(centerX + size*0.5, centerY);
+          // Right shaft indent
+          ctx.lineTo(centerX + size*0.3, centerY - size*0.1);
+          // Shaft
+          ctx.lineTo(centerX + size*0.2, centerY + size*0.6);
+          // Right tail fin
+          ctx.lineTo(centerX + size*0.6, centerY + size*0.8);
+          ctx.lineTo(centerX + size*0.2, centerY + size);
+          // Bottom center
+          ctx.lineTo(centerX, centerY + size*0.7);
+          // Left tail fin
+          ctx.lineTo(centerX - size*0.2, centerY + size);
+          ctx.lineTo(centerX - size*0.6, centerY + size*0.8);
+          // Left shaft
+          ctx.lineTo(centerX - size*0.2, centerY + size*0.6);
+          // Left shaft indent
+          ctx.lineTo(centerX - size*0.3, centerY - size*0.1);
+          // Left wing
+          ctx.lineTo(centerX - size*0.5, centerY);
+          ctx.lineTo(centerX - size*0.8, centerY - size*0.2);
+        } else {
+          // Default diamond shape (for upgrade/dual, triple, quad)
+          ctx.moveTo(centerX, centerY - size);
+          ctx.lineTo(centerX + size, centerY);
+          ctx.lineTo(centerX, centerY + size);
+          ctx.lineTo(centerX - size, centerY);
+        }
+        
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Restore context state for non-rotated effects
+        ctx.restore();
+        
+        // 2. Pulsing inner glow based on crystal type (EXACTLY like the game)
+        let pulseSpeed = 4;
+        let pulseIntensity = 0.3;
+        
+        // Different pulse patterns for different crystal types
+        if (type === 'homing') {
+          pulseSpeed = 8; // Fast pulse for homing
+          pulseIntensity = 0.5;
+        } else if (type === 'explosive') {
+          pulseSpeed = 3; // Slow, intense pulse
+          pulseIntensity = 0.4;
+        } else if (type === 'lightning') {
+          pulseSpeed = 10; // Very fast flicker
+          pulseIntensity = 0.6;
+        } else if (type === 'freeze') {
+          pulseSpeed = 2; // Very slow, gentle
+          pulseIntensity = 0.2;
+        }
+        
+        const pulse = Math.sin(time * pulseSpeed) * pulseIntensity + (1 - pulseIntensity);
+        const coreSize = Math.max(1, size * 0.3 * pulse); // Ensure coreSize is never negative or zero
+        
+        ctx.save();
+        ctx.globalAlpha = 0.8;
+        const coreGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, coreSize);
+        coreGradient.addColorStop(0, '#ffffff');
+        coreGradient.addColorStop(0.5, color);
+        coreGradient.addColorStop(1, color + '00');
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, coreSize, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // 3. Particle effects (sparkles/energy wisps) - EXACTLY like the game
+        particleTimer += 0.016;
+        
+        // Spawn sparkle particles periodically (more frequent for lightning)
+        const spawnInterval = type === 'lightning' ? 0.15 : 0.3;  // Lightning spawns twice as often
+        if (particleTimer > spawnInterval) {
+          particleTimer = 0;
+          
+          // Spawn more particles for lightning
+          const particleCount = type === 'homing' ? 3 : 
+                               type === 'lightning' ? 4 : 2;  // Lightning gets 4 particles
+          for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = size * 0.8 + Math.random() * 5; // Spawn closer to crystal
+            
+            particles.push({
+              x: centerX + Math.cos(angle) * distance,
+              y: centerY + Math.sin(angle) * distance,
+              vx: (Math.random() - 0.5) * 10, // Slower movement
+              vy: -15 - Math.random() * 10, // Slower upward movement
+              life: 0,
+              maxLife: 1.0 + Math.random() * 0.5, // Longer life
+              size: 2 + Math.random() * 3, // Bigger particles
+              // Use brighter colors for dark crystals
+              color: type === 'homing' ? '#ffffff' : 
+                     type === 'lightning' ? '#00FFFF' :  // Bright cyan for lightning
+                     type === 'shotgun' ? '#FFB347' :    // Brighter orange for shotgun
+                     color
+            });
+          }
+        }
+        
+        // Draw particles
+        particles.forEach(p => {
+          const alpha = 1 - (p.life / p.maxLife);
+          ctx.save();
+          ctx.globalAlpha = alpha * 0.8;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        
+        // Update animation state for next frame
+        rotation += 0.005; // VERY slow spinning
+        time += 0.016; // Time for pulsing effects
+        
+        // Continue animation only if still active
+        if (animationActive) {
+          animId = requestAnimationFrame(drawCrystal);
+        }
+      }
+      
+      // Store animation reference BEFORE starting
+      const animRef = { 
+        canvas, 
+        getId: () => animId,  // Function to get current ID
+        stop: () => { 
+          animationActive = false;
+          if (animId) cancelAnimationFrame(animId); 
+        },
+        isActive: () => animationActive
+      };
+      crystalPreviewAnimations.push(animRef);
+      
+      // Start animation
+      drawCrystal();
+    });
+  }
+  
   // ===== Helper function to create enemy legend HTML =====
   function createEnemyLegendHTML() {
     return `
-      <div class="enemy-legend">
+      <div class="enemy-legend" style="padding: 12px; font-size: 13px;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--accent); font-size: 14px;">Enemy Types & Behaviors</strong>
+        </div>
         <div class="enemy-category">
           <h4>⚙️ HOW ENEMIES WORK</h4>
           <div style="font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px;">
@@ -7350,6 +8492,242 @@
     `;
   }
 
+  // ===== Options Menu Functions =====
+  let optionsMenuOpen = false;
+  let optionsMenuInitialized = false;
+  
+  function showOptionsMenu() {
+    if (optionsMenuOpen) return;
+    optionsMenuOpen = true;
+    
+    // Hide start menu
+    banner.style.display = 'none';
+    
+    // Show and setup options panel
+    optionsPanel.style.display = 'block';
+    optionsPanel.style.animation = 'optionsFadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+    
+    // Only create content once
+    if (!optionsMenuInitialized) {
+      optionsMenuInitialized = true;
+      // Clear options panel content ONLY on first creation
+      optionsPanel.innerHTML = '';
+    
+    // Create options screen elements with tabs (exact copy of pause menu)
+    
+    // Tab container
+    const tabContainer = document.createElement('div');
+    tabContainer.className = 'tab-container';
+    
+    const controlsTab = document.createElement('button');
+    controlsTab.className = 'tab-button active';
+    controlsTab.textContent = 'Controls';
+    controlsTab.onclick = (e) => switchOptionsTab('controls', e);
+    
+    const enemiesTab = document.createElement('button');
+    enemiesTab.className = 'tab-button';
+    enemiesTab.textContent = 'Enemies';
+    enemiesTab.onclick = (e) => switchOptionsTab('enemies', e);
+    
+    const crystalsTab = document.createElement('button');
+    crystalsTab.className = 'tab-button';
+    crystalsTab.textContent = 'Crystals';
+    crystalsTab.onclick = (e) => switchOptionsTab('crystals', e);
+    
+    tabContainer.appendChild(controlsTab);
+    tabContainer.appendChild(enemiesTab);
+    tabContainer.appendChild(crystalsTab);
+    
+    // Controls panel (default active)
+    const controlsDiv = document.createElement('div');
+    controlsDiv.id = 'options-controls-content';
+    controlsDiv.className = 'controls-panel tab-content active';
+    controlsDiv.innerHTML = createControlsHTML();
+    
+    // Enemy legend panel
+    const enemiesDiv = document.createElement('div');
+    enemiesDiv.id = 'options-enemies-content';
+    enemiesDiv.className = 'controls-panel tab-content';
+    enemiesDiv.innerHTML = createEnemyLegendHTML();
+    
+    // Initialize enemy preview animations when panel is created
+    setTimeout(() => {
+      if (document.querySelector('.enemy-preview-canvas')) {
+        initEnemyPreviews();
+      }
+    }, 100);
+    
+    // Crystals panel
+    const crystalsDiv = document.createElement('div');
+    crystalsDiv.id = 'options-crystals-content';
+    crystalsDiv.className = 'controls-panel tab-content';
+    crystalsDiv.innerHTML = createCrystalLegendHTML();
+    
+    const backBtn = document.createElement('button');
+    backBtn.id = 'optionsBackBtn';
+    backBtn.textContent = 'Back';
+    backBtn.onclick = hideOptionsMenu;
+    
+    // Add tab switching function for options
+    window.switchOptionsTab = function(tabName, evt) {
+      // Update tab buttons
+      optionsPanel.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+      
+      // Update content panels
+      optionsPanel.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      const targetContent = optionsPanel.querySelector('#options-' + tabName + '-content');
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+      
+      // Initialize preview animations when switching tabs
+      if (tabName === 'enemies') {
+        setTimeout(() => {
+          initEnemyPreviews();
+        }, 50);
+      } else if (tabName === 'crystals') {
+        setTimeout(() => {
+          initCrystalPreviews();
+        }, 50);
+      }
+    };
+    
+    optionsPanel.appendChild(tabContainer);
+    optionsPanel.appendChild(controlsDiv);
+    optionsPanel.appendChild(enemiesDiv);
+    optionsPanel.appendChild(crystalsDiv);
+    optionsPanel.appendChild(backBtn);
+    } // End of if (!optionsMenuInitialized)
+    
+    // Re-initialize crystal animations if crystals tab is visible
+    const crystalsContent = document.getElementById('options-crystals-content');
+    if (crystalsContent && crystalsContent.classList.contains('active')) {
+      setTimeout(() => {
+        initCrystalPreviews();
+      }, 50);
+    }
+  }
+  
+  function hideOptionsMenu() {
+    optionsMenuOpen = false;
+    // Reset animation flags when closing options menu
+    crystalAnimationsRunning = false;
+    crystalPreviewAnimations.forEach(anim => anim.stop());
+    crystalPreviewAnimations = [];
+    optionsPanel.style.animation = 'optionsFadeOut 0.3s ease-out forwards';
+    setTimeout(() => {
+      optionsPanel.style.display = 'none';
+      optionsPanel.innerHTML = ''; // Clear content
+    }, 300);
+    banner.style.display = 'block';
+  }
+  
+  
+  // ===== Helper function to create crystal legend HTML =====
+  function createCrystalLegendHTML() {
+    // Create unique crystal data for rendering (colors from bulletPowerups array)
+    const crystals = [
+      { type: 'homing', color: '#FFD700', name: 'Homing', desc: 'Bullets auto-track enemies', category: 'ultra' },
+      { type: 'explosive', color: '#FF4500', name: 'Explosive', desc: 'Area damage on impact', category: 'effect' },
+      { type: 'lightning', color: '#00BFFF', name: 'Lightning', desc: 'Chain damage to nearby foes', category: 'effect' },
+      { type: 'freeze', color: '#00CED1', name: 'Freeze', desc: 'Slows enemies on hit', category: 'effect' },
+      { type: 'ricochet', color: '#FF69B4', name: 'Ricochet', desc: 'Bullets bounce off enemies', category: 'effect' },
+      { type: 'seeking', color: '#DC143C', name: 'Seeking', desc: 'Mild homing effect', category: 'effect' },
+      { type: 'shotgun', color: '#8B4513', name: 'Shotgun', desc: 'Wide spread pattern', category: 'effect' },
+      { type: 'cluster', color: '#FFA500', name: 'Cluster', desc: 'Splits into mini bullets', category: 'effect' },
+      { type: 'upgrade', color: '#32CD32', name: 'Dual Shot', desc: 'Front & back bullets', category: 'pattern' },
+      { type: 'triple', color: '#00BFFF', name: 'Triple Shot', desc: '3-way spread', category: 'pattern' },
+      { type: 'quad', color: '#FF1493', name: 'Quad Shot', desc: '4 directions', category: 'pattern' }
+    ];
+    
+    let html = `
+      <div class="crystal-legend" style="padding: 12px; font-size: 13px;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--accent); font-size: 14px;">Crystal Types & Effects</strong>
+        </div>`;
+    
+    // Ultra rare section
+    html += `
+        <div class="crystal-category" style="margin-bottom: 8px;">
+          <h4 style="color: #FFD700; margin: 8px 0 4px 0; font-size: 13px;">⭐ ULTRA RARE (0.5%)</h4>`;
+    
+    crystals.filter(c => c.category === 'ultra').forEach(crystal => {
+      html += `
+          <div class="crystal-item" style="margin: 4px 0; display: flex; align-items: center;">
+            <canvas class="crystal-preview-canvas" 
+                    data-crystal-type="${crystal.type}" 
+                    data-crystal-color="${crystal.color}"
+                    width="100" height="100"
+                    style="width: 50px; height: 50px; margin-right: 8px;">
+            </canvas>
+            <div><span style="color: ${crystal.color};">${crystal.name}</span> - ${crystal.desc}</div>
+          </div>`;
+    });
+    
+    html += `</div>`;
+    
+    // Effect crystals section
+    html += `
+        <div class="crystal-category" style="margin-bottom: 8px;">
+          <h4 style="color: #5af2c7; margin: 8px 0 4px 0; font-size: 13px;">💎 EFFECT CRYSTALS</h4>`;
+    
+    crystals.filter(c => c.category === 'effect').forEach(crystal => {
+      html += `
+          <div class="crystal-item" style="margin: 4px 0; display: flex; align-items: center;">
+            <canvas class="crystal-preview-canvas" 
+                    data-crystal-type="${crystal.type}" 
+                    data-crystal-color="${crystal.color}"
+                    width="100" height="100"
+                    style="width: 50px; height: 50px; margin-right: 8px;">
+            </canvas>
+            <div><span style="color: ${crystal.color};">${crystal.name}</span> - ${crystal.desc}</div>
+          </div>`;
+    });
+    
+    html += `</div>`;
+    
+    // Pattern crystals section
+    html += `
+        <div class="crystal-category">
+          <h4 style="color: #5af2c7; margin: 8px 0 4px 0; font-size: 13px;">🔫 PATTERN CRYSTALS</h4>`;
+    
+    crystals.filter(c => c.category === 'pattern').forEach(crystal => {
+      html += `
+          <div class="crystal-item" style="margin: 4px 0; display: flex; align-items: center;">
+            <canvas class="crystal-preview-canvas" 
+                    data-crystal-type="${crystal.type}" 
+                    data-crystal-color="${crystal.color}"
+                    width="100" height="100"
+                    style="width: 50px; height: 50px; margin-right: 8px;">
+            </canvas>
+            <div><span style="color: ${crystal.color};">${crystal.name}</span> - ${crystal.desc}</div>
+          </div>`;
+    });
+    
+    html += `</div>`;
+    
+    // Footer tips
+    html += `
+        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--muted); font-size: 11px; color: var(--muted);">
+          <div>💡 Crystals have limited shots (25-50)</div>
+          <div>💡 Effects can stack for powerful combos</div>
+          <div>💡 Pattern upgrades double your bullets</div>
+        </div>
+      </div>
+    `;
+    
+    // Don't initialize here - it's done when switching tabs
+    
+    return html;
+  }
+
   // ===== Helper function to create controls HTML =====
   function createControlsHTML() {
     return `
@@ -7373,10 +8751,6 @@
       <div class="control-row">
         <div class="control-keys"><kbd>P</kbd></div>
         <div class="control-desc">Resume game</div>
-      </div>
-      <div class="control-row">
-        <div class="control-keys"><kbd>L</kbd></div>
-        <div class="control-desc">Crystal legend</div>
       </div>
       <div class="control-row">
         <div class="control-keys"><kbd>F11</kbd></div>
@@ -7406,21 +8780,27 @@
       const controlsTab = document.createElement('button');
       controlsTab.className = 'tab-button active';
       controlsTab.textContent = 'Controls';
-      controlsTab.onclick = () => switchTab('controls');
+      controlsTab.onclick = (e) => switchTab('controls', e);
       
       const enemiesTab = document.createElement('button');
       enemiesTab.className = 'tab-button';
       enemiesTab.textContent = 'Enemies';
-      enemiesTab.onclick = () => switchTab('enemies');
+      enemiesTab.onclick = (e) => switchTab('enemies', e);
       
       const upgradesTab = document.createElement('button');
       upgradesTab.className = 'tab-button';
       upgradesTab.textContent = 'Upgrades';
-      upgradesTab.onclick = () => switchTab('upgrades');
+      upgradesTab.onclick = (e) => switchTab('upgrades', e);
+      
+      const crystalsTab = document.createElement('button');
+      crystalsTab.className = 'tab-button';
+      crystalsTab.textContent = 'Crystals';
+      crystalsTab.onclick = (e) => switchTab('crystals', e);
       
       tabContainer.appendChild(controlsTab);
       tabContainer.appendChild(enemiesTab);
       tabContainer.appendChild(upgradesTab);
+      tabContainer.appendChild(crystalsTab);
       
       // Controls panel (default active)
       const controlsDiv = document.createElement('div');
@@ -7467,28 +8847,43 @@
       upgradesDiv.appendChild(upgradesTitle);
       upgradesDiv.appendChild(upgradesList);
       
+      // Crystals panel
+      const crystalsDiv = document.createElement('div');
+      crystalsDiv.id = 'crystals-content';
+      crystalsDiv.className = 'controls-panel tab-content';
+      crystalsDiv.innerHTML = createCrystalLegendHTML();
+      
       const startBtn = document.createElement('button');
       startBtn.id = 'startBtn';
       startBtn.textContent = 'Resume';
       
       // Add tab switching function
-      window.switchTab = function(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.tab-button').forEach(btn => {
+      window.switchTab = function(tabName, evt) {
+        // Update tab buttons - scope to pause banner only
+        banner.querySelectorAll('.tab-button').forEach(btn => {
           btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        if (evt && evt.target) {
+          evt.target.classList.add('active');
+        }
         
-        // Update content panels
-        document.querySelectorAll('.tab-content').forEach(content => {
+        // Update content panels - scope to pause banner only
+        banner.querySelectorAll('.tab-content').forEach(content => {
           content.classList.remove('active');
         });
-        document.getElementById(tabName + '-content').classList.add('active');
+        const targetContent = banner.querySelector('#' + tabName + '-content');
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
         
-        // Initialize enemy preview animations when switching to enemies tab
+        // Initialize preview animations when switching tabs
         if (tabName === 'enemies') {
           setTimeout(() => {
             initEnemyPreviews();
+          }, 50);
+        } else if (tabName === 'crystals') {
+          setTimeout(() => {
+            initCrystalPreviews();
           }, 50);
         }
       };
@@ -7497,6 +8892,7 @@
       banner.appendChild(controlsDiv);
       banner.appendChild(enemiesDiv);
       banner.appendChild(upgradesDiv);
+      banner.appendChild(crystalsDiv);
       banner.appendChild(startBtn);
       // Re-attach event listener to the new Resume button
       document.getElementById('startBtn').addEventListener('click', () => { 
@@ -7514,6 +8910,10 @@
       setTimeout(() => {
         banner.style.display = 'none';
       }, 300);
+      // Reset animation flags when closing pause menu
+      crystalAnimationsRunning = false;
+      crystalPreviewAnimations.forEach(anim => anim.stop());
+      crystalPreviewAnimations = [];
       game.state = STATE.RUN;
       // Restore original banner content efficiently
       banner.innerHTML = '';
@@ -7686,6 +9086,11 @@
     }
   });
   restartBtn.addEventListener('click', () => { start(); });
+  
+  // Options button listener
+  optionsBtn.addEventListener('click', () => {
+    showOptionsMenu();
+  });
 
   // Start in menu
   game = newGame();
