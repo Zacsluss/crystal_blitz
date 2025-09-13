@@ -20,19 +20,20 @@
 **Crystal Blitz** is a single-file HTML5 arena survival shooter game where players face endless waves of increasingly difficult enemies. The game features a robust crystal-based powerup system, intelligent enemy AI, and progressive difficulty scaling.
 
 ### Key Features
-- **Single-File Architecture**: Entire game contained in one HTML file (7,704 lines)
+- **Single-File Architecture**: Entire game contained in one HTML file (8,500+ lines)
 - **No External Dependencies**: Self-contained with procedural audio, no external assets
 - **Cross-Platform**: Works on desktop and mobile browsers
 - **Performance Optimized**: Adaptive quality system, object pooling, spatial partitioning
-- **Rich Gameplay**: 11 crystal types, 17 permanent upgrades, 12+ enemy behaviors
-- **Enhanced UI**: Glassmorphism effects, shimmer animations, improved visual feedback
+- **Rich Gameplay**: 11 crystal types with unique visuals, 17 permanent upgrades, 12+ enemy behaviors
+- **Enhanced UI**: Glassmorphism effects, tabbed menus, responsive design
+- **Visual Systems**: Footstep tracking, hexagonal floor pattern, enhanced blood effects
 
 ### Technology Stack
 - **Language**: Vanilla JavaScript (ES6+)
 - **Rendering**: HTML5 Canvas 2D API
 - **Audio**: Web Audio API (procedural sound generation)
 - **Build**: None required (single HTML file)
-- **Size**: ~283KB uncompressed
+- **Size**: ~310KB uncompressed
 
 ---
 
@@ -101,8 +102,7 @@ function makePool(createFn, initial=0)
 - **Mouse**: Aim and shoot
 - **Shift**: Sprint/Dash (consumes stamina)
 - **Space**: Emergency leap (3-second cooldown)
-- **P**: Pause/Resume
-- **L**: Toggle crystal legend
+- **P**: Pause Menu (with tabs for Controls, Enemies, Crystals, Upgrades)
 - **F11**: Fullscreen
 
 #### Touch Controls
@@ -262,19 +262,36 @@ Waves 51+: 60 + 30 * ((wave-50)/50)       // 60→90 enemies
 #### Crystal Types Distribution
 ```javascript
 bulletPowerups = [
-  {type: 'upgrade', color: '#00BFFF', shots: 50},  // Dual Shot
-  {type: 'triple', color: '#32CD32', shots: 50},   // Triple Shot
-  {type: 'quad', color: '#FF1493', shots: 50},     // Quad Shot
-  {type: 'homing', color: '#FFD700', shots: 25},   // Homing (rare)
-  {type: 'explosive', color: '#FF4500', shots: 50},
-  {type: 'ricochet', color: '#FF69B4', shots: 50},
-  {type: 'lightning', color: '#000080', shots: 50},
-  {type: 'freeze', color: '#00CED1', shots: 50},
-  {type: 'shotgun', color: '#8B4513', shots: 50},
-  {type: 'cluster', color: '#FFA500', shots: 50},
-  {type: 'seeking', color: '#DC143C', shots: 50}
+  {type: 'upgrade', color: '#32CD32', shots: 50},  // Dual Shot (green)
+  {type: 'triple', color: '#00BFFF', shots: 50},   // Triple Shot (cyan)
+  {type: 'quad', color: '#FF1493', shots: 50},     // Quad Shot (pink)
+  {type: 'homing', color: '#FFD700', shots: 25},   // Homing (gold, ultra-rare)
+  {type: 'explosive', color: '#FF4500', shots: 50}, // Explosive (red)
+  {type: 'ricochet', color: '#FF69B4', shots: 50}, // Ricochet (hot pink)
+  {type: 'lightning', color: '#00BFFF', shots: 50}, // Lightning (cyan/yellow gradient)
+  {type: 'freeze', color: '#00CED1', shots: 50},   // Freeze (dark turquoise)
+  {type: 'shotgun', color: '#8B4513', shots: 50},  // Shotgun (brown)
+  {type: 'cluster', color: '#FFA500', shots: 50},  // Cluster (orange)
+  {type: 'seeking', color: '#DC143C', shots: 50}   // Seeking (crimson)
 ]
 ```
+
+#### Crystal Visual Shapes
+- **Homing**: 8-pointed star with golden aura
+- **Explosive**: Hexagon
+- **Lightning**: Lightning bolt with yellow-blue gradient
+- **Freeze**: 6-pointed snowflake
+- **Ricochet**: Triangle
+- **Seeking**: Stylized arrow
+- **Shotgun**: Pentagon
+- **Cluster**: Square
+- **Dual/Triple/Quad**: Diamond shapes
+
+#### Crystal Combination System
+- Multiple effects stack (stored in `activeEffects` Map)
+- Pattern multipliers combine (stored in `patternMultipliers` Map)
+- All active effects apply to each bullet
+- Shot counts add rather than replace
 
 ### Pickup Physics
 - Initial upward velocity (bounce effect)
@@ -475,10 +492,11 @@ Level 5+: +50 + 50*(level-3) kills
 - Helps track off-screen threats
 
 #### Crystal Legend
-- Toggle with 'L' key
-- Shows all crystal types
-- Color coding and descriptions
-- Bottom-right positioning
+- Integrated into pause menu (no longer L key)
+- Shows all crystal types with animations
+- Canvas-based previews with slow rotation
+- Effect descriptions and durations
+- Organized by rarity (Ultra Rare, Effect, Pattern)
 
 ### Powerup Dialog
 
@@ -525,6 +543,15 @@ const MAX_GRADIENT_CACHE_SIZE = 100;
 - Numeric keys for fast Map lookups
 - Caches all gradients: leap glow, boss aura, damage vignette, homing crystals
 - Prevents recreation of expensive gradient objects every frame
+
+#### Canvas Transform Management
+```javascript
+// Reset transform matrix each frame to prevent accumulation
+ctx.setTransform(1, 0, 0, 1, 0, 0);
+```
+- Prevents transform stack corruption
+- Fixes rotation bugs that occurred at higher waves
+- Ensures clean slate for each render frame
 
 #### Batch Rendering
 - Single path for multiple shapes (bullets, enemies)
@@ -618,6 +645,51 @@ performanceLevel: 0.3 to 1.0
 - Effect quality scaling
 - Draw distance optimization
 - Frame skip for updates
+
+---
+
+## Visual Systems
+
+### Footstep System
+- **Bipedal tracking**: Alternating left/right footprints
+- **Entity-based**: All moving entities leave footprints
+- **Fade mechanics**: 
+  - 3.6 seconds visible at 70% opacity
+  - 2.4 seconds gradual fade
+  - Object pooled for performance
+- **Visual style**:
+  - Realistic foot shapes with toe marks
+  - Gradient coloring (tan/brown)
+  - Shadow layer for depth
+
+### Floor Pattern System
+- **Hexagonal grid**: 60px hexagons
+- **Dynamic rendering**: Only redraws when needed
+- **Gradient effects**: Dark center to lighter edges
+- **Cached to off-screen canvas**: Prevents per-frame regeneration
+
+### Blood Effects
+- **Particle-based**: Initial splatter with velocity
+- **Settlement system**: Droplets slow and stick
+- **Gradual fading**: 
+  - 60% lifetime at full opacity
+  - 40% lifetime quick fade
+- **Object pooled**: Max 200 stains
+
+### Crystal Effects
+- **Multi-layered rendering**:
+  1. Shape layer (unique per type)
+  2. Gradient fill layer
+  3. Glow/aura layer
+  4. Particle emission layer
+- **Animation systems**:
+  - Rotation (varies by type)
+  - Pulsing (intensity varies)
+  - Particle spawning (periodic)
+- **Special effects**:
+  - Homing: Golden aura with intense glow
+  - Lightning: Yellow-blue gradient
+  - All crystals: Sparkle particles
 
 ---
 
@@ -853,5 +925,7 @@ This documentation serves as a complete reference for understanding, modifying, 
 
 ---
 
-*Game Version: 2.0.0*
-*Documentation Date: December 2024*
+*Game Version: 2.1.0*  
+*File Size: 310KB*  
+*Lines of Code: 8,500+*  
+*Documentation Date: January 2025*
