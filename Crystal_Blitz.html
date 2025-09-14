@@ -2847,7 +2847,7 @@
           orientationWarning.classList.add('show');
         }
         if (game && game.state === STATE.RUN) {
-          game.state = STATE.PAUSE;
+          setState(game, STATE.PAUSE);
         }
         return false; // Not in correct orientation
       } else {
@@ -3089,13 +3089,8 @@
   }
   
   function shouldSpawnParticle() {
-    // Count active particles for hard cap
-    let activeCount = 0;
-    for (const p of particles.items) {
-      if (p.alive) activeCount++;
-    }
-    // Don't spawn if at cap
-    if (activeCount >= MAX_PARTICLES) return false;
+    // Use the counter for O(1) performance instead of O(n)
+    if (activeParticleCount >= MAX_PARTICLES) return false;
     return Math.random() < performanceLevel;
   }
   
@@ -3370,7 +3365,7 @@
   function showPowerupDialog() {
     // Pause game for powerup selection (different from manual pause)
     if (game && game.state === STATE.RUN) {
-      game.state = STATE.POWERUP;
+      setState(game, STATE.POWERUP);
     }
     
     // Cleanly hide wave announcement if it's showing
@@ -3470,7 +3465,7 @@
             powerupDialog.style.display = 'none';
             selectedOption.classList.remove('selected');
             if (game && game.state === STATE.POWERUP) {
-              game.state = STATE.RUN;
+              setState(game, STATE.RUN);
             }
             // Show notification after dialog is fully closed
             showPowerupNotification(powerup.name);
@@ -3490,6 +3485,24 @@
   // ===== Game State =====
   const STATE = { MENU:0, RUN:1, PAUSE:2, OVER:3, POWERUP:4 };
   let game = null;
+
+  // State transition validation
+  function setState(game, newState) {
+    if (!game) return false;
+    const validTransitions = {
+      [STATE.MENU]: [STATE.RUN],
+      [STATE.RUN]: [STATE.PAUSE, STATE.POWERUP, STATE.OVER],
+      [STATE.PAUSE]: [STATE.RUN, STATE.MENU, STATE.OVER],
+      [STATE.POWERUP]: [STATE.RUN],
+      [STATE.OVER]: [STATE.MENU]
+    };
+    if (validTransitions[game.state] && validTransitions[game.state].includes(newState)) {
+      game.state = newState;
+      return true;
+    }
+    return false;
+  }
+
   function newGame(){
     return {
       state: STATE.MENU,
@@ -3524,8 +3537,8 @@
       key(ix,iy){ return (ix << 16) | (iy & 0xFFFF); }, // Numeric key instead of string
       reset(){ this.map.clear(); },
       insert(e){
-        const ix = (e.x / this.cell) | 0;
-        const iy = (e.y / this.cell) | 0;
+        const ix = Math.floor(e.x / this.cell);
+        const iy = Math.floor(e.y / this.cell);
         const k = this.key(ix,iy);
         let arr = this.map.get(k);
         if (!arr){ arr = []; this.map.set(k, arr); }
@@ -3533,8 +3546,8 @@
         e._cellX = ix; e._cellY = iy;
       },
       near(x,y){
-        const ix = (x / this.cell) | 0;
-        const iy = (y / this.cell) | 0;
+        const ix = Math.floor(x / this.cell);
+        const iy = Math.floor(y / this.cell);
         const out = [];
         for (let dx = -1; dx <= 1; dx++){
           for (let dy = -1; dy <= 1; dy++){
@@ -3552,11 +3565,9 @@
   const MAX_PARTICLES = 500; // Hard cap on total particles
   const MAX_BLOOD_STAINS = 200; // Hard cap on blood stains
   const MAX_FOOTSTEPS = 300; // Hard cap on footstep marks
-  let activeParticleCount = 0;
-  let activeBloodStainCount = 0;
-  let activeFootstepCount = 0;
+  let activeParticleCount = 0; // Used for efficient particle limit checking
   
-  function makePool(createFn, initial=0){
+  function makePool(createFn, initial=0, maxSize=1000){
     const items = [];
     for (let i=0;i<initial;i++) items.push(createFn());
     return {
@@ -3565,8 +3576,19 @@
         for (let i=0;i<items.length;i++){
           const it = items[i];
           if (!it.alive){
-            initFn(it); it.alive = true; return it;
+            initFn(it); it.alive = true;
+            return it;
           }
+        }
+        // Check pool size limit
+        if (items.length >= maxSize) {
+          // Try to reuse any dead item one more time
+          const deadItem = items.find(it => !it.alive);
+          if (deadItem) {
+            initFn(deadItem); deadItem.alive = true;
+            return deadItem;
+          }
+          return null; // Pool is full, cannot spawn
         }
         const it = createFn();
         initFn(it); it.alive = true;
@@ -5599,11 +5621,13 @@
             // Lightning chains to nearby enemies (limit to prevent infinite chaining)
             let chainCount = 0;
             const maxChains = 3; // Limit chains per bullet
-            
-            for (const e2 of enemies.items) {
+
+            // Use spatial grid for efficient nearby enemy lookup
+            const nearbyEnemies = g.grid.near(b.x, b.y);
+            for (const e2 of nearbyEnemies) {
               if (!e2.alive || e2 === e || e2.dying) continue; // Skip dying enemies
               if (chainCount >= maxChains) break; // Limit total chains
-              
+
               const dist = fastLength(e2.x - b.x, e2.y - b.y);
               if (dist < 120) { // Chain range
                 e2.hp -= 1; // Chain damage
@@ -5728,6 +5752,34 @@
           if (p.hp <= 0) {
             triggerGameOver(g);
           }
+        }
+      }
+    }
+
+    // Bullet-to-bullet collision (player bullets can destroy enemy bullets)
+    for (const pb of bullets.items) {
+      if (!pb.alive) continue;
+
+      for (const eb of enemyBullets.items) {
+        if (!eb.alive) continue;
+
+        // Check collision between bullets
+        const dist = fastLength(pb.x - eb.x, pb.y - eb.y);
+        if (dist < pb.r + eb.r + 2) { // Small buffer for better collision
+          // Destroy both bullets
+          pb.alive = false;
+          eb.alive = false;
+
+          // Visual effect at collision point
+          const midX = (pb.x + eb.x) / 2;
+          const midY = (pb.y + eb.y) / 2;
+          spawnBurst(midX, midY, 8, '#ffff00'); // Yellow flash
+          spawnBurst(midX, midY, 5, '#ffffff'); // White core
+
+          // Sound effect
+          beep(500, 0.04, 'square', 0.02); // Quick high pitch
+
+          break; // This player bullet is destroyed, move to next
         }
       }
     }
@@ -5917,18 +5969,20 @@
             p.upgradeShots += powerup.shots;
             beep(800, 0.1, 'triangle', 0.03);
           } else if (powerup.type === 'triple' || powerup.type === 'quad') {
-            // Pattern powerup - add multiplier instead of replacing
-            p.patternMultipliers.set(powerup.type, powerup.shots);
+            // Pattern powerup - actually add shots to existing
+            const currentShots = p.patternMultipliers.get(powerup.type) || 0;
+            p.patternMultipliers.set(powerup.type, currentShots + powerup.shots);
             // Legacy support
             p.bulletPattern = powerup.type;
-            p.patternTimer = powerup.shots;
+            p.patternTimer = currentShots + powerup.shots;
             beep(600, 0.15, 'sawtooth', 0.04);
           } else {
-            // Effect powerup - add to active effects instead of replacing
-            p.activeEffects.set(powerup.type, powerup.shots);
+            // Effect powerup - actually add shots to existing (not replace)
+            const currentShots = p.activeEffects.get(powerup.type) || 0;
+            p.activeEffects.set(powerup.type, currentShots + powerup.shots);
             // Legacy support
             p.bulletType = powerup.type;
-            p.bulletTimer = powerup.shots;
+            p.bulletTimer = currentShots + powerup.shots;
             beep(600, 0.15, 'sawtooth', 0.04);
           }
           showPowerupNotification(powerup.name);
@@ -6124,8 +6178,10 @@
     }
 
     // particles
+    activeParticleCount = 0; // Reset counter each frame
     for (const p2 of particles.items){
       if (!p2.alive) continue;
+      activeParticleCount++; // Count active particles
       p2.x += p2.vx*dt;
       p2.y += p2.vy*dt;
       // Add gravity to blood particles
@@ -6286,9 +6342,14 @@
     // CRITICAL: Reset canvas transform to prevent accumulation bugs
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     
-    // Clear gradient cache if it gets too large
+    // Evict oldest gradient cache entries if it gets too large (simple LRU)
     if (gradientCache.size > MAX_GRADIENT_CACHE_SIZE) {
-      gradientCache.clear();
+      // Remove the first 20 entries (oldest in Map insertion order)
+      let removed = 0;
+      for (const key of gradientCache.keys()) {
+        gradientCache.delete(key);
+        if (++removed >= 20) break; // Remove 20 oldest entries
+      }
     }
     
     // clear
@@ -6904,8 +6965,24 @@
           ctx.lineTo(pickup.x + size * 0.866, pickup.y + size * 0.5);
           ctx.lineTo(pickup.x - size * 0.866, pickup.y + size * 0.5);
         } else if (pickup.type === 'shotgun') {
-          // Wide rectangle for shotgun
-          ctx.rect(pickup.x - size * 1.2, pickup.y - size * 0.5, size * 2.4, size);
+          // Stylized connected spread crystal for shotgun
+          // Main body with flared end
+          ctx.moveTo(pickup.x - size * 0.3, pickup.y + size * 0.4);
+          ctx.lineTo(pickup.x - size * 0.3, pickup.y - size * 0.4);
+          ctx.lineTo(pickup.x + size * 0.2, pickup.y - size * 0.3);
+          // Top spread arm
+          ctx.lineTo(pickup.x + size * 0.5, pickup.y - size * 0.7);
+          ctx.lineTo(pickup.x + size * 0.8, pickup.y - size * 0.6);
+          ctx.lineTo(pickup.x + size * 0.6, pickup.y - size * 0.3);
+          // Middle spread arm
+          ctx.lineTo(pickup.x + size * 0.7, pickup.y);
+          ctx.lineTo(pickup.x + size * 0.9, pickup.y);
+          ctx.lineTo(pickup.x + size * 0.7, pickup.y);
+          // Bottom spread arm
+          ctx.lineTo(pickup.x + size * 0.6, pickup.y + size * 0.3);
+          ctx.lineTo(pickup.x + size * 0.8, pickup.y + size * 0.6);
+          ctx.lineTo(pickup.x + size * 0.5, pickup.y + size * 0.7);
+          ctx.lineTo(pickup.x + size * 0.2, pickup.y + size * 0.3);
         } else if (pickup.type === 'cluster') {
           // Three overlapping circles for cluster
           ctx.arc(pickup.x - size*0.4, pickup.y, size*0.6, 0, TAU);
@@ -7355,7 +7432,7 @@
             // Star shape for homing
             for (let i = 0; i < 8; i++) {
               const angle = (i * Math.PI / 4) - Math.PI / 2;
-              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/4;
+              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/2 * 0.5;
               const px = x + Math.cos(angle) * radius;
               const py = y + Math.sin(angle) * radius;
               if (i === 0) ctx.moveTo(px, py);
@@ -7382,7 +7459,7 @@
             // Snowflake shape (6-pointed star)
             for (let i = 0; i < 12; i++) {
               const angle = (i * Math.PI / 6) - Math.PI / 2;
-              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/4;
+              const radius = i % 2 === 0 ? crystalSize/2 : crystalSize/2 * 0.4;
               const px = x + Math.cos(angle) * radius;
               const py = y + Math.sin(angle) * radius;
               if (i === 0) ctx.moveTo(px, py);
@@ -7394,29 +7471,59 @@
             ctx.lineTo(x + crystalSize/2 * 0.866, y + crystalSize/2 * 0.5);
             ctx.lineTo(x - crystalSize/2 * 0.866, y + crystalSize/2 * 0.5);
           } else if (effect === 'seeking') {
-            // Stylized arrow pointing upward
-            ctx.moveTo(x, y - crystalSize/2);
-            ctx.lineTo(x + crystalSize/2*0.3, y);
-            ctx.lineTo(x + crystalSize/2*0.15, y);
-            ctx.lineTo(x + crystalSize/2*0.15, y + crystalSize/2);
-            ctx.lineTo(x - crystalSize/2*0.15, y + crystalSize/2);
-            ctx.lineTo(x - crystalSize/2*0.15, y);
-            ctx.lineTo(x - crystalSize/2*0.3, y);
+            // Cool stylized arrow with swept-back wings (matching ground pickup)
+            const s = crystalSize/2;
+            // Arrow tip
+            ctx.moveTo(x, y - s);
+            // Right wing
+            ctx.lineTo(x + s*0.8, y - s*0.2);
+            ctx.lineTo(x + s*0.5, y);
+            // Right shaft indent
+            ctx.lineTo(x + s*0.3, y - s*0.1);
+            // Shaft
+            ctx.lineTo(x + s*0.2, y + s*0.6);
+            // Right tail fin
+            ctx.lineTo(x + s*0.6, y + s*0.8);
+            ctx.lineTo(x + s*0.2, y + s);
+            // Bottom center
+            ctx.lineTo(x, y + s*0.7);
+            // Left tail fin
+            ctx.lineTo(x - s*0.2, y + s);
+            ctx.lineTo(x - s*0.6, y + s*0.8);
+            ctx.lineTo(x - s*0.2, y + s*0.6);
+            // Left shaft
+            ctx.lineTo(x - s*0.3, y - s*0.1);
+            ctx.lineTo(x - s*0.5, y);
+            // Left wing
+            ctx.lineTo(x - s*0.8, y - s*0.2);
           } else if (effect === 'shotgun') {
-            // Pentagon for shotgun
-            for (let i = 0; i < 5; i++) {
-              const angle = (i * Math.PI * 2 / 5) - Math.PI / 2;
-              const px = x + Math.cos(angle) * crystalSize/2;
-              const py = y + Math.sin(angle) * crystalSize/2;
-              if (i === 0) ctx.moveTo(px, py);
-              else ctx.lineTo(px, py);
-            }
+            // Stylized connected spread crystal for shotgun
+            const s = crystalSize/2;
+            // Main body with flared end
+            ctx.moveTo(x - s * 0.3, y + s * 0.4);
+            ctx.lineTo(x - s * 0.3, y - s * 0.4);
+            ctx.lineTo(x + s * 0.2, y - s * 0.3);
+            // Top spread arm
+            ctx.lineTo(x + s * 0.5, y - s * 0.7);
+            ctx.lineTo(x + s * 0.8, y - s * 0.6);
+            ctx.lineTo(x + s * 0.6, y - s * 0.3);
+            // Middle spread arm
+            ctx.lineTo(x + s * 0.7, y);
+            ctx.lineTo(x + s * 0.9, y);
+            ctx.lineTo(x + s * 0.7, y);
+            // Bottom spread arm
+            ctx.lineTo(x + s * 0.6, y + s * 0.3);
+            ctx.lineTo(x + s * 0.8, y + s * 0.6);
+            ctx.lineTo(x + s * 0.5, y + s * 0.7);
+            ctx.lineTo(x + s * 0.2, y + s * 0.3);
           } else if (effect === 'cluster') {
-            // Square for cluster
-            ctx.moveTo(x - crystalSize/2, y - crystalSize/2);
-            ctx.lineTo(x + crystalSize/2, y - crystalSize/2);
-            ctx.lineTo(x + crystalSize/2, y + crystalSize/2);
-            ctx.lineTo(x - crystalSize/2, y + crystalSize/2);
+            // Three overlapping circles for cluster (matching ground pickup)
+            const s = crystalSize/2;
+            ctx.arc(x - s*0.4, y, s*0.6, 0, Math.PI * 2);
+            ctx.moveTo(x + s*0.4 + s*0.6, y - s*0.3);
+            ctx.arc(x + s*0.4, y - s*0.3, s*0.6, 0, Math.PI * 2);
+            ctx.moveTo(x + s*0.4 + s*0.6, y + s*0.3);
+            ctx.arc(x + s*0.4, y + s*0.3, s*0.6, 0, Math.PI * 2);
           } else {
             // Default diamond for unknown types
             ctx.moveTo(x, y - crystalSize/2);
@@ -7697,13 +7804,19 @@
       last = now;
       if (game && game.state === STATE.RUN){
         acc += rawDt;
+        acc = Math.min(acc, dtFixed * 3); // Cap at 3 frames max to prevent spiral of death
         while (acc >= dtFixed){
           try {
             update(game, dtFixed);
           } catch (updateError) {
             // Game update error
             // Pause game on critical error to prevent infinite errors
-            if (game) game.state = STATE.PAUSE;
+            if (game) setState(game, STATE.PAUSE);
+            // Notify user of error
+            if (banner) {
+              banner.textContent = 'Game Error - Please Refresh';
+              banner.style.display = 'block';
+            }
             break;
           }
           acc -= dtFixed;
@@ -8130,8 +8243,24 @@
           ctx.lineTo(centerX + size * 0.866, centerY + size * 0.5);
           ctx.lineTo(centerX - size * 0.866, centerY + size * 0.5);
         } else if (type === 'shotgun') {
-          // Wide rectangle for shotgun
-          ctx.rect(centerX - size * 1.2, centerY - size * 0.5, size * 2.4, size);
+          // Stylized connected spread crystal for shotgun
+          // Main body with flared end
+          ctx.moveTo(centerX - size * 0.3, centerY + size * 0.4);
+          ctx.lineTo(centerX - size * 0.3, centerY - size * 0.4);
+          ctx.lineTo(centerX + size * 0.2, centerY - size * 0.3);
+          // Top spread arm
+          ctx.lineTo(centerX + size * 0.5, centerY - size * 0.7);
+          ctx.lineTo(centerX + size * 0.8, centerY - size * 0.6);
+          ctx.lineTo(centerX + size * 0.6, centerY - size * 0.3);
+          // Middle spread arm
+          ctx.lineTo(centerX + size * 0.7, centerY);
+          ctx.lineTo(centerX + size * 0.9, centerY);
+          ctx.lineTo(centerX + size * 0.7, centerY);
+          // Bottom spread arm
+          ctx.lineTo(centerX + size * 0.6, centerY + size * 0.3);
+          ctx.lineTo(centerX + size * 0.8, centerY + size * 0.6);
+          ctx.lineTo(centerX + size * 0.5, centerY + size * 0.7);
+          ctx.lineTo(centerX + size * 0.2, centerY + size * 0.3);
         } else if (type === 'cluster') {
           // Three overlapping circles for cluster
           ctx.arc(centerX - size*0.4, centerY, size*0.6, 0, Math.PI * 2);
@@ -8624,7 +8753,7 @@
     optionsPanel.style.animation = 'optionsFadeOut 0.3s ease-out forwards';
     setTimeout(() => {
       optionsPanel.style.display = 'none';
-      optionsPanel.innerHTML = ''; // Clear content
+      // Don't clear innerHTML here - keep content for next open
     }, 300);
     banner.style.display = 'block';
   }
@@ -8765,7 +8894,7 @@
   function togglePause(){
     if (!game || (game.state!==STATE.RUN && game.state!==STATE.PAUSE)) return;
     if (game.state === STATE.RUN) {
-      game.state = STATE.PAUSE;
+      setState(game, STATE.PAUSE);
       banner.style.display = 'block';
       banner.style.animation = 'pauseSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
       // Clear banner content efficiently
