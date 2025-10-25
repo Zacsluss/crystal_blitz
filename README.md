@@ -13,8 +13,8 @@
   ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
   ![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
   ![Web Audio](https://img.shields.io/badge/Web_Audio_API-5A9FD4?style=flat-square&logo=webaudio&logoColor=white)
-  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-8,500+-brightgreen?style=flat-square)
-  ![File Size](https://img.shields.io/badge/File_Size-310KB-blue?style=flat-square)
+  ![Lines of Code](https://img.shields.io/badge/Lines_of_Code-9,280-brightgreen?style=flat-square)
+  ![File Size](https://img.shields.io/badge/File_Size-347KB-blue?style=flat-square)
   ![Performance](https://img.shields.io/badge/Performance-60_FPS-green?style=flat-square)
   
   <br>
@@ -135,7 +135,7 @@ open Crystal_Blitz.html  # That's it!
 - **Mouse** - Aim/Shoot
 - **Shift** - Sprint
 - **Space** - Leap
-- **P** - Pause Menu (with Crystals/Enemies/Upgrades tabs)
+- **P / ESC** - Pause Menu (with Crystals/Enemies/Upgrades tabs)
 
 </td>
 <td width="50%">
@@ -153,29 +153,21 @@ open Crystal_Blitz.html  # That's it!
 
 ---
 
-## 🆕 **Latest Updates (v2.0)**
+## 🆕 **Latest Updates (v0.99 - Late Beta)**
 
-### Visual Enhancements
+### Bug Fixes & Polish
+- **Fixed Pause Menu Tab Highlighting**: Tabs now properly stay highlighted when clicked
+- **Improved Game Over Screen**: Smaller, more focused design that emphasizes the restart button
+- **Enhanced Restart Button**: Larger, more prominent styling for better UX
+- **Added ESC Key**: ESC key now opens/closes pause menu in addition to P key
+
+### Previous Major Features (v2.0)
 - **Crystal System Overhaul**: Each crystal now has unique shapes and visual effects
-  - Homing crystals feature golden star shapes with pulsing auras
-  - Lightning crystals use yellow-to-blue gradients with bolt shapes
-  - All crystals have multi-layered effects with particles and glow
 - **Footstep System**: Bipedal tracking with realistic fade effects for all entities
 - **Hexagonal Floor Pattern**: Dynamic gradient-based floor tiles for depth
-- **Blood Effects**: Improved blood stain fading with gradual alpha transitions
-
-### UI Improvements
 - **Pause Menu Redesign**: Tabbed interface with Controls, Enemies, Crystals, and Upgrades
-- **Options Menu**: Added to start screen with crystal and enemy previews
 - **Glassmorphism Effects**: Modern UI with blur effects and animations
-- **Responsive Menus**: All menus now scale with viewport (90vh x 90vw)
-- **HUD Crystal Display**: Shows actual crystal shapes and gradients in inventory
-
-### Bug Fixes
-- Fixed canvas transform accumulation causing screen rotation at wave 7
-- Resolved CSS specificity conflicts in pause menu buttons
-- Fixed blood stain sudden disappearance issue
-- Improved enemy spawn animations to prevent visibility issues
+- **Performance Optimizations**: Zero GC in game loop, gradient caching, improved rendering
 
 ---
 
@@ -234,8 +226,8 @@ python -m http.server 8000  # Optional local server
 
 ## 🎯 **Project Stats**
 
-- **8,500+** lines of optimized code
-- **310KB** file size (enhanced visuals & UI!)
+- **9,280** lines of optimized code
+- **347KB** file size (enhanced visuals & UI!)
 - **0** dependencies
 - **0** build steps
 - **100%** browser compatible
