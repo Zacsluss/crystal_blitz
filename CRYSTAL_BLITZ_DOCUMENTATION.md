@@ -925,7 +925,7 @@ This documentation serves as a complete reference for understanding, modifying, 
 
 ---
 
-*Game Version: 0.99 (Late Beta)*
+*Game Version: 0.99*
 *File Size: 347KB*
 *Lines of Code: 9,280*
 *Documentation Date: January 2025*
