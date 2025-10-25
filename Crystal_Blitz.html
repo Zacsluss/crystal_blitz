@@ -1,10 +1,13 @@
 <!doctype html>
+<!-- Crystal Blitz v0.99 - Late Beta Release -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="screen-orientation" content="landscape">
-  <title>Crystal Blitz — Arena Shooter</title>
+  <meta name="version" content="0.99">
+  <meta name="description" content="Crystal Blitz - High-performance arena shooter in a single HTML file">
+  <title>Crystal Blitz v0.99 — Arena Shooter</title>
   <style>
     :root {
       --bg: #0b0d10;
@@ -692,32 +695,60 @@
       cursor: pointer;
       transition: all 0.2s ease;
       font-size: 14px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      box-sizing: border-box;
+      height: auto;
     }
     .tab-button.active {
       background: rgba(90, 242, 199, 0.2);
       color: var(--accent);
       border-color: var(--accent);
     }
-    .tab-button:hover {
+    .tab-button:hover:not(.active) {
       background: rgba(90, 242, 199, 0.15);
       color: var(--fg);
     }
-    
+
     /* CRITICAL FIX: Pause menu specific button styles with HIGHER SPECIFICITY */
-    #pauseBanner .tab-button {
-      background: rgba(0, 0, 0, 0.5);
-      color: var(--muted);
-      border-color: var(--border);
-      transition: all 0.2s;
+    #banner .tab-button {
+      background: rgba(0, 0, 0, 0.5) !important;
+      color: var(--muted) !important;
+      border: 1px solid var(--border) !important;
+      transition: all 0.2s !important;
+      padding: 8px 16px !important;
+      margin: 0 !important;
+      font-weight: 400 !important;
+      font-style: normal !important;
+      text-decoration: none !important;
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
+      box-sizing: border-box !important;
+      font-size: 14px !important;
+      line-height: 1 !important;
+      height: 34px !important;
+      min-height: 34px !important;
+      max-height: 34px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      vertical-align: middle !important;
     }
-    #pauseBanner .tab-button.active {
+    #banner .tab-button.active {
       background: rgba(90, 242, 199, 0.3) !important;
       color: var(--accent) !important;
       border-color: var(--accent) !important;
       box-shadow: 0 0 20px rgba(90, 242, 199, 0.4),
-                  inset 0 0 10px rgba(90, 242, 199, 0.2);
+                  inset 0 0 10px rgba(90, 242, 199, 0.2) !important;
+      height: 34px !important;
+      min-height: 34px !important;
+      max-height: 34px !important;
     }
-    #pauseBanner .tab-button:hover:not(.active) {
+    #banner .tab-button:hover:not(.active) {
       background: rgba(90, 242, 199, 0.15);
       color: var(--text);
       transform: translateY(-1px);
@@ -833,15 +864,15 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 20px 24px;
-      border-radius: 12px;
+      padding: 40px 50px;
+      border-radius: 16px;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
                   inset 0 1px 0 rgba(255, 255, 255, 0.05),
                   inset 0 -1px 0 rgba(0, 0, 0, 0.1);
       text-align: center;
-      /* Match other menu sizing */
-      width: min(90vw, 750px);
-      height: min(90vh, 650px);
+      /* Smaller, more focused sizing to emphasize restart button */
+      width: min(90vw, 450px);
+      max-height: min(90vh, 350px);
       line-height: 1.4;
       opacity: 0;
       overflow: hidden;
@@ -849,17 +880,28 @@
     #gameOver.active {
       animation: glassUnderglow 8s ease-in-out infinite;
     }
-    #gameOver h2 { margin: 0 0 8px 0; }
+    #gameOver h2 {
+      margin: 0 0 20px 0;
+      font-size: 48px;
+      color: var(--danger);
+    }
+    #gameOver > div {
+      font-size: 20px;
+      margin-bottom: 30px;
+      color: var(--fg);
+    }
     #gameOver button {
-      margin-top: 10px;
+      margin-top: 20px;
       background: var(--accent);
       color: #002e24;
       border: none;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(90, 242, 199, 0.3);
     }
     #gameOver button:hover {
       transform: translateY(-2px) scale(1.05);
@@ -2625,7 +2667,7 @@
   let touchIndicatorLeft = null;
   let touchIndicatorRight = null;
   window.addEventListener('keydown', e => {
-    if (e.code === 'KeyP'){ togglePause(); return; }
+    if (e.code === 'KeyP' || e.code === 'Escape'){ togglePause(); return; }
     if (e.code === 'F11'){ 
       e.preventDefault();
       if (!document.fullscreenElement) {
@@ -8878,8 +8920,8 @@
         <div class="control-desc">Emergency leap</div>
       </div>
       <div class="control-row">
-        <div class="control-keys"><kbd>P</kbd></div>
-        <div class="control-desc">Resume game</div>
+        <div class="control-keys"><kbd>P</kbd> or <kbd>ESC</kbd></div>
+        <div class="control-desc">Pause / Resume game</div>
       </div>
       <div class="control-row">
         <div class="control-keys"><kbd>F11</kbd></div>
