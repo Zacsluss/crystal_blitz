@@ -187,7 +187,7 @@ That's it. No `npm install`. No build process. No server required.
 
 ## 🚀 What's New in v0.99
 
-### Latest Updates (Late Beta)
+### Latest Updates
 - ✅ Fixed pause menu tab highlighting
 - ✅ Fixed tab button sizing inconsistency
 - ✅ Improved game over screen layout
