@@ -15,7 +15,7 @@
   <a href="https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html">
     <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-2d7a3e?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
   </a>
-  <a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html">
+  <a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html" download="Crystal_Blitz.html">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-347KB_HTML-b5320a?style=for-the-badge&labelColor=000000&logo=download&logoColor=white" alt="Download"/>
   </a>
 </p>
@@ -149,7 +149,7 @@ Instant access, no installation
 
 ### 💾 Play Offline
 
-**[Download HTML](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html)**
+<a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html" download="Crystal_Blitz.html"><strong>Download HTML</strong></a>
 
 Open in any browser
 
