@@ -1,316 +1,97 @@
 <div align="center">
 
-# ⚡ CRYSTAL BLITZ
+# Crystal Blitz
 
-### *A Complete Browser Game in One File. Zero Dependencies.*
+### High-performance arena shooter in a single HTML file—zero dependencies, zero build tools
 
-[![Play Now](https://img.shields.io/badge/🎮_PLAY_NOW-Live_Demo-00ff88?style=for-the-badge&logo=gamepad&logoColor=white)](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)
-[![Download](https://img.shields.io/badge/💾_DOWNLOAD-347KB-ff6b35?style=for-the-badge&logo=download&logoColor=white)](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html)
-[![Documentation](https://img.shields.io/badge/📖_TECHNICAL_DOCS-Read_More-4078c0?style=for-the-badge&logo=github&logoColor=white)](CRYSTAL_BLITZ_DOCUMENTATION.md)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Changelog](https://img.shields.io/badge/Changelog-v0.99-blue?style=flat-square&logo=github)](CHANGELOG.md)
-[![Security](https://img.shields.io/badge/Security-Policy-green?style=flat-square&logo=shield)](SECURITY.md)
-
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
-![Web Audio](https://img.shields.io/badge/Web_Audio_API-5A9FD4?style=flat-square&logo=webaudio&logoColor=white)
-![Performance](https://img.shields.io/badge/Performance-60_FPS-green?style=flat-square)
-
-**Portfolio Showcase • Open Source • Production Ready**
+**[Play Live Demo](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)** • **[Download (347KB)](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html)**
 
 </div>
 
 ---
 
-<div align="center">
+## What This Is
 
-![Crystal Blitz Gameplay](assets/gameplay.gif)
+Crystal Blitz is a browser-based arena shooter that runs at 60 FPS with 200+ simultaneous entities—all from a single 347KB HTML file with no external dependencies. Open it in any browser and it works. No npm install, no webpack, no asset pipelines.
 
-*Fast-paced arena combat with dynamic enemy AI, crystal powerups, and 60 FPS performance*
+The technical challenge was achieving console-quality performance within browser constraints while maintaining code maintainability. The result is 9,280 lines of optimized JavaScript implementing spatial grid partitioning (reducing collision detection from O(n²) to O(n)), object pooling for zero-allocation game loops, and procedural audio synthesis—all without frameworks or build tools.
 
-</div>
+**Key Stats:**
+- 60 FPS locked framerate with 200+ entities
+- 347KB total file size (single HTML file)
+- Spatial grid optimization: O(n²) → O(n) collision detection
+- Object pooling: zero runtime memory allocation
+- Gradient caching: 3x rendering speed improvement
+- Entity Component System architecture
+- Full mobile support with touch controls
 
----
+## Gameplay
 
-## 🎯 The Challenge
+Face endless waves of intelligent enemies while collecting 11 crystal powerups and unlocking 17 permanent upgrades. Waves scale from 15 to 90 enemies, with boss battles every 10 waves featuring multi-phase attack patterns.
 
-**Can you build a AAA-quality game with zero build tools, zero dependencies, and zero external assets?**
+**Crystal System:** Temporary powerups with unique mechanics—homing shots, lightning chains, explosive blasts, freeze effects, ricochet bullets, cluster fragments, and more. Stack effects for devastating combinations.
 
-*Crystal Blitz is the answer.* A high-performance arena shooter that runs at 60 FPS with 200+ simultaneous entities — all from a single 347KB HTML file you can open directly in any browser.
+**Upgrade System:** Permanent improvements to health, speed, fire rate, and damage that compound across runs, creating meaningful build variety.
 
-### Why This Matters
+**Enemy AI:** 12+ behavior types using state machines—from basic melee rushers to ranged attackers, healers, and complex boss patterns.
 
-- **No npm install** • No webpack • No frameworks
-- **No loading screens** • No asset pipelines • No API calls
-- **Just open and play** • Works offline • Works forever
+## Technical Stack
 
-This is what modern web development can achieve when performance and simplicity are the priority.
+Built with vanilla JavaScript, Canvas API, and Web Audio API. No frameworks, libraries, or external assets.
 
----
+**Architecture:**
+- Entity Component System pattern for scalable entity management
+- Spatial grid partitioning for efficient collision detection
+- Object pooling for bullets, particles, and enemies (zero GC in game loop)
+- LRU gradient cache for 3x faster rendering
+- Delta-time physics for frame-independent movement
+- State machines for complex AI behaviors
 
-## ⚡ Quick Start
+**Performance Optimizations:**
+- Zero garbage collection during gameplay (pre-allocated pools)
+- Cached canvas states to minimize draw calls
+- Particle system with hard limits to maintain 60 FPS
+- Efficient spatial queries using grid-based lookups
+- Gradient computation moved to initialization time
 
-### Play Instantly
-**[Click here to play →](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)**
-*No installation. No setup. Just click.*
+**Cross-Platform:**
+- Desktop: WASD movement, mouse aiming, keyboard shortcuts
+- Mobile: Touch joystick, tap-to-shoot, virtual buttons
+- Fully responsive across devices
 
-### Download & Run Locally
-```bash
-# Clone the repo
-git clone https://github.com/Zacsluss/CRYSTAL_BLITZ.git
+## Quick Start
 
-# Open and play (literally just open the file)
-open Crystal_Blitz.html
-```
+**Play Online:** Visit [zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)
 
-That's it. No `npm install`. No build process. No server required.
+**Play Offline:** [Download the HTML file](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html) and open it in any browser—no server required.
 
----
-
-## 🎮 Gameplay
-
-<div align="center">
-
-### Survive. Adapt. Dominate.
-
-*Face endless waves of intelligent enemies in a fast-paced arena shooter where every crystal pickup transforms your playstyle.*
-
-</div>
-
-### Core Loop
-1. **Eliminate enemies** to level up and choose permanent upgrades
-2. **Collect crystals** for temporary but powerful abilities
-3. **Survive waves** that grow progressively more challenging
-4. **Face bosses** with unique multi-phase attack patterns
-
-### What Makes It Addictive
-- **11 Crystal Powerups** with unique visuals and mechanics
-- **17 Permanent Upgrades** for endless build variety
-- **12+ Enemy Behaviors** that evolve as you progress
-- **Dynamic Difficulty** scaling from 15 to 90 enemies per wave
-- **Boss Battles** every 10 waves with escalating complexity
-
----
-
-## 💎 Crystal System
-
-<div align="center">
-
-| Crystal | Effect | Rarity | Duration |
-|---------|--------|--------|----------|
-| 🎯 **Homing** | Auto-targeting ammunition | Ultra Rare | 25 shots |
-| ⚡ **Lightning** | Chain damage across enemies | Common | 50 shots |
-| 💥 **Explosive** | Area-of-effect blasts | Common | 50 shots |
-| ❄️ **Freeze** | Slows enemies by 50% | Common | 50 shots |
-| 🏀 **Ricochet** | Bullets bounce off walls | Common | 50 shots |
-| 💀 **Cluster** | Splits into fragments | Common | 50 shots |
-| 🔍 **Seeking** | Curves toward targets | Common | 50 shots |
-| 🔥 **Shotgun** | Wide-spread pattern | Common | 50 shots |
-| 🔫 **Multi-Shot** | Fire 2x/3x/4x bullets | Common | 50 shots |
-
-*Mix and match for devastating combos*
-
-</div>
-
----
-
-## 🛠️ Technical Excellence
-
-### Architecture Highlights
-
-<table>
-<tr>
-<td width="50%">
-
-**Performance**
-- 60 FPS locked framerate
-- 200+ entities without lag
-- Zero garbage collection in game loop
-- 347KB total file size
-- Sub-16ms frame times
-
-</td>
-<td width="50%">
-
-**Code Quality**
-- 9,280 lines of optimized JavaScript
-- Entity Component System pattern
-- Spatial grid collision detection (O(n))
-- Object pooling for all entities
-- Procedural audio synthesis
-
-</td>
-</tr>
-</table>
-
-### Advanced Techniques Demonstrated
-
-```javascript
-✓ Spatial Grid Partitioning → O(n²) to O(n) collision detection
-✓ Object Pools → Zero runtime memory allocation
-✓ Gradient Caching → 3x render speed improvement
-✓ Delta Time → Frame-independent physics
-✓ State Machines → Complex AI behaviors
-✓ Touch Controls → Full mobile compatibility
-```
-
-### Why It's Fast
-
-| Optimization | Impact |
-|--------------|--------|
-| **Zero GC in Game Loop** | No frame drops |
-| **Gradient Caching (LRU)** | 3x faster rendering |
-| **Particle Limits** | Consistent performance |
-| **Spatial Grid** | O(n) collision detection |
-| **Canvas State Cache** | Minimal draw calls |
-
----
-
-## 🎮 Controls
-
-<table>
-<tr>
-<td width="50%">
-
-### 🖥️ Desktop
-- **WASD** — Movement
-- **Mouse** — Aim & Shoot
-- **Shift** — Sprint/Dash
-- **Space** — Emergency Leap
-- **P / ESC** — Pause Menu
-
-</td>
-<td width="50%">
-
-### 📱 Mobile
-- **Left Touch** — Virtual Joystick
-- **Right Touch** — Aim & Shoot
-- **Bottom Left** — Sprint Button
-- **Bottom Right** — Leap Button
-- **Top Right** — Pause Button
-
-</td>
-</tr>
-</table>
-
-*Fully responsive. Works on any device.*
-
----
-
-## 🚀 What's New in v0.99
-
-### Latest Updates
-- ✅ Fixed pause menu tab highlighting
-- ✅ Fixed tab button sizing inconsistency
-- ✅ Improved game over screen layout
-- ✅ Added ESC key for pause menu
-- ✅ Enhanced restart button visibility
-
-### Major Features (Previous Versions)
-- **Crystal Overhaul** — Unique shapes and visual effects for every crystal type
-- **Footstep System** — Bipedal tracking with realistic fading
-- **Glassmorphism UI** — Modern blur effects and animations
-- **Hexagonal Floor** — Dynamic gradient-based floor pattern
-- **Tabbed Pause Menu** — Organized Controls, Enemies, Crystals, and Upgrades sections
-
-**[View Full Changelog →](CHANGELOG.md)**
-
----
-
-## 📊 Performance Benchmarks
-
-| Scenario | FPS | Active Entities |
-|----------|-----|-----------------|
-| Normal Combat | **60** | 50-100 |
-| Intense Battle | **55-60** | 200+ |
-| Boss Fight | **50-60** | 250+ |
-| Mobile (2020+) | **45-60** | 100+ |
-
-*Tested on mid-range hardware. Optimized for consistent performance.*
-
----
-
-## 👨‍💻 For Developers
-
-### What You'll Learn
-
-This project demonstrates production-grade implementations of:
-
-- **Performance Optimization** — Console-quality rendering in a browser
-- **Algorithm Design** — Efficient spatial partitioning and AI systems
-- **Memory Management** — Zero-allocation game loops
-- **Cross-Platform Dev** — Seamless desktop/mobile experience
-- **Code Architecture** — Maintainable single-file structure
-
-### Quick Dev Setup
-
+**Development:**
 ```bash
 git clone https://github.com/Zacsluss/CRYSTAL_BLITZ.git
 cd CRYSTAL_BLITZ
-
-# Optional: Run local server for testing
+# Open Crystal_Blitz.html in your browser or run:
 python -m http.server 8000
-# Open http://localhost:8000/Crystal_Blitz.html
+# Navigate to http://localhost:8000/Crystal_Blitz.html
 ```
 
-### Customization Points
+## Why I Built This
 
-```javascript
-bulletPowerups[]  // Add new crystal types
-enemy.update()    // Create new AI behaviors
-waveScaling()     // Adjust difficulty curve
-particleSystem()  // Add visual effects
-```
+As someone who manages enterprise platforms serving 3,000+ users across 22 countries, I built this to maintain hands-on technical skills. The best leaders never stop coding.
 
----
+This project specifically explores performance constraints—how far can you push browser-based rendering without falling back on WebGL or external engines? The answer: surprisingly far. By implementing game development fundamentals from scratch (spatial partitioning, object pooling, ECS architecture), I maintained both performance and code maintainability in a single file that works offline, forever.
 
-## 📈 Project Stats
+The constraint of zero dependencies forced creative problem-solving. No physics engine meant building delta-time physics from first principles. No audio library meant synthesizing sounds procedurally. No sprite atlases meant rendering everything with Canvas primitives. These limitations became opportunities to understand the fundamentals.
 
-<div align="center">
+## Contributing
 
-| Metric | Value |
-|--------|-------|
-| **Lines of Code** | 9,280 |
-| **File Size** | 347KB |
-| **Dependencies** | 0 |
-| **Build Steps** | 0 |
-| **External Assets** | 0 |
-| **Browser Support** | 100% |
-| **Target FPS** | 60 |
-| **Mobile Compatible** | ✓ |
-
-</div>
-
----
-
-## 🤝 Connect
-
-<div align="center">
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Zachary_Sluss-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/zacharyjsluss/)
-[![GitHub](https://img.shields.io/badge/GitHub-@Zacsluss-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Zacsluss)
-[![Portfolio](https://img.shields.io/badge/Portfolio-View_Projects-FF6B6B?style=for-the-badge&logo=google-chrome&logoColor=white)](https://zacsluss.github.io/Portfolio)
-
-</div>
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-**TL;DR**: Free to use, modify, and distribute. Just keep the copyright notice.
+Bug reports and feature suggestions welcome. See [CRYSTAL_BLITZ_DOCUMENTATION.md](CRYSTAL_BLITZ_DOCUMENTATION.md) for detailed technical documentation.
 
 ---
 
 <div align="center">
 
-### Built with passion. Optimized for performance. Ready to impress.
+**Built by [Zachary Sluss](https://github.com/Zacsluss)** • MIT License
 
-**[Play Crystal Blitz →](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)**
-
-*No installation required. Just click and play.*
+[![GitHub stars](https://img.shields.io/github/stars/Zacsluss/CRYSTAL_BLITZ?style=social)](https://github.com/Zacsluss/CRYSTAL_BLITZ/stargazers)
 
 </div>
