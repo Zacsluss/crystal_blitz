@@ -24,6 +24,16 @@
 
 ---
 
+<div align="center">
+
+![Crystal Blitz Gameplay](assets/gameplay.gif)
+
+*Fast-paced arena combat with dynamic enemy AI, crystal powerups, and 60 FPS performance*
+
+</div>
+
+---
+
 ## 🎯 The Challenge
 
 **Can you build a AAA-quality game with zero build tools, zero dependencies, and zero external assets?**
