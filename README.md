@@ -8,6 +8,10 @@
 [![Download](https://img.shields.io/badge/💾_DOWNLOAD-347KB-ff6b35?style=for-the-badge&logo=download&logoColor=white)](https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html)
 [![Documentation](https://img.shields.io/badge/📖_TECHNICAL_DOCS-Read_More-4078c0?style=for-the-badge&logo=github&logoColor=white)](CRYSTAL_BLITZ_DOCUMENTATION.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![Changelog](https://img.shields.io/badge/Changelog-v0.99-blue?style=flat-square&logo=github)](CHANGELOG.md)
+[![Security](https://img.shields.io/badge/Security-Policy-green?style=flat-square&logo=shield)](SECURITY.md)
+
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![Canvas API](https://img.shields.io/badge/Canvas_API-FF6B6B?style=flat-square&logo=mozilla&logoColor=white)
@@ -201,6 +205,8 @@ That's it. No `npm install`. No build process. No server required.
 - **Hexagonal Floor** — Dynamic gradient-based floor pattern
 - **Tabbed Pause Menu** — Organized Controls, Enemies, Crystals, and Upgrades sections
 
+**[View Full Changelog →](CHANGELOG.md)**
+
 ---
 
 ## 📊 Performance Benchmarks
@@ -283,7 +289,9 @@ particleSystem()  // Add visual effects
 
 ## 📄 License
 
-Open source and free to use. See the code, learn from it, build something better.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**TL;DR**: Free to use, modify, and distribute. Just keep the copyright notice.
 
 ---
 
