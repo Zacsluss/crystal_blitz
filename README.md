@@ -34,6 +34,16 @@
 
 ---
 
+<div align="center">
+
+![Crystal Blitz Gameplay](assets/gameplay.gif)
+
+*Fast-paced arena combat with dynamic enemy AI, crystal powerups, and 60 FPS performance*
+
+</div>
+
+---
+
 ## 🎯 What This Is
 
 **A high-performance arena shooter running at 60 FPS with 200+ simultaneous entities**—all from a single 347KB HTML file with no external dependencies. Open it in any browser and it works. No npm install, no webpack, no asset pipelines.
