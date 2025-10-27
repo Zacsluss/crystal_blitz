@@ -59,19 +59,19 @@
 <table>
   <tr>
     <td align="center">
-      <img src="https://img.shields.io/badge/Performance-60_FPS-00ff88?style=flat-square&logo=speedtest&logoColor=white"/><br/>
+      <img src="https://img.shields.io/badge/Performance-60_FPS-2d7a3e?style=flat-square&logo=speedtest&logoColor=white"/><br/>
       <sub><b>Frame Rate</b></sub>
     </td>
     <td align="center">
-      <img src="https://img.shields.io/badge/Entities-200%2B-0088ff?style=flat-square&logo=atom&logoColor=white"/><br/>
+      <img src="https://img.shields.io/badge/Entities-200%2B-1E4A6D?style=flat-square&logo=atom&logoColor=white"/><br/>
       <sub><b>Simultaneous</b></sub>
     </td>
     <td align="center">
-      <img src="https://img.shields.io/badge/Size-347KB-ff6b6b?style=flat-square&logo=file&logoColor=white"/><br/>
+      <img src="https://img.shields.io/badge/Size-347KB-8B3A3A?style=flat-square&logo=file&logoColor=white"/><br/>
       <sub><b>Single File</b></sub>
     </td>
     <td align="center">
-      <img src="https://img.shields.io/badge/Dependencies-0-ffd93d?style=flat-square&logo=npm&logoColor=white"/><br/>
+      <img src="https://img.shields.io/badge/Dependencies-0-8B6914?style=flat-square&logo=npm&logoColor=white"/><br/>
       <sub><b>Zero Deps</b></sub>
     </td>
   </tr>
@@ -260,8 +260,8 @@ Bug reports and feature suggestions welcome. See [CRYSTAL_BLITZ_DOCUMENTATION.md
 
 **Built by [Zachary Sluss](https://github.com/Zacsluss)** • MIT License
 
-[![Portfolio](https://img.shields.io/badge/🌐_My_Portfolio-00ff88?style=flat-square)](https://zacsluss.github.io/portfolio)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zacharyjsluss)
-[![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:zacsluss@yahoo.com)
+[![Portfolio](https://img.shields.io/badge/🌐_My_Portfolio-2d7a3e?style=flat-square)](https://zacsluss.github.io/portfolio)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0055A4?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zacharyjsluss)
+[![Email](https://img.shields.io/badge/Email-8B2E0F?style=flat-square&logo=gmail&logoColor=white)](mailto:zacsluss@yahoo.com)
 
 </div>
