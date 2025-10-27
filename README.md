@@ -6,17 +6,17 @@
 <br/>
 
 <!-- Animated Subtitle -->
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=3000&pause=1000&color=00FF88&center=true&vCenter=true&random=false&width=600&lines=60+FPS+%E2%80%A2+200%2B+Entities+%E2%80%A2+347KB;Zero+Dependencies+%E2%80%A2+Zero+Build+Tools;Single+HTML+File+%E2%80%A2+Works+Forever" alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=3000&pause=1000&color=2d9a5e&center=true&vCenter=true&random=false&width=600&lines=60+FPS+%E2%80%A2+200%2B+Entities+%E2%80%A2+347KB;Zero+Dependencies+%E2%80%A2+Zero+Build+Tools;Single+HTML+File+%E2%80%A2+Works+Forever" alt="Typing SVG" />
 
 <br/>
 
 <!-- Main Action Buttons -->
 <p align="center">
   <a href="https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html">
-    <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-00ff88?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
+    <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-2d7a3e?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
   </a>
   <a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/raw/main/Crystal_Blitz.html">
-    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-347KB_HTML-ff6b35?style=for-the-badge&labelColor=000000&logo=download&logoColor=white" alt="Download"/>
+    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-347KB_HTML-b5320a?style=for-the-badge&labelColor=000000&logo=download&logoColor=white" alt="Download"/>
   </a>
 </p>
 
