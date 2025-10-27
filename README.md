@@ -12,7 +12,7 @@
 
 <!-- Main Action Buttons -->
 <p align="center">
-  <a href="[https://zacsluss.github.io/crystal_blitz/crystal_blitz.html](https://zacsluss.github.io/crystal_blitz/)">
+  <a href="https://zacsluss.github.io/crystal_blitz/">
     <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-2d7a3e?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
   </a>
   <a href="https://github.com/Zacsluss/crystal_blitz/releases/download/v1.0.0/crystal_blitz.html">
@@ -140,7 +140,7 @@
 
 ### 🌐 Play Online
 
-**[Launch Game](https://zacsluss.github.io/crystal_blitz/crystal_blitz.html)**
+**[Launch Game](https://zacsluss.github.io/crystal_blitz/)**
 
 Instant access, no installation
 
@@ -254,7 +254,7 @@ This project specifically explores:
 
 ## 🤝 Contributing
 
-Bug reports and feature suggestions welcome. See [crystal_blitz_DOCUMENTATION.md](crystal_blitz_DOCUMENTATION.md) for detailed technical documentation.
+Bug reports and feature suggestions welcome. See [CRYSTAL_BLITZ_DOCUMENTATION.md](CRYSTAL_BLITZ_DOCUMENTATION.md) for detailed technical documentation.
 
 <div align="center">
 

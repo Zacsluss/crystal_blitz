@@ -56,7 +56,7 @@ If you discover a security vulnerability in Crystal Blitz, please report it resp
 ### How to Report
 
 1. **Email**: [Your Email Here] (Replace with your contact)
-2. **GitHub**: Open a [security advisory](https://github.com/Zacsluss/CRYSTAL_BLITZ/security/advisories/new)
+2. **GitHub**: Open a [security advisory](https://github.com/Zacsluss/crystal_blitz/security/advisories/new)
 3. **LinkedIn**: Message via [LinkedIn profile](https://www.linkedin.com/in/zacharyjsluss/)
 
 ### What to Include
@@ -89,10 +89,10 @@ Please don't:
 ## Security Best Practices for Users
 
 ### Safe Usage
-- Download directly from [official GitHub repository](https://github.com/Zacsluss/CRYSTAL_BLITZ)
+- Download directly from [official GitHub repository](https://github.com/Zacsluss/crystal_blitz)
 - Verify file integrity if security is critical
 - Open only in modern, updated browsers
-- Use official GitHub Pages deployment: https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html
+- Use official GitHub Pages deployment: https://zacsluss.github.io/crystal_blitz/
 
 ### Hosting Your Own Copy
 If you want to host Crystal Blitz yourself:

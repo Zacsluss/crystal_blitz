@@ -699,7 +699,7 @@ performanceLevel: 0.3 to 1.0
 
 #### File Organization
 ```
-Crystal_Blitz.html
+crystal_blitz.html
 ├── <head>
 │   ├── Meta tags
 │   └── <style> (Enhanced CSS with glassmorphism)
