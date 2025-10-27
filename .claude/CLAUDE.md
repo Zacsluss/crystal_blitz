@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Crystal Blitz is a single-file HTML5 arena shooter game contained entirely in `Crystal_Blitz.html` (7,704 lines, 283KB). No dependencies, no build process, no external assets - everything is self-contained.
+Crystal Blitz is a single-file HTML5 arena shooter game contained entirely in `crystal_blitz.html` (7,704 lines, 283KB). No dependencies, no build process, no external assets - everything is self-contained.
 
 ## Architecture & Key Systems
 
@@ -68,7 +68,7 @@ entity = {
 
 ### Testing Approach
 Since this is a single HTML file with no dependencies:
-1. Open `Crystal_Blitz.html` directly in browser
+1. Open `crystal_blitz.html` directly in browser
 2. Test gameplay manually - no automated tests
 3. Monitor console for errors (though console.log is removed from game loop)
 4. Check FPS counter (bottom-right) for performance
@@ -83,4 +83,4 @@ Since this is a single HTML file with no dependencies:
 - **No build process** - Direct HTML file editing only
 - **Performance critical** - Game targets 60 FPS with 200+ entities
 - **Mobile support** - Touch controls must be maintained
-- **Single file constraint** - All changes stay within Crystal_Blitz.html
+- **Single file constraint** - All changes stay within crystal_blitz.html
