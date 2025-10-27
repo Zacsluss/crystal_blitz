@@ -12,7 +12,7 @@
 
 <!-- Main Action Buttons -->
 <p align="center">
-  <a href="https://zacsluss.github.io/crystal_blitz/crystal_blitz.html">
+  <a href="[https://zacsluss.github.io/crystal_blitz/crystal_blitz.html](https://zacsluss.github.io/crystal_blitz/)">
     <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-2d7a3e?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
   </a>
   <a href="https://github.com/Zacsluss/crystal_blitz/releases/download/v1.0.0/crystal_blitz.html">
