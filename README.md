@@ -12,20 +12,20 @@
 
 <!-- Main Action Buttons -->
 <p align="center">
-  <a href="https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html">
+  <a href="https://zacsluss.github.io/crystal_blitz/crystal_blitz.html">
     <img src="https://img.shields.io/badge/🎮_PLAY-LIVE_GAME-2d7a3e?style=for-the-badge&labelColor=000000&logo=gamepad&logoColor=white" alt="Play Now"/>
   </a>
-  <a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/releases/download/v1.0.0/Crystal_Blitz.html">
+  <a href="https://github.com/Zacsluss/crystal_blitz/releases/download/v1.0.0/crystal_blitz.html">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-347KB_HTML-b5320a?style=for-the-badge&labelColor=000000&logo=download&logoColor=white" alt="Download"/>
   </a>
 </p>
 
 <!-- GitHub Stats Badges -->
 <p align="center">
-  <img src="https://img.shields.io/github/stars/Zacsluss/CRYSTAL_BLITZ?style=social" alt="Stars"/>
-  <img src="https://img.shields.io/github/forks/Zacsluss/CRYSTAL_BLITZ?style=social" alt="Forks"/>
-  <img src="https://img.shields.io/github/license/Zacsluss/CRYSTAL_BLITZ?style=flat-square&color=555555" alt="License"/>
-  <img src="https://img.shields.io/github/last-commit/Zacsluss/CRYSTAL_BLITZ?style=flat-square&color=666666" alt="Last Commit"/>
+  <img src="https://img.shields.io/github/stars/Zacsluss/crystal_blitz?style=social" alt="Stars"/>
+  <img src="https://img.shields.io/github/forks/Zacsluss/crystal_blitz?style=social" alt="Forks"/>
+  <img src="https://img.shields.io/github/license/Zacsluss/crystal_blitz?style=flat-square&color=555555" alt="License"/>
+  <img src="https://img.shields.io/github/last-commit/Zacsluss/crystal_blitz?style=flat-square&color=666666" alt="Last Commit"/>
 </p>
 
 </div>
@@ -140,7 +140,7 @@
 
 ### 🌐 Play Online
 
-**[Launch Game](https://zacsluss.github.io/CRYSTAL_BLITZ/Crystal_Blitz.html)**
+**[Launch Game](https://zacsluss.github.io/crystal_blitz/crystal_blitz.html)**
 
 Instant access, no installation
 
@@ -149,7 +149,7 @@ Instant access, no installation
 
 ### 💾 Play Offline
 
-<a href="https://github.com/Zacsluss/CRYSTAL_BLITZ/releases/download/v1.0.0/Crystal_Blitz.html"><strong>Download HTML</strong></a>
+<a href="https://github.com/Zacsluss/crystal_blitz/releases/download/v1.0.0/crystal_blitz.html"><strong>Download HTML</strong></a>
 
 Open in any browser
 
@@ -254,7 +254,7 @@ This project specifically explores:
 
 ## 🤝 Contributing
 
-Bug reports and feature suggestions welcome. See [CRYSTAL_BLITZ_DOCUMENTATION.md](CRYSTAL_BLITZ_DOCUMENTATION.md) for detailed technical documentation.
+Bug reports and feature suggestions welcome. See [crystal_blitz_DOCUMENTATION.md](crystal_blitz_DOCUMENTATION.md) for detailed technical documentation.
 
 <div align="center">
 
