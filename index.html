@@ -9257,40 +9257,40 @@
 
       // Main Menu button returns to initial state
       document.getElementById('mainMenuBtn').addEventListener('click', () => {
-        // Close pause menu
+        // Close pause menu with animation
         banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
-        setTimeout(() => {
-          banner.style.display = 'none';
-        }, 300);
 
-        // Reset game state to initial
+        // Reset game state immediately
         game = null;
 
-        // Show initial banner
-        banner.style.display = 'block';
-        banner.style.animation = 'none';
-        banner.innerHTML = `
-          <h1>Crystal Blitz</h1>
-          <p>60 FPS Arena Shooter • 200+ Entities • Single HTML File</p>
-        `;
-
-        const newStartBtn = document.createElement('button');
-        newStartBtn.id = 'startBtn';
-        newStartBtn.textContent = 'Start Game';
-        banner.appendChild(newStartBtn);
-
-        // Re-attach start button event listener
-        newStartBtn.addEventListener('click', () => {
-          initAudio();
-          start();
-        });
-
-        // Hide HUD
+        // Hide HUD immediately
         const hud = document.getElementById('hud');
         if (hud) {
           hud.style.opacity = '0';
           hud.style.visibility = 'hidden';
         }
+
+        // After animation completes, show main menu
+        setTimeout(() => {
+          // Show initial banner
+          banner.style.display = 'block';
+          banner.style.animation = 'none';
+          banner.innerHTML = `
+            <h1>Crystal Blitz</h1>
+            <p>60 FPS Arena Shooter • 200+ Entities • Single HTML File</p>
+          `;
+
+          const newStartBtn = document.createElement('button');
+          newStartBtn.id = 'startBtn';
+          newStartBtn.textContent = 'Start Game';
+          banner.appendChild(newStartBtn);
+
+          // Re-attach start button event listener
+          newStartBtn.addEventListener('click', () => {
+            initAudio();
+            start();
+          });
+        }, 300);
       });
     } else {
       banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
