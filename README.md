@@ -267,8 +267,6 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 ### Real numbers from my production build
 
-</div>
-
 <table>
 <tr>
 <td width="50%">
@@ -345,6 +343,8 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 </td>
 </tr>
 </table>
+
+</div>
 
 <details>
 <summary><b>📦 Bundle size breakdown</b></summary>
