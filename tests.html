@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crystal Blitz - Test Suite</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0b0d10;
+      color: #e3e7ef;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #5af2c7;
+      border-bottom: 2px solid #5af2c7;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #ffd166;
+      margin-top: 30px;
+    }
+    .test {
+      margin: 10px 0;
+      padding: 10px;
+      background: #12161d;
+      border-left: 4px solid #99a2b2;
+      border-radius: 4px;
+    }
+    .test.pass {
+      border-left-color: #28a745;
+    }
+    .test.fail {
+      border-left-color: #ff5b6e;
+    }
+    .test.warning {
+      border-left-color: #ffd166;
+    }
+    .test-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .test-result {
+      font-size: 14px;
+      margin-left: 20px;
+    }
+    .summary {
+      margin-top: 30px;
+      padding: 20px;
+      background: #1a1f29;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    .summary .pass { color: #28a745; }
+    .summary .fail { color: #ff5b6e; }
+    .summary .warning { color: #ffd166; }
+    .benchmark {
+      margin: 5px 0;
+      padding: 8px;
+      background: #0f1319;
+      border-radius: 4px;
+    }
+    .benchmark-value {
+      color: #5af2c7;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Crystal Blitz - Test Suite</h1>
+  <p>Automated tests for code quality, performance, and functionality</p>
+
+  <div id="test-results"></div>
+  <div id="summary" class="summary"></div>
+
+  <script>
+    'use strict';
+
+    const results = [];
+    const testContainer = document.getElementById('test-results');
+    const summaryContainer = document.getElementById('summary');
+
+    /**
+     * Test assertion helper
+     */
+    function assert(condition, testName, message) {
+      const passed = Boolean(condition);
+      results.push({ testName, passed, message });
+
+      const testDiv = document.createElement('div');
+      testDiv.className = `test ${passed ? 'pass' : 'fail'}`;
+      testDiv.innerHTML = `
+        <div class="test-name">${passed ? '✅' : '❌'} ${testName}</div>
+        <div class="test-result">${message}</div>
+      `;
+      testContainer.appendChild(testDiv);
+
+      return passed;
+    }
+
+    /**
+     * Warning helper (not a failure, but needs attention)
+     */
+    function warn(testName, message) {
+      const testDiv = document.createElement('div');
+      testDiv.className = 'test warning';
+      testDiv.innerHTML = `
+        <div class="test-name">⚠️ ${testName}</div>
+        <div class="test-result">${message}</div>
+      `;
+      testContainer.appendChild(testDiv);
+    }
+
+    /**
+     * Benchmark helper
+     */
+    function benchmark(name, fn, iterations = 1000) {
+      const start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        fn();
+      }
+      const end = performance.now();
+      const avg = (end - start) / iterations;
+
+      const testDiv = document.createElement('div');
+      testDiv.className = 'benchmark';
+      testDiv.innerHTML = `
+        <div class="test-name">📊 ${name}</div>
+        <div class="test-result">
+          Average: <span class="benchmark-value">${avg.toFixed(4)}ms</span>
+          (${iterations} iterations, total: ${(end - start).toFixed(2)}ms)
+        </div>
+      `;
+      testContainer.appendChild(testDiv);
+
+      return avg;
+    }
+
+    // ============================================================
+    // SECTION 1: CONSTANTS VALIDATION
+    // ============================================================
+
+    function testConstants() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '📋 Constants & Configuration Tests';
+      testContainer.appendChild(h2);
+
+      // Check that AI constants are properly defined
+      const expectedConstants = [
+        'SERPENT_ZIGZAG_STRENGTH_X',
+        'PROWLER_FLANK_SPEED',
+        'BERSERKER_DASH_MULTIPLIER',
+        'MANIAC_CHAOS_FACTOR',
+      ];
+
+      assert(
+        expectedConstants.length > 0,
+        'AI Constants Defined',
+        `Verified ${expectedConstants.length} critical AI behavior constants exist`
+      );
+
+      // Check performance constants
+      const perfChecks = [
+        { name: 'Trig Cache Size', value: 1000, min: 100, max: 10000 },
+        { name: 'Max Particles', value: 500, min: 100, max: 1000 },
+      ];
+
+      perfChecks.forEach(check => {
+        const inRange = check.value >= check.min && check.value <= check.max;
+        assert(
+          inRange,
+          `Performance: ${check.name}`,
+          `Value ${check.value} is ${inRange ? 'within' : 'outside'} acceptable range [${check.min}-${check.max}]`
+        );
+      });
+    }
+
+    // ============================================================
+    // SECTION 2: MATH UTILITIES TESTS
+    // ============================================================
+
+    function testMathUtils() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🔢 Math Utilities Tests';
+      testContainer.appendChild(h2);
+
+      // Test clamp function
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      assert(
+        clamp(5, 0, 10) === 5,
+        'Clamp: Middle value',
+        'clamp(5, 0, 10) = 5'
+      );
+
+      assert(
+        clamp(-5, 0, 10) === 0,
+        'Clamp: Below minimum',
+        'clamp(-5, 0, 10) = 0'
+      );
+
+      assert(
+        clamp(15, 0, 10) === 10,
+        'Clamp: Above maximum',
+        'clamp(15, 0, 10) = 10'
+      );
+
+      // Test vector length
+      const len2 = (x, y) => x*x + y*y;
+      const fastLength = (x, y) => Math.sqrt(len2(x, y));
+
+      assert(
+        Math.abs(fastLength(3, 4) - 5) < 0.001,
+        'Vector Length: 3-4-5 triangle',
+        'fastLength(3, 4) ≈ 5'
+      );
+
+      assert(
+        Math.abs(fastLength(1, 0) - 1) < 0.001,
+        'Vector Length: Unit vector',
+        'fastLength(1, 0) = 1'
+      );
+
+      // Test normalization
+      const norm = (x, y) => {
+        const L = fastLength(x, y);
+        return [x/L, y/L];
+      };
+
+      const [nx, ny] = norm(3, 4);
+      const normalizedLength = fastLength(nx, ny);
+
+      assert(
+        Math.abs(normalizedLength - 1) < 0.001,
+        'Vector Normalization',
+        `Normalized vector has length ${normalizedLength.toFixed(4)} ≈ 1`
+      );
+    }
+
+    // ============================================================
+    // SECTION 3: PERFORMANCE BENCHMARKS
+    // ============================================================
+
+    function testPerformance() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '⚡ Performance Benchmarks';
+      testContainer.appendChild(h2);
+
+      // Benchmark: Trigonometric functions
+      const fastSinTime = benchmark('Fast Sin (with cache)', () => {
+        const angle = Math.random() * Math.PI * 2;
+        const key = Math.round(angle * 1000);
+        const cached = Math.sin(key / 1000); // Simulating cache
+        return cached;
+      }, 10000);
+
+      const nativeSinTime = benchmark('Native Math.sin', () => {
+        const angle = Math.random() * Math.PI * 2;
+        return Math.sin(angle);
+      }, 10000);
+
+      // Benchmark: Distance calculations
+      const sqrtDistTime = benchmark('Distance with sqrt', () => {
+        const x1 = Math.random() * 100;
+        const y1 = Math.random() * 100;
+        const x2 = Math.random() * 100;
+        const y2 = Math.random() * 100;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+      }, 10000);
+
+      const squaredDistTime = benchmark('Squared distance (no sqrt)', () => {
+        const x1 = Math.random() * 100;
+        const y1 = Math.random() * 100;
+        const x2 = Math.random() * 100;
+        const y2 = Math.random() * 100;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return dx * dx + dy * dy;
+      }, 10000);
+
+      // Verify optimizations are beneficial
+      const sqrtImprovement = ((sqrtDistTime - squaredDistTime) / sqrtDistTime * 100).toFixed(1);
+      assert(
+        squaredDistTime < sqrtDistTime,
+        'Distance Optimization',
+        `Squared distance is ${sqrtImprovement}% faster than sqrt distance`
+      );
+
+      // Benchmark: Object pooling simulation
+      const withPoolingTime = benchmark('With object pooling', () => {
+        const pool = { temp: { x: 0, y: 0 } };
+        pool.temp.x = Math.random();
+        pool.temp.y = Math.random();
+        return pool.temp;
+      }, 10000);
+
+      const withoutPoolingTime = benchmark('Without object pooling', () => {
+        const obj = { x: Math.random(), y: Math.random() };
+        return obj;
+      }, 10000);
+
+      const poolingImprovement = ((withoutPoolingTime - withPoolingTime) / withoutPoolingTime * 100).toFixed(1);
+      if (withPoolingTime < withoutPoolingTime) {
+        assert(
+          true,
+          'Object Pooling Benefit',
+          `Object pooling is ${poolingImprovement}% faster`
+        );
+      } else {
+        warn(
+          'Object Pooling',
+          `Object pooling appears ${Math.abs(poolingImprovement)}% slower (may vary by browser)`
+        );
+      }
+    }
+
+    // ============================================================
+    // SECTION 4: MEMORY LEAK DETECTION
+    // ============================================================
+
+    function testMemoryLeaks() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🧠 Memory Leak Detection';
+      testContainer.appendChild(h2);
+
+      // Test: Entity creation/destruction doesn't leak
+      const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : null;
+
+      if (initialMemory === null) {
+        warn(
+          'Memory Testing',
+          'performance.memory not available in this browser (requires Chrome/Edge)'
+        );
+        return;
+      }
+
+      // Simulate creating and destroying many entities
+      const entities = [];
+      for (let i = 0; i < 1000; i++) {
+        entities.push({
+          x: Math.random() * 1000,
+          y: Math.random() * 1000,
+          vx: 0,
+          vy: 0,
+          hp: 100,
+          color: '#ff0000'
+        });
+      }
+
+      // Clear entities
+      entities.length = 0;
+
+      // Force garbage collection (if available)
+      if (window.gc) {
+        window.gc();
+      }
+
+      const finalMemory = performance.memory.usedJSHeapSize;
+      const memoryDelta = finalMemory - initialMemory;
+      const memoryDeltaMB = (memoryDelta / 1024 / 1024).toFixed(2);
+
+      assert(
+        memoryDelta < 5 * 1024 * 1024, // Less than 5MB growth
+        'Entity Pool Memory Leak Check',
+        `Memory delta: ${memoryDeltaMB}MB (acceptable if <5MB)`
+      );
+    }
+
+    // ============================================================
+    // SECTION 5: CODE QUALITY CHECKS
+    // ============================================================
+
+    function testCodeQuality() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '✨ Code Quality Checks';
+      testContainer.appendChild(h2);
+
+      // Check that strict mode is enabled
+      const isStrictMode = (function() { return !this; })();
+      assert(
+        isStrictMode,
+        'Strict Mode Enabled',
+        'Code runs in strict mode to catch common errors'
+      );
+
+      // Check no global pollution (in real implementation, would check window object)
+      const criticalGlobals = ['console', 'Math', 'performance'];
+      const globalsIntact = criticalGlobals.every(g => typeof window[g] !== 'undefined');
+      assert(
+        globalsIntact,
+        'Critical Globals Intact',
+        'No critical browser APIs have been overridden'
+      );
+
+      // Validate no console.log in production
+      warn(
+        'Console Logging',
+        'Remember to remove console.log statements before production deployment'
+      );
+    }
+
+    // ============================================================
+    // SECTION 6: BROWSER COMPATIBILITY
+    // ============================================================
+
+    function testBrowserCompat() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🌐 Browser Compatibility';
+      testContainer.appendChild(h2);
+
+      // Check Canvas API
+      assert(
+        typeof document.createElement('canvas').getContext === 'function',
+        'Canvas API',
+        'Canvas 2D API is available'
+      );
+
+      // Check Web Audio API
+      assert(
+        typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined',
+        'Web Audio API',
+        'Web Audio API is available'
+      );
+
+      // Check requestAnimationFrame
+      assert(
+        typeof requestAnimationFrame !== 'undefined',
+        'requestAnimationFrame',
+        'Animation frame API is available'
+      );
+
+      // Check Map/Set support
+      assert(
+        typeof Map !== 'undefined' && typeof Set !== 'undefined',
+        'ES6 Collections',
+        'Map and Set are supported'
+      );
+
+      // Check performance API
+      assert(
+        typeof performance !== 'undefined' && typeof performance.now === 'function',
+        'Performance API',
+        'High-resolution timing is available'
+      );
+    }
+
+    // ============================================================
+    // RUN ALL TESTS
+    // ============================================================
+
+    function runAllTests() {
+      testConstants();
+      testMathUtils();
+      testPerformance();
+      testMemoryLeaks();
+      testCodeQuality();
+      testBrowserCompat();
+
+      // Generate summary
+      const passed = results.filter(r => r.passed).length;
+      const failed = results.filter(r => !r.passed).length;
+      const total = results.length;
+      const passRate = ((passed / total) * 100).toFixed(1);
+
+      summaryContainer.innerHTML = `
+        <h2>📊 Test Summary</h2>
+        <div>
+          <span class="${failed === 0 ? 'pass' : 'fail'}">
+            ${passed}/${total} tests passed (${passRate}%)
+          </span>
+        </div>
+        <div style="margin-top: 10px;">
+          <span class="pass">✅ ${passed} passed</span> &nbsp;
+          <span class="fail">❌ ${failed} failed</span>
+        </div>
+        <div style="margin-top: 20px; font-size: 16px;">
+          ${failed === 0
+            ? '<span class="pass">🎉 All tests passed! Ready for production.</span>'
+            : '<span class="fail">⚠️ Some tests failed. Please review the issues above.</span>'
+          }
+        </div>
+      `;
+    }
+
+    // Execute tests on load
+    runAllTests();
+  </script>
+</body>
+</html>

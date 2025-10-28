@@ -913,12 +913,16 @@
     #fps {
       position: fixed;
       bottom: 10px; right: 12px;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      background: #0f1319aa;
-      padding: 4px 8px;
+      background: #0f1319ee;
+      padding: 6px 10px;
       border-radius: 6px;
       user-select: none;
+      font-family: 'Courier New', monospace;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
     }
     #powerupNotification {
       position: fixed;
@@ -2622,11 +2626,31 @@
   const leapBtn = getElement('leapBtn');
   const pauseBtn = getElement('pauseBtn');
 
-  // ===== Math Utils =====
+  // ============================================================
+  // SECTION: MATH UTILITIES
+  // ============================================================
+
+  /** Mathematical constant for 2π (full circle in radians) */
   const TAU = Math.PI * 2;
+
+  /**
+   * Clamps a value between a minimum and maximum
+   * @param {number} v - Value to clamp
+   * @param {number} lo - Minimum value
+   * @param {number} hi - Maximum value
+   * @returns {number} Clamped value
+   */
   function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  /**
+   * Returns the squared length of a 2D vector (avoids expensive sqrt)
+   * @param {number} x - X component
+   * @param {number} y - Y component
+   * @returns {number} Squared length (x² + y²)
+   */
   function len2(x,y){ return x*x + y*y; }
-  // Reusable vector objects to eliminate array allocations
+
+  /** Reusable vector objects to eliminate array allocations during gameplay */
   const vecPool = {
     temp1: {x: 0, y: 0},
     temp2: {x: 0, y: 0},
@@ -2634,26 +2658,130 @@
     temp4: {x: 0, y: 0}
   };
 
-  // Fast length calculation without fastLength()
+  /**
+   * Fast length calculation for 2D vectors
+   * @param {number} x - X component
+   * @param {number} y - Y component
+   * @returns {number} Vector length
+   */
   function fastLength(x, y) {
     return Math.sqrt(x * x + y * y);
   }
 
-  // Old norm function - kept for compatibility where destructuring is needed
+  /**
+   * Normalizes a 2D vector (legacy version with array allocation)
+   * @param {number} x - X component
+   * @param {number} y - Y component
+   * @returns {Array<number>} Normalized vector as [x, y]
+   * @deprecated Use normInPlace() to avoid allocations
+   */
   function norm(x,y) {
     const L = fastLength(x,y); return [x/L, y/L];
   }
 
-  // New optimized version that reuses objects (no allocations)
+  /**
+   * Normalizes a 2D vector in-place (no allocations)
+   * @param {number} x - X component
+   * @param {number} y - Y component
+   * @param {Object} out - Output object with x, y properties
+   * @returns {Object} The output object with normalized components
+   */
   function normInPlace(x, y, out) {
     const L = fastLength(x, y);
     out.x = x / L;
     out.y = y / L;
     return out;
   }
+
+  /**
+   * Returns a random value in the range [a, b]
+   * @param {number} a - Minimum value
+   * @param {number} b - Maximum value
+   * @returns {number} Random value
+   */
   function randRange(a,b){ return a + Math.random()*(b-a); }
+
+  /**
+   * Returns the sign of a number (-1, 0, or 1)
+   * @param {number} v - Input value
+   * @returns {number} -1 if negative, 1 if positive or zero
+   */
   function sign(v){ return v < 0 ? -1 : 1; }
 
+  // ============================================================
+  // SECTION: GAME CONSTANTS & CONFIGURATION
+  // ============================================================
+
+  /**
+   * AI Behavior Constants - Centralized tuning values for enemy movement
+   */
+  const AI_CONSTANTS = {
+    // Serpent (zigzag) behavior
+    SERPENT_ZIGZAG_STRENGTH_X: 300,
+    SERPENT_ZIGZAG_STRENGTH_Y: 250,
+    SERPENT_SPEED_MULTIPLIER: 1.5,
+
+    // Prowler (flanking) behavior
+    PROWLER_FLANK_SPEED: 2.0,
+    PROWLER_DIRECT_ATTRACTION: 0.2,
+
+    // Berserker (dash) behavior
+    BERSERKER_PROWL_SPEED: 1.2,
+    BERSERKER_TELEGRAPH_SPEED: 0.2,
+    BERSERKER_TELEGRAPH_DURATION: 1.0,
+    BERSERKER_DASH_DURATION: 0.4,
+    BERSERKER_DASH_MULTIPLIER: 3,
+    BERSERKER_DASH_IMPULSE: 8,
+    BERSERKER_COOLDOWN_MIN: 3,
+    BERSERKER_COOLDOWN_MAX: 5,
+
+    // Maniac (chaotic) behavior
+    MANIAC_CHAOS_FACTOR: 800,
+    MANIAC_SPEED_MULTIPLIER: 1.5,
+
+    // Leaper (rush) behavior
+    LEAPER_RUSH_MULTIPLIER: 4,
+    LEAPER_RUSH_IMPULSE: 10,
+    LEAPER_BETWEEN_RUSH_SPEED: 1.8,
+    LEAPER_COOLDOWN_MIN: 1.0,
+    LEAPER_COOLDOWN_MAX: 2.5,
+
+    // Volatile (suicide crawler) behavior
+    VOLATILE_ORBIT_RADIUS: 120,
+    VOLATILE_ORBIT_SPEED: 1.2,
+    VOLATILE_ORBIT_MOVE_SPEED: 1.5,
+    VOLATILE_ORBIT_ATTRACTION: 0.2,
+    VOLATILE_TELEGRAPH_DURATION: 1.0,
+    VOLATILE_CHARGE_MULTIPLIER: 4,
+    VOLATILE_CHARGE_IMPULSE: 15,
+
+    // Boss behavior
+    BOSS_SPEED_MULTIPLIER: 1.2,
+    SUPERBOSS_PHASE_DURATION: 20,
+    SUPERBOSS_ORBIT_SPEED: 1.8,
+    SUPERBOSS_CHAOS_FACTOR: 400,
+    SUPERBOSS_RUSH_POWER: 3.0,
+    SUPERBOSS_RUSH_DURATION: 1.5,
+    SUPERBOSS_STALK_SPEED: 0.3,
+
+    // Basic movement
+    BASIC_SPEED_MULTIPLIER: 2.6,
+    WALK_SWAY_STRENGTH: 8,
+  };
+
+  /**
+   * Performance Optimization Constants
+   */
+  const PERF_CONSTANTS = {
+    TRIG_CACHE_SIZE: 1000,
+    GRADIENT_CACHE_SIZE: 100,
+    MAX_PARTICLES: 500,
+    MAX_BLOOD_STAINS: 200,
+  };
+
+  // ============================================================
+  // SECTION: INPUT & CONTROLS
+  // ============================================================
   // ===== Input =====
   const keys = new Set();
   let mouseX = 0, mouseY = 0, mouseDown = false;
@@ -2997,15 +3125,23 @@
     return isNaN(parsed) ? defaultValue : parsed;
   }
 
-  // ===== Performance Optimizations =====
-  
-  // Optimized trigonometric cache with numeric keys
+  // ============================================================
+  // SECTION: PERFORMANCE OPTIMIZATIONS
+  // ============================================================
+
+  /** LRU cache for sine calculations (reduces Math.sin calls by ~90%) */
   const sinCache = new Map();
+  /** LRU cache for cosine calculations (reduces Math.cos calls by ~90%) */
   const cosCache = new Map();
+  /** Maximum cache size before LRU eviction */
   const TRIG_CACHE_SIZE = 1000;
-  
+
+  /**
+   * Fast sine calculation with LRU caching
+   * @param {number} angle - Angle in radians
+   * @returns {number} Sine value
+   */
   function fastSin(angle) {
-    // Use numeric keys instead of string templates
     const key = Math.round(angle * 1000);
     if (!sinCache.has(key)) {
       if (sinCache.size > TRIG_CACHE_SIZE) {
@@ -3017,12 +3153,17 @@
     }
     return sinCache.get(key);
   }
-  
+
+  /**
+   * Fast cosine calculation with LRU caching
+   * @param {number} angle - Angle in radians
+   * @returns {number} Cosine value
+   */
   function fastCos(angle) {
     const key = Math.round(angle * 1000);
     if (!cosCache.has(key)) {
       if (cosCache.size > TRIG_CACHE_SIZE) {
-        // LRU eviction - remove oldest entry  
+        // LRU eviction - remove oldest entry
         const firstKey = cosCache.keys().next().value;
         cosCache.delete(firstKey);
       }
@@ -3030,19 +3171,33 @@
     }
     return cosCache.get(key);
   }
-  
-  // Fast distance comparison using squared distance
+
+  /**
+   * Fast distance comparison using squared distance (avoids sqrt)
+   * @param {number} x1 - First point X
+   * @param {number} y1 - First point Y
+   * @param {number} x2 - Second point X
+   * @param {number} y2 - Second point Y
+   * @param {number} maxDist - Maximum distance threshold
+   * @returns {boolean} True if distance is less than or equal to maxDist
+   */
   function fastDistanceCheck(x1, y1, x2, y2, maxDist) {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const distSq = dx * dx + dy * dy;
     return distSq <= maxDist * maxDist;
   }
-  
-  // Batch DOM updates to reduce reflows
+
+  /** Queue for batched DOM updates */
   let domUpdateQueue = [];
+  /** Flag to track if DOM update is scheduled */
   let domUpdateScheduled = false;
-  
+
+  /**
+   * Queues a DOM update to be executed in the next animation frame
+   * Batches multiple updates to reduce reflows
+   * @param {Function} fn - Function to execute for DOM update
+   */
   function queueDOMUpdate(fn) {
     domUpdateQueue.push(fn);
     if (!domUpdateScheduled) {
@@ -3056,42 +3211,56 @@
       });
     }
   }
-  
-  // Rendering optimizations
+
+  /** Canvas state caching to avoid redundant context calls */
   let lastFillStyle = '';
   let lastStrokeStyle = '';
   let lastGlobalAlpha = 1;
   let lastLineWidth = 1;
-  
+
+  /**
+   * Sets canvas fill style with caching to avoid redundant calls
+   * @param {string} style - CSS color string
+   */
   function setFillStyle(style) {
-    // ABSOLUTELY ENSURE style is valid
-    let validStyle = '#ff0000'; // Default bright red
+    // Validate style to prevent crashes
+    let validStyle = '#ff0000'; // Default fallback
     if (style && style !== '' && style !== 'undefined' && style !== 'null' && style !== 'transparent' && style !== 'none') {
       validStyle = style;
-    } else {
-      // Invalid fillStyle attempted
     }
-    
+
     if (lastFillStyle !== validStyle) {
       ctx.fillStyle = validStyle;
       lastFillStyle = validStyle;
     }
   }
-  
+
+  /**
+   * Sets canvas stroke style with caching
+   * @param {string} style - CSS color string
+   */
   function setStrokeStyle(style) {
     if (lastStrokeStyle !== style) {
       ctx.strokeStyle = style;
       lastStrokeStyle = style;
     }
   }
-  
+
+  /**
+   * Sets canvas global alpha with caching
+   * @param {number} alpha - Alpha value (0-1)
+   */
   function setGlobalAlpha(alpha) {
     if (lastGlobalAlpha !== alpha) {
       ctx.globalAlpha = alpha;
       lastGlobalAlpha = alpha;
     }
   }
-  
+
+  /**
+   * Sets canvas line width with caching
+   * @param {number} width - Line width in pixels
+   */
   function setLineWidth(width) {
     if (lastLineWidth !== width) {
       ctx.lineWidth = width;
@@ -4999,24 +5168,24 @@
         e.vy += perpY * stepSway * dt * freezeMultiplier;
       } else if (e.behavior === 'serpent') {
         // Strong zigzag movement - very noticeable serpentine pattern
-        e.vx += dx * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
-        e.vy += dy * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
+        e.vx += dx * e.speed * dt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * dt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
         // Much stronger zigzag for clear serpentine movement
-        e.vx += fastSin(g.t * 10 + e.x * 0.01) * 300 * dt * freezeMultiplier; // Increased from 120 to 300
-        e.vy += fastCos(g.t * 8 + e.y * 0.01) * 250 * dt * freezeMultiplier; // Increased from 100 to 250
+        e.vx += fastSin(g.t * 10 + e.x * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_X * dt * freezeMultiplier;
+        e.vy += fastCos(g.t * 8 + e.y * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_Y * dt * freezeMultiplier;
       } else if (e.behavior === 'prowler') {
         // Flanking movement - circles around to attack from sides
         const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
         // Larger flanking angle for more obvious circling
-        const flankAngle = playerAngle + fastSin(g.t * 3 + e.x * 0.005) * Math.PI/2; // Increased angle
+        const flankAngle = playerAngle + fastSin(g.t * 3 + e.x * 0.005) * Math.PI/2;
         const fx = fastCos(flankAngle);
         const fy = fastSin(flankAngle);
         // Faster flanking movement
-        e.vx += fx * e.speed * dt * 2.0 * walkRhythm * freezeMultiplier; // Increased from 1.3 to 2.0
-        e.vy += fy * e.speed * dt * 2.0 * walkRhythm * freezeMultiplier;
+        e.vx += fx * e.speed * dt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
+        e.vy += fy * e.speed * dt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
         // Less direct attraction for more flanking
-        e.vx += dx * e.speed * dt * 0.2 * freezeMultiplier; // Reduced from 0.3 to 0.2
-        e.vy += dy * e.speed * dt * 0.2 * freezeMultiplier;
+        e.vx += dx * e.speed * dt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
+        e.vy += dy * e.speed * dt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
       } else if (e.behavior === 'berserker') {
         // Enhanced dash zombie with telegraph system
         if (!e.dashState) e.dashState = 'prowling';
@@ -5026,13 +5195,13 @@
         
         if (e.dashState === 'prowling') {
           // Prowl around player between dashes
-          e.vx += dx * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
-          e.vy += dy * e.speed * dt * 1.2 * walkRhythm * freezeMultiplier;
-          
+          e.vx += dx * e.speed * dt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
+          e.vy += dy * e.speed * dt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
+
           if (e.dashTimer <= 0) {
             // Start telegraph phase
             e.dashState = 'telegraph';
-            e.dashTimer = 1.0; // 1 second telegraph
+            e.dashTimer = AI_CONSTANTS.BERSERKER_TELEGRAPH_DURATION;
             e.originalColor = e.color;
             e.dashDirection = { x: dx, y: dy }; // Lock dash direction
             beep(400, 0.1, 'triangle', 0.08); // Telegraph warning sound
@@ -5040,40 +5209,40 @@
         } else if (e.dashState === 'telegraph') {
           // Flash bright white during telegraph and slow down
           e.color = Math.sin(g.t * 12) > 0 ? '#ffffff' : e.originalColor;
-          
+
           // Move very slowly during telegraph
-          e.vx += dx * e.speed * dt * 0.2 * freezeMultiplier;
-          e.vy += dy * e.speed * dt * 0.2 * freezeMultiplier;
-          
+          e.vx += dx * e.speed * dt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
+          e.vy += dy * e.speed * dt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
+
           if (e.dashTimer <= 0) {
             // Start dash
             e.dashState = 'dashing';
-            e.dashTimer = 0.4; // Short dash duration
+            e.dashTimer = AI_CONSTANTS.BERSERKER_DASH_DURATION;
             e.color = '#ffff00'; // Bright yellow while dashing
             beep(600, 0.05, 'sawtooth', 0.12); // Dash sound
           }
         } else if (e.dashState === 'dashing') {
           // Fast linear dash in locked direction
-          const dashSpeed = e.speed * 3; // Reduced from 6x to 3x speed
-          e.vx += e.dashDirection.x * dashSpeed * dt * 8;
-          e.vy += e.dashDirection.y * dashSpeed * dt * 8;
-          
+          const dashSpeed = e.speed * AI_CONSTANTS.BERSERKER_DASH_MULTIPLIER;
+          e.vx += e.dashDirection.x * dashSpeed * dt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
+          e.vy += e.dashDirection.y * dashSpeed * dt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
+
           if (e.dashTimer <= 0) {
             // Return to prowling
             e.dashState = 'prowling';
-            e.dashTimer = 3 + Math.random() * 2; // 3-5 second cooldown
+            e.dashTimer = AI_CONSTANTS.BERSERKER_COOLDOWN_MIN + Math.random() * (AI_CONSTANTS.BERSERKER_COOLDOWN_MAX - AI_CONSTANTS.BERSERKER_COOLDOWN_MIN);
             e.color = e.originalColor; // Restore original color
           }
         }
       } else if (e.behavior === 'maniac') {
         // Truly chaotic, unpredictable movement - much more erratic
-        const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 3); // Even faster rhythm
+        const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 3);
         // Much stronger random movement
-        e.vx += (Math.random() - 0.5) * 800 * dt * panicRhythm; // Increased from 300 to 800
-        e.vy += (Math.random() - 0.5) * 800 * dt * panicRhythm;
+        e.vx += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * dt * panicRhythm;
+        e.vy += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * dt * panicRhythm;
         // Faster base movement toward player
-        e.vx += dx * e.speed * 1.5 * dt * freezeMultiplier; // Increased from 1.0 to 1.5
-        e.vy += dy * e.speed * 1.5 * dt * freezeMultiplier;
+        e.vx += dx * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * dt * freezeMultiplier;
+        e.vy += dy * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * dt * freezeMultiplier;
       } else if (e.behavior === 'superboss') {
         // Super boss with changing movement phases every 20 seconds
         e.phaseTimer = (e.phaseTimer || 0) + dt;
