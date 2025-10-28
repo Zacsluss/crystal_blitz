@@ -271,28 +271,76 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 <table>
 <tr>
-<td width="50%" align="center">
+<td width="50%">
 
 #### Desktop (1920×1080)
-| Metric | Value |
-|:--------:|:-------:|
-| **Frame Rate** | 60 FPS (locked) |
-| **Max Entities** | 200+ simultaneous |
-| **File Size** | 347KB |
-| **Load Time** | <500ms |
-| **Memory Usage** | ~80MB stable |
+
+<table>
+<thead>
+<tr>
+<th align="center">Metric</th>
+<th align="center">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><b>Frame Rate</b></td>
+<td align="center">60 FPS (locked)</td>
+</tr>
+<tr>
+<td align="center"><b>Max Entities</b></td>
+<td align="center">200+ simultaneous</td>
+</tr>
+<tr>
+<td align="center"><b>File Size</b></td>
+<td align="center">347KB</td>
+</tr>
+<tr>
+<td align="center"><b>Load Time</b></td>
+<td align="center">&lt;500ms</td>
+</tr>
+<tr>
+<td align="center"><b>Memory Usage</b></td>
+<td align="center">~80MB stable</td>
+</tr>
+</tbody>
+</table>
 
 </td>
-<td width="50%" align="center">
+<td width="50%">
 
 #### Mobile (iPhone 12)
-| Metric | Value |
-|:--------:|:-------:|
-| **Frame Rate** | 60 FPS (locked) |
-| **Max Entities** | 150+ simultaneous |
-| **File Size** | 347KB |
-| **Load Time** | <600ms |
-| **Touch Latency** | <16ms |
+
+<table>
+<thead>
+<tr>
+<th align="center">Metric</th>
+<th align="center">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><b>Frame Rate</b></td>
+<td align="center">60 FPS (locked)</td>
+</tr>
+<tr>
+<td align="center"><b>Max Entities</b></td>
+<td align="center">150+ simultaneous</td>
+</tr>
+<tr>
+<td align="center"><b>File Size</b></td>
+<td align="center">347KB</td>
+</tr>
+<tr>
+<td align="center"><b>Load Time</b></td>
+<td align="center">&lt;600ms</td>
+</tr>
+<tr>
+<td align="center"><b>Touch Latency</b></td>
+<td align="center">&lt;16ms</td>
+</tr>
+</tbody>
+</table>
 
 </td>
 </tr>
