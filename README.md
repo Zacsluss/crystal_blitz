@@ -271,7 +271,7 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" align="center">
 
 #### Desktop (1920×1080)
 | Metric | Value |
@@ -283,7 +283,7 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 | **Memory Usage** | ~80MB stable |
 
 </td>
-<td width="50%">
+<td width="50%" align="center">
 
 #### Mobile (iPhone 12)
 | Metric | Value |
