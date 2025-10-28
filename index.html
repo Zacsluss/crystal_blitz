@@ -7089,7 +7089,7 @@
           pulseIntensity = 0.2;
         }
         
-        const pulse = Math.sin(game.t * pulseSpeed) * pulseIntensity + (1 - pulseIntensity);
+        const pulse = Math.max(0, Math.sin(game.t * pulseSpeed) * pulseIntensity + (1 - pulseIntensity));
         const coreSize = size * 0.3 * pulse;
         
         ctx.save();
