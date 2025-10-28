@@ -9256,11 +9256,18 @@
       });
 
       // Main Menu button returns to initial state
-      document.getElementById('mainMenuBtn').addEventListener('click', () => {
-        // Close pause menu with animation
-        banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
+      document.getElementById('mainMenuBtn').addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-        // Reset game state immediately
+        // Stop all animations immediately
+        crystalAnimationsRunning = false;
+        enemyPreviewAnimations.forEach(anim => {
+          if (anim && anim.id) cancelAnimationFrame(anim.id);
+        });
+        enemyPreviewAnimations = [];
+
+        // Reset game state immediately to stop game loop updates
         game = null;
 
         // Hide HUD immediately
@@ -9270,9 +9277,11 @@
           hud.style.visibility = 'hidden';
         }
 
-        // After animation completes, show main menu
+        // Clear banner content to stop all animations/references
+        banner.innerHTML = '';
+
+        // After a brief delay, show main menu
         setTimeout(() => {
-          // Show initial banner
           banner.style.display = 'block';
           banner.style.animation = 'none';
           banner.innerHTML = `
@@ -9290,7 +9299,7 @@
             initAudio();
             start();
           });
-        }, 300);
+        }, 350);
       });
     } else {
       banner.style.animation = 'pauseSlideOut 0.3s ease-out forwards';
