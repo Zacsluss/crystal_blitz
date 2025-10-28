@@ -480,8 +480,6 @@ I'm into WebGL, particle systems, shader programming, AI/ML, digital art, and 36
 
 <br/>
 
-<br/>
-
 **Found this helpful?** Give it a ⭐ to show support!
 
 </div>
