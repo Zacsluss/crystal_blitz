@@ -9270,6 +9270,10 @@
         // Reset game state immediately to stop game loop updates
         game = null;
 
+        // Clear the canvas to prevent frozen game frame from showing
+        ctx.fillStyle = '#0d1015';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
         // Hide HUD immediately
         const hud = document.getElementById('hud');
         if (hud) {
