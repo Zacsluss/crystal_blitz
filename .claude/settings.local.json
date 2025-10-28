@@ -2,7 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(dir:*)",
-      "Bash(copy crystal_blitz.html crystal_blitz_glassmorphism_attempt.html)",
+      "Bash(copy index.html index_backup.html)",
       "Bash(git restore:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
