@@ -4389,8 +4389,8 @@
       // Crystal drop logic - bosses get special treatment
       const p = game.player;
       if (enemy.behavior === 'boss' || enemy.behavior === 'superboss') {
-        // Bosses: 15% chance to drop homing crystal
-        if (Math.random() < 0.15) {
+        // Bosses: 20% chance to drop homing crystal
+        if (Math.random() < 0.20) {
           spawnBossPickup(enemy.x, enemy.y);
         }
       } else {
@@ -4399,8 +4399,8 @@
           // 1% chance for minelayers and grenadiers to drop Remote Detonator
           spawnDetonatorPickup(enemy.x, enemy.y);
         } else {
-          // Regular enemies: 3% chance to drop any crystal (+20% per lucky upgrade)
-          const baseRate = 0.03;
+          // Regular enemies: 4% chance to drop any crystal (+20% per lucky upgrade)
+          const baseRate = 0.04;
           const luckyMultiplier = 1 + (p.luckyBonus || 0);
           const dropRate = baseRate * luckyMultiplier;
           const roll = Math.random();
@@ -4663,9 +4663,9 @@
       // Variable bounce heights
       const bounceVariation = 0.7 + Math.random() * 0.6; // 0.7x to 1.3x
       p.vy = -(Math.random() * 150 + 50) * bounceVariation;
-      // Weighted crystal selection - homing is 0.5% chance
+      // Weighted crystal selection - homing is 0.1% chance
       let selectedPowerup;
-      if (Math.random() < 0.005) { // 0.5% chance for homing
+      if (Math.random() < 0.001) { // 0.1% chance for homing
         selectedPowerup = bulletPowerupMap.get('homing');
       } else {
         // Choose from pre-computed non-homing crystals (avoid O(n) filter)
