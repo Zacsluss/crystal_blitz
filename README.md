@@ -278,30 +278,30 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 <table>
 <thead>
 <tr>
-<th align="center">Metric</th>
-<th align="center">Value</th>
+<th style="text-align: center;">Metric</th>
+<th style="text-align: center;">Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><b>Frame Rate</b></td>
-<td align="center">60 FPS (locked)</td>
+<td style="text-align: center;"><b>Frame Rate</b></td>
+<td style="text-align: center;">60 FPS (locked)</td>
 </tr>
 <tr>
-<td align="center"><b>Max Entities</b></td>
-<td align="center">200+ simultaneous</td>
+<td style="text-align: center;"><b>Max Entities</b></td>
+<td style="text-align: center;">200+ simultaneous</td>
 </tr>
 <tr>
-<td align="center"><b>File Size</b></td>
-<td align="center">347KB</td>
+<td style="text-align: center;"><b>File Size</b></td>
+<td style="text-align: center;">347KB</td>
 </tr>
 <tr>
-<td align="center"><b>Load Time</b></td>
-<td align="center">&lt;500ms</td>
+<td style="text-align: center;"><b>Load Time</b></td>
+<td style="text-align: center;">&lt;500ms</td>
 </tr>
 <tr>
-<td align="center"><b>Memory Usage</b></td>
-<td align="center">~80MB stable</td>
+<td style="text-align: center;"><b>Memory Usage</b></td>
+<td style="text-align: center;">~80MB stable</td>
 </tr>
 </tbody>
 </table>
@@ -314,30 +314,30 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 <table>
 <thead>
 <tr>
-<th align="center">Metric</th>
-<th align="center">Value</th>
+<th style="text-align: center;">Metric</th>
+<th style="text-align: center;">Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><b>Frame Rate</b></td>
-<td align="center">60 FPS (locked)</td>
+<td style="text-align: center;"><b>Frame Rate</b></td>
+<td style="text-align: center;">60 FPS (locked)</td>
 </tr>
 <tr>
-<td align="center"><b>Max Entities</b></td>
-<td align="center">150+ simultaneous</td>
+<td style="text-align: center;"><b>Max Entities</b></td>
+<td style="text-align: center;">150+ simultaneous</td>
 </tr>
 <tr>
-<td align="center"><b>File Size</b></td>
-<td align="center">347KB</td>
+<td style="text-align: center;"><b>File Size</b></td>
+<td style="text-align: center;">347KB</td>
 </tr>
 <tr>
-<td align="center"><b>Load Time</b></td>
-<td align="center">&lt;600ms</td>
+<td style="text-align: center;"><b>Load Time</b></td>
+<td style="text-align: center;">&lt;600ms</td>
 </tr>
 <tr>
-<td align="center"><b>Touch Latency</b></td>
-<td align="center">&lt;16ms</td>
+<td style="text-align: center;"><b>Touch Latency</b></td>
+<td style="text-align: center;">&lt;16ms</td>
 </tr>
 </tbody>
 </table>
