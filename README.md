@@ -475,7 +475,7 @@ I'm into WebGL, particle systems, shader programming, AI/ML, digital art, and 36
   <img src="https://img.shields.io/badge/Email-zacharyjsluss@gmail.com-b91c1c?style=for-the-badge&logo=gmail&logoColor=white"/>
 </a>
 <a href="https://github.com/Zacsluss/crystal_blitz/raw/main/Zachary_Sluss_Resume.pdf">
-  <img src="https://img.shields.io/badge/Download-Resume-6b7280?style=for-the-badge&logo=adobeacrobatreader&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Download-Resume-7c3aed?style=for-the-badge&logo=adobeacrobatreader&logoColor=white"/>
 </a>
 
 <br/>
