@@ -275,7 +275,7 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 #### Desktop (1920×1080)
 | Metric | Value |
-|--------|-------|
+|:--------:|:-------:|
 | **Frame Rate** | 60 FPS (locked) |
 | **Max Entities** | 200+ simultaneous |
 | **File Size** | 347KB |
@@ -287,7 +287,7 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 #### Mobile (iPhone 12)
 | Metric | Value |
-|--------|-------|
+|:--------:|:-------:|
 | **Frame Rate** | 60 FPS (locked) |
 | **Max Entities** | 150+ simultaneous |
 | **File Size** | 347KB |
