@@ -4663,9 +4663,11 @@
       // Variable bounce heights
       const bounceVariation = 0.7 + Math.random() * 0.6; // 0.7x to 1.3x
       p.vy = -(Math.random() * 150 + 50) * bounceVariation;
-      // Weighted crystal selection - homing is 0.1% chance
+      // Weighted crystal selection - homing is 3x rarer than each regular crystal
+      // Weight: 7 regular crystals (weight=1 each) + 1 homing (weight=1/3)
+      // Homing probability = (1/3) / (7 + 1/3) = 1/22 ≈ 4.54%
       let selectedPowerup;
-      if (Math.random() < 0.001) { // 0.1% chance for homing
+      if (Math.random() < 1/22) { // 1/22 = ~4.54% chance for homing
         selectedPowerup = bulletPowerupMap.get('homing');
       } else {
         // Choose from pre-computed non-homing crystals (avoid O(n) filter)
