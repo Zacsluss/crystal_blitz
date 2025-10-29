@@ -2437,7 +2437,26 @@
   </div>
   <div id="gameOver">
     <h2>Game Over</h2>
-    <div>Wave <span id="goWave">1</span> • Kills <span id="goKills">0</span></div>
+    <div style="margin: 20px 0; font-size: 18px;">
+      <div style="margin: 8px 0;">Wave: <span id="goWave" style="color: #5af2c7; font-weight: bold;">1</span></div>
+      <div style="margin: 8px 0;">Kills: <span id="goKills" style="color: #5af2c7; font-weight: bold;">0</span></div>
+      <div style="margin: 8px 0;">Time: <span id="goTime" style="color: #5af2c7; font-weight: bold;">0:00</span></div>
+      <div style="margin: 8px 0;">Best Combo: <span id="goCombo" style="color: #FFD700; font-weight: bold;">0x</span></div>
+      <div style="margin: 8px 0;">Accuracy: <span id="goAccuracy" style="color: #5af2c7; font-weight: bold;">0%</span></div>
+    </div>
+    <div id="newRecordBanner" style="display:none; margin: 15px 0; padding: 12px; background: linear-gradient(90deg, rgba(255,215,0,0.2), rgba(90,242,199,0.2)); border-radius: 8px; border: 2px solid #FFD700;">
+      <div style="font-size: 20px; color: #FFD700; font-weight: bold;">🏆 NEW RECORDS! 🏆</div>
+      <div id="recordsList" style="margin-top: 8px; font-size: 14px; color: #e3e7ef;"></div>
+    </div>
+    <div style="margin: 20px 0; padding: 15px; background: rgba(18,22,29,0.6); border-radius: 8px; font-size: 14px;">
+      <div style="margin-bottom: 10px; color: #99a2b2; font-weight: bold;">CAREER STATS</div>
+      <div style="margin: 5px 0;">Best Wave: <span id="statsBestWave" style="color: #e3e7ef;">0</span></div>
+      <div style="margin: 5px 0;">Best Kills: <span id="statsBestKills" style="color: #e3e7ef;">0</span></div>
+      <div style="margin: 5px 0;">Best Combo: <span id="statsBestCombo" style="color: #e3e7ef;">0x</span></div>
+      <div style="margin: 5px 0;">Total Kills: <span id="statsTotalKills" style="color: #e3e7ef;">0</span></div>
+      <div style="margin: 5px 0;">Games Played: <span id="statsGamesPlayed" style="color: #e3e7ef;">0</span></div>
+      <div style="margin: 5px 0;">Total Playtime: <span id="statsTotalTime" style="color: #e3e7ef;">0h 0m</span></div>
+    </div>
     <button id="restartBtn">Restart</button>
   </div>
   <div id="fps">FPS: —</div>
@@ -2707,6 +2726,97 @@
    * @returns {number} -1 if negative, 1 if positive or zero
    */
   function sign(v){ return v < 0 ? -1 : 1; }
+
+  // ============================================================
+  // SECTION: SAVE SYSTEM & STATS TRACKING
+  // ============================================================
+
+  const SAVE_KEY = 'crystalBlitz_save_v1';
+
+  function getDefaultSave() {
+    return {
+      // High scores
+      highestWave: 0,
+      bestKills: 0,
+      longestSurvivalTime: 0,
+      bestCombo: 0,
+      bestAccuracy: 0,
+
+      // Career stats
+      totalKills: 0,
+      totalShots: 0,
+      totalHits: 0,
+      totalDeaths: 0,
+      gamesPlayed: 0,
+      totalPlayTime: 0,
+    };
+  }
+
+  function loadSaveData() {
+    try {
+      const data = localStorage.getItem(SAVE_KEY);
+      if (!data) return getDefaultSave();
+      return {...getDefaultSave(), ...JSON.parse(data)};
+    } catch (e) {
+      console.warn('Failed to load save data:', e);
+      return getDefaultSave();
+    }
+  }
+
+  function saveSaveData() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    } catch (e) {
+      console.warn('Failed to save game data:', e);
+    }
+  }
+
+  let saveData = loadSaveData();
+
+  function updateHighScores(game) {
+    let newRecords = [];
+
+    // Calculate accuracy
+    const accuracy = game.shotsFired > 0 ? (game.shotsHit / game.shotsFired) * 100 : 0;
+
+    // Check for new records
+    if (game.wave > saveData.highestWave) {
+      saveData.highestWave = game.wave;
+      newRecords.push('Highest Wave');
+    }
+
+    if (game.kills > saveData.bestKills) {
+      saveData.bestKills = game.kills;
+      newRecords.push('Most Kills');
+    }
+
+    if (game.t > saveData.longestSurvivalTime) {
+      saveData.longestSurvivalTime = game.t;
+      newRecords.push('Longest Survival');
+    }
+
+    if (game.highestCombo > saveData.bestCombo) {
+      saveData.bestCombo = game.highestCombo;
+      newRecords.push('Best Combo');
+    }
+
+    if (accuracy > saveData.bestAccuracy) {
+      saveData.bestAccuracy = accuracy;
+      newRecords.push('Best Accuracy');
+    }
+
+    // Update career stats
+    saveData.totalKills += game.kills;
+    saveData.totalShots += game.shotsFired || 0;
+    saveData.totalHits += game.shotsHit || 0;
+    saveData.totalDeaths += 1;
+    saveData.gamesPlayed += 1;
+    saveData.totalPlayTime += game.t;
+
+    saveSaveData();
+
+    return newRecords;
+  }
 
   // ============================================================
   // SECTION: GAME CONSTANTS & CONFIGURATION
@@ -3308,16 +3418,52 @@
   // Helper to avoid duplicate game over code
   function triggerGameOver(g) {
     g.state = STATE.OVER;
-    goWave.textContent = g.wave.toString();
-    goKills.textContent = g.kills.toString();
+
+    // Calculate session stats
+    const minutes = Math.floor(g.t / 60);
+    const seconds = Math.floor(g.t % 60);
+    const accuracy = g.shotsFired > 0 ? Math.round((g.shotsHit / g.shotsFired) * 100) : 0;
+
+    // Update high scores and get list of new records
+    const newRecords = updateHighScores(g);
+
+    // Update session stats display
+    document.getElementById('goWave').textContent = g.wave.toString();
+    document.getElementById('goKills').textContent = g.kills.toString();
+    document.getElementById('goTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('goCombo').textContent = g.highestCombo + 'x';
+    document.getElementById('goAccuracy').textContent = accuracy + '%';
+
+    // Show/hide new record banner
+    const recordBanner = document.getElementById('newRecordBanner');
+    const recordsList = document.getElementById('recordsList');
+    if (newRecords.length > 0) {
+      recordBanner.style.display = 'block';
+      recordsList.innerHTML = newRecords.map(r => `<div>• ${r}</div>`).join('');
+    } else {
+      recordBanner.style.display = 'none';
+    }
+
+    // Update career stats display
+    const totalMinutes = Math.floor(saveData.totalPlayTime / 60);
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    document.getElementById('statsBestWave').textContent = saveData.highestWave.toString();
+    document.getElementById('statsBestKills').textContent = saveData.bestKills.toString();
+    document.getElementById('statsBestCombo').textContent = saveData.bestCombo + 'x';
+    document.getElementById('statsTotalKills').textContent = saveData.totalKills.toString();
+    document.getElementById('statsGamesPlayed').textContent = saveData.gamesPlayed.toString();
+    document.getElementById('statsTotalTime').textContent = `${totalHours}h ${remainingMinutes}m`;
+
     gameOverPanel.style.display = 'block';
     gameOverPanel.classList.add('active');
     gameOverPanel.style.animation = 'gameOverDramaticEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, glassUnderglow 8s ease-in-out infinite';
-    
+
     // Hide HUD when game over
     const hud = document.getElementById('hud');
     hud.style.animation = 'hudFadeIn 0.3s ease-out reverse forwards';
-    
+
     // Hide mobile controls during game over
     if (isMobile && mobileControls) {
       mobileControls.style.display = 'none';
@@ -3737,6 +3883,12 @@
       fpsSum: 0, // Running sum for efficient FPS calculation
       invulTime: 0,
       damageFlash: 0, // Red vignette flash timer
+      // Stats tracking
+      shotsFired: 0,
+      shotsHit: 0,
+      currentCombo: 0,
+      highestCombo: 0,
+      comboTimer: 0,
     };
   }
 
@@ -4411,7 +4563,14 @@
       }
       
       game.kills++;
-      
+
+      // Combo system: increment combo on kill and reset timer
+      game.currentCombo++;
+      game.comboTimer = 3.0; // 3 second window to chain next kill
+      if (game.currentCombo > game.highestCombo) {
+        game.highestCombo = game.currentCombo;
+      }
+
       // Vampiric healing
       const player = game.player;
       if (player && player.vampiricHealing) {
@@ -4851,6 +5010,14 @@
     if (g.invulTime > 0) g.invulTime -= dt;
     if (g.damageFlash > 0) g.damageFlash -= dt;
 
+    // Combo timer decay
+    if (g.comboTimer > 0) {
+      g.comboTimer -= dt;
+      if (g.comboTimer <= 0) {
+        g.currentCombo = 0; // Reset combo when timer expires
+      }
+    }
+
     // Static powerup effects
     const p = g.player;
     if (p.healthRegenRate > 0) {
@@ -5085,6 +5252,9 @@
       
       p.heat = Math.min(p.maxHeat, p.heat + heatGenerated * p.heatEfficiencyMod);
       shootSound();
+
+      // Track shots fired for accuracy stat
+      g.shotsFired += actualBulletCount;
     }
 
     // Enemy spawning now handled by setTimeout in wave completion logic
@@ -5803,7 +5973,10 @@
           }
           
           b.hitEnemies.add(e); // Mark this enemy as hit by this bullet
-          
+
+          // Track successful hit for accuracy stat
+          g.shotsHit++;
+
           // Critical hit effects
           if (b.critical) {
             criticalHitSound();
