@@ -10,17 +10,22 @@
   <title>Crystal Blitz v0.99 — Arena Shooter</title>
   <style>
     :root {
-      --bg: #0b0d10;
-      --fg: #e3e7ef;
-      --muted: #99a2b2;
-      --accent: #5af2c7;
+      --bg: #0a0c0f;
+      --fg: #f0f3f7;
+      --muted: #9ba5b8;
+      --accent: #4ee9c4;
+      --accent-soft: #6ff2d1;
       --danger: #ff5b6e;
-      --warning: #ffd166;
-      --panel: #12161d;
-      --panel2: #0f1319;
-      --shadow: rgba(0,0,0,0.35);
-      --health-gradient: linear-gradient(90deg, #ff6b6b, #ffa5a5);
-      --stamina-gradient: linear-gradient(90deg, #ffd166, #ffeb99);
+      --warning: #ffc857;
+      --panel: #0e1218;
+      --panel2: #0b0f15;
+      --shadow: rgba(0,0,0,0.45);
+      --shadow-elevated: rgba(0,0,0,0.6);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-highlight: rgba(255, 255, 255, 0.05);
+      --health-gradient: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+      --stamina-gradient: linear-gradient(135deg, #ffc857 0%, #ffd97d 50%, #ffeb99 100%);
+      --glass-noise: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=');
     }
     html, body {
       margin: 0;
@@ -35,19 +40,25 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      background: linear-gradient(180deg, rgba(18, 22, 29, 0.7), rgba(15, 19, 25, 0.7));
-      padding: 20px 24px;
-      border-radius: 10px;
-      box-shadow: 0 6px 14px var(--shadow);
+      background: linear-gradient(135deg, rgba(14, 18, 24, 0.4), rgba(11, 15, 21, 0.3)), var(--glass-noise);
+      padding: 24px 28px;
+      border-radius: 18px;
+      box-shadow:
+        0 8px 32px var(--shadow-elevated),
+        inset 0 1px 0 var(--glass-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
       font-size: 28px;
       user-select: none;
       pointer-events: none;
       min-width: 440px;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       z-index: 200;
       opacity: 0;
       visibility: hidden;
       transition: none;
+      letter-spacing: -0.01em;
     }
     #hud .row {
       display: flex;
@@ -60,18 +71,23 @@
       --w: 320px;
       position: relative;
       width: var(--w);
-      height: 16px;
-      background: #1a1f29;
+      height: 18px;
+      background: linear-gradient(180deg, rgba(10, 14, 20, 0.8), rgba(15, 19, 25, 0.6));
       border-radius: 999px;
       overflow: hidden;
-      border: 1px solid #1f2430;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.6),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.02);
     }
     #hud .bar > i {
       display: block;
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), #34d1ff);
-      box-shadow: inset 0 0 6px rgba(0,0,0,0.25);
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0,0,0,0.2),
+        0 0 12px rgba(78, 233, 196, 0.3);
       transition: none;
       position: relative;
       border-radius: 999px;
@@ -258,16 +274,20 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      background: radial-gradient(1200px 700px at 40% 35%, rgba(90,242,199,0.04), transparent),
-                  linear-gradient(180deg, rgba(18, 22, 29, 0.45), rgba(15, 19, 25, 0.35));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 24px 28px;
-      border-radius: 14px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      background:
+        radial-gradient(1200px 700px at 40% 35%, rgba(78,233,196,0.06), transparent),
+        linear-gradient(135deg, rgba(14, 18, 24, 0.35), rgba(11, 15, 21, 0.25)),
+        var(--glass-noise);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      padding: 28px 36px;
+      border-radius: 24px;
+      box-shadow:
+        0 16px 64px var(--shadow-elevated),
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 var(--glass-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
       z-index: 1000;
       /* Match banner sizing for consistency */
       width: min(90vw, 750px);
@@ -289,31 +309,38 @@
       animation: titleSlideIn 0.6s ease-out 0.3s forwards;
     }
     #optionsPanel .tab-button {
-      background: rgba(90, 242, 199, 0.08);
-      border: 1px solid rgba(90, 242, 199, 0.2);
+      background: linear-gradient(135deg, rgba(78, 233, 196, 0.1), rgba(78, 233, 196, 0.05)), var(--glass-noise);
+      border: 1px solid rgba(78, 233, 196, 0.2);
       color: var(--muted);
-      padding: 10px 20px;
+      padding: 12px 24px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(8px);
+      letter-spacing: 0.01em;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-radius: 14px;
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
     }
     #optionsPanel .tab-button:hover {
       color: var(--fg);
-      background: rgba(90, 242, 199, 0.15);
-      border-color: rgba(90, 242, 199, 0.4);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(90, 242, 199, 0.25);
+      background: linear-gradient(135deg, rgba(78, 233, 196, 0.18), rgba(78, 233, 196, 0.12)), var(--glass-noise);
+      border-color: rgba(78, 233, 196, 0.35);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow:
+        0 8px 20px rgba(78, 233, 196, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     #optionsPanel .tab-button.active {
-      color: #002e24;
-      background: var(--accent);
+      color: #001a14;
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
       border-color: var(--accent);
-      box-shadow: 0 8px 24px rgba(90, 242, 199, 0.35),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      box-shadow:
+        0 8px 24px rgba(78, 233, 196, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     }
     #optionsPanel .tab-button.active:hover {
       filter: brightness(1.1);
@@ -547,16 +574,20 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      background: radial-gradient(1200px 700px at 40% 35%, rgba(90,242,199,0.04), transparent),
-                  linear-gradient(180deg, rgba(18, 22, 29, 0.45), rgba(15, 19, 25, 0.35));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(1200px 700px at 40% 35%, rgba(78,233,196,0.06), transparent),
+        linear-gradient(135deg, rgba(14, 18, 24, 0.35), rgba(11, 15, 21, 0.25)),
+        var(--glass-noise);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
       padding: 24px 28px;
-      border-radius: 14px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 24px;
+      box-shadow:
+        0 16px 64px var(--shadow-elevated),
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 var(--glass-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
       text-align: center;
       /* Responsive sizing - all menus same size */
       width: min(90vw, 750px);
@@ -585,50 +616,85 @@
       animation: subtitleSlideIn 0.5s ease-out 0.5s forwards;
     }
     #banner button {
-      background: var(--accent);
-      color: #002e24;
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #001a14;
       border: none;
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 12px 32px;
+      border-radius: 16px;
       font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      box-shadow: 0 8px 16px rgba(90,242,199,0.25);
+      box-shadow:
+        0 8px 24px rgba(78, 233, 196, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
       opacity: 0;
       transform: translateY(20px) scale(0.9);
       animation: buttonSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
     }
-    #banner button:hover { 
-      filter: brightness(1.05);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 12px 24px rgba(90,242,199,0.4);
+    #banner button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    #banner button:hover::before {
+      left: 100%;
+    }
+    #banner button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow:
+        0 12px 36px rgba(78, 233, 196, 0.4),
+        0 6px 18px rgba(78, 233, 196, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     }
     #banner button:active {
-      transform: translateY(0px) scale(0.98);
+      transform: translateY(-1px) scale(0.98);
     }
     #banner button + button {
       margin-top: 12px;
-      background: linear-gradient(135deg, rgba(90, 242, 199, 0.15), rgba(90, 242, 199, 0.08));
+      background: linear-gradient(135deg, rgba(78, 233, 196, 0.12), rgba(78, 233, 196, 0.06)), var(--glass-noise);
       color: var(--accent);
-      border: 1px solid rgba(90, 242, 199, 0.3);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(78, 233, 196, 0.25);
+      box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
     }
     #banner button + button:hover {
-      background: linear-gradient(135deg, rgba(90, 242, 199, 0.25), rgba(90, 242, 199, 0.15));
+      background: linear-gradient(135deg, rgba(78, 233, 196, 0.2), rgba(78, 233, 196, 0.12)), var(--glass-noise);
       border-color: var(--accent);
       filter: none;
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 24px rgba(90, 242, 199, 0.3);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow:
+        0 10px 28px rgba(78, 233, 196, 0.25),
+        0 6px 14px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
     .controls-panel {
       margin: 16px 0;
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(26, 31, 41, 0.9), rgba(18, 22, 29, 0.8));
-      border-radius: 10px;
-      border: 1px solid rgba(90, 242, 199, 0.2);
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(14, 18, 24, 0.5), rgba(11, 15, 21, 0.4)), var(--glass-noise);
+      border-radius: 16px;
+      border: 1px solid rgba(78, 233, 196, 0.15);
       font-size: 14px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
       opacity: 0;
       transform: translateY(30px);
       animation: controlsSlideIn 0.6s ease-out 0.9s forwards;
@@ -860,20 +926,25 @@
       top: 50%;
       transform: translate(-50%, -50%);
       display: none;
-      background: linear-gradient(180deg, rgba(18, 22, 29, 0.45), rgba(15, 19, 25, 0.35));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 30px 40px;
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      background:
+        radial-gradient(800px 500px at 50% 30%, rgba(78,233,196,0.04), transparent),
+        linear-gradient(135deg, rgba(14, 18, 24, 0.35), rgba(11, 15, 21, 0.25)),
+        var(--glass-noise);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      padding: 30px 36px;
+      border-radius: 24px;
+      box-shadow:
+        0 16px 64px var(--shadow-elevated),
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 var(--glass-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
       text-align: center;
       /* Expanded to fit enhanced stats with scrolling */
-      width: min(90vw, 520px);
+      width: min(90vw, 540px);
       max-height: 85vh;
-      line-height: 1.4;
+      line-height: 1.5;
       opacity: 0;
       overflow-y: auto;
       overflow-x: hidden;
@@ -892,24 +963,47 @@
       color: var(--fg);
     }
     #gameOver button {
-      margin-top: 20px;
-      background: var(--accent);
-      color: #002e24;
+      margin-top: 24px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #001a14;
       border: none;
-      padding: 16px 40px;
-      border-radius: 12px;
+      padding: 16px 48px;
+      border-radius: 18px;
       font-weight: 700;
       font-size: 20px;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(90, 242, 199, 0.3);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow:
+        0 8px 24px rgba(78, 233, 196, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    #gameOver button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    #gameOver button:hover::before {
+      left: 100%;
     }
     #gameOver button:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 6px 16px rgba(90,242,199,0.4);
+      filter: brightness(1.1);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow:
+        0 12px 36px rgba(78, 233, 196, 0.4),
+        0 6px 18px rgba(78, 233, 196, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
     #gameOver button:active {
-      transform: translateY(0px) scale(0.98);
+      transform: translateY(-1px) scale(0.98);
     }
     #fps {
       position: fixed;
@@ -1088,19 +1182,23 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: linear-gradient(180deg, rgba(18, 22, 29, 0.25), rgba(15, 19, 25, 0.25));
-      border: 3px solid rgba(90, 242, 199, 0.4);
-      padding: 24px 28px;
-      border-radius: 16px;
-      box-shadow: 
-        0 16px 48px rgba(0,0,0,0.3),
-        0 0 40px rgba(90,242,199,0.5),
+      background:
+        linear-gradient(135deg, rgba(14, 18, 24, 0.4), rgba(11, 15, 21, 0.3)),
+        var(--glass-noise);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 3px solid rgba(78, 233, 196, 0.4);
+      padding: 28px 36px;
+      border-radius: 20px;
+      box-shadow:
+        0 16px 48px rgba(0,0,0,0.4),
+        0 0 40px rgba(78,233,196,0.5),
         0 0 80px rgba(255,91,110,0.3),
         0 0 120px rgba(52,209,255,0.2),
-        0 0 160px rgba(255,209,102,0.15);
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
       display: none;
       z-index: 2000;
-      max-width: 600px;
+      max-width: 620px;
       text-align: center;
       opacity: 0;
       pointer-events: none;
@@ -9388,7 +9486,7 @@
       const mainMenuBtn = document.createElement('button');
       mainMenuBtn.id = 'mainMenuBtn';
       mainMenuBtn.textContent = 'Main Menu';
-      mainMenuBtn.style.cssText = 'margin-top: 8px; background: #ff5b6e; border-color: #ff5b6e;';
+      mainMenuBtn.style.cssText = 'margin-top: 12px; background: #ff5b6e; border-color: #ff5b6e;';
 
       // Add tab switching function
       window.switchTab = function(tabName, evt) {
