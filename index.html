@@ -249,9 +249,6 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       font-size: 12px;
     }
-    #crystalLegend {
-      display: none !important; /* Deprecated - now in pause menu */
-    }
     #optionsPanel::before {
       content: '';
       position: absolute;
@@ -521,11 +518,6 @@
       background: rgba(90, 242, 199, 0.05);
       border-color: rgba(90, 242, 199, 0.2);
       transform: translateX(4px);
-    }
-    #crystalLegend h3 {
-      margin: 0 0 8px 0;
-      color: var(--accent);
-      font-size: 16px;
     }
     .crystal-item {
       display: flex;
@@ -2597,65 +2589,7 @@
       </div>
     </div>
   </div>
-  <div id="crystalLegend">
-    <h3>Crystal Types</h3>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #00BFFF;"></div>
-      <div class="crystal-name">Dual Shot</div>
-      <div class="crystal-desc">Front & back bullets</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #32CD32;"></div>
-      <div class="crystal-name">Triple Shot</div>
-      <div class="crystal-desc">3-way spread</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #FF1493;"></div>
-      <div class="crystal-name">Quad Shot</div>
-      <div class="crystal-desc">4-way spread</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #FFD700;"></div>
-      <div class="crystal-name">Homing</div>
-      <div class="crystal-desc">Tracks enemies</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #FF4500;"></div>
-      <div class="crystal-name">Explosive</div>
-      <div class="crystal-desc">Area damage</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #FF69B4;"></div>
-      <div class="crystal-name">Ricochet</div>
-      <div class="crystal-desc">Bounces off walls</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #00BFFF;"></div>
-      <div class="crystal-name">Lightning</div>
-      <div class="crystal-desc">Chains to enemies</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #00CED1;"></div>
-      <div class="crystal-name">Freeze Shot</div>
-      <div class="crystal-desc">Slows enemies</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #8b4513;"></div>
-      <div class="crystal-name">Shotgun</div>
-      <div class="crystal-desc">Spreads on hit</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #ffa500;"></div>
-      <div class="crystal-name">Cluster</div>
-      <div class="crystal-desc">Splits into fragments</div>
-    </div>
-    <div class="crystal-item">
-      <div class="crystal-color" style="background-color: #dc143c;"></div>
-      <div class="crystal-name">Seeking</div>
-      <div class="crystal-desc">Curves to enemies</div>
-    </div>
-  </div>
-  
+
   <!-- Mobile Touch Zones -->
   <div id="touchZones">
     <div class="touch-zone left">
@@ -2735,7 +2669,6 @@
   const powerupNotification = getElement('powerupNotification');
   const waveAnnouncement = getElement('waveAnnouncement');
   const powerupDialog = getElement('powerupDialog');
-  const crystalLegend = getElement('crystalLegend');
   const optionsPanel = getElement('optionsPanel');
   const optionsBtn = getElement('optionsBtn');
 
@@ -7761,9 +7694,9 @@
         
         // Create gradient for dual shot
         const dualGradient = ctx.createRadialGradient(x, y, 0, x, y, crystalSize/2);
-        dualGradient.addColorStop(0, '#00BFFF');
-        dualGradient.addColorStop(0.7, '#00BFFFcc');
-        dualGradient.addColorStop(1, '#00BFFF66');
+        dualGradient.addColorStop(0, '#32CD32');
+        dualGradient.addColorStop(0.7, '#32CD32cc');
+        dualGradient.addColorStop(1, '#32CD3266');
         
         ctx.fillStyle = dualGradient;
         ctx.strokeStyle = '#ffffff88';
@@ -7815,10 +7748,10 @@
           const baseColor = powerup ? powerup.color : '#ffffff';
           
           if (pattern === 'triple') {
-            // Use swapped color for triple (green)
-            patternGradient.addColorStop(0, '#32CD32');
-            patternGradient.addColorStop(0.7, '#32CD32cc');
-            patternGradient.addColorStop(1, '#32CD3266');
+            // Use correct blue color for triple
+            patternGradient.addColorStop(0, '#00BFFF');
+            patternGradient.addColorStop(0.7, '#00BFFFcc');
+            patternGradient.addColorStop(1, '#00BFFF66');
           } else if (pattern === 'quad') {
             patternGradient.addColorStop(0, baseColor);
             patternGradient.addColorStop(0.7, baseColor + 'cc');
