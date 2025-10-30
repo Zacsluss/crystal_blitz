@@ -3892,31 +3892,31 @@
       setState(game, STATE.POWERUP);
     }
 
-    // Define starting loadout options (shuffle to keep it interesting)
-    const allLoadouts = [
-      {id: 'explosive', name: '💥 Explosive', desc: 'Area damage on impact (50 shots)', color: '#FF4500'},
-      {id: 'lightning', name: '⚡ Lightning', desc: 'Chain damage to nearby foes (50 shots)', color: '#00BFFF'},
-      {id: 'seeking', name: '🎯 Seeking', desc: 'Mild homing effect (50 shots)', color: '#DC143C'},
-      {id: 'ricochet', name: '🔄 Ricochet', desc: 'Bullets bounce off enemies (50 shots)', color: '#FF69B4'}
-    ];
+    // Use the SAME powerup system as level-ups (staticPowerups array)
+    const p = game.player;
+    const availablePowerups = staticPowerups.filter(powerup => {
+      // Exclude maxed upgrades
+      if (powerup.id === 'shield' && (p.damageReduction || 0) >= 0.9) return false;
+      if (powerup.id === 'knockbackImmune' && (p.knockbackResistance || 0) >= 1.0) return false;
+      if (powerup.id === 'criticalChance' && (p.criticalChance || 0) >= 0.5) return false;
+      if (powerup.id === 'efficient' && (p.ammoEfficiency || 0) >= 0.50) return false;
+      return true;
+    });
 
-    // Pick 2 random powerups + always include "Normal" as 3rd option
-    const shuffled = [...allLoadouts].sort(() => Math.random() - 0.5);
-    const loadoutOptions = [
-      shuffled[0],
-      shuffled[1],
-      {id: 'normal', name: '⚪ Normal Bullets', desc: 'No powerup (standard shots)', color: '#5af2c7'}
-    ];
+    // Select 3 unique random powerups (same as level-up system)
+    const selected = [];
+    const availableIndices = [...Array(availablePowerups.length).keys()];
 
-    // Populate dialog with loadout options
-    loadoutOptions.forEach((loadout, i) => {
-      if (powerupTitles[i]) {
-        powerupTitles[i].textContent = loadout.name;
-        powerupTitles[i].style.color = loadout.color;
-      }
-      if (powerupDescs[i]) {
-        powerupDescs[i].textContent = loadout.desc;
-      }
+    while (selected.length < 3 && availableIndices.length > 0) {
+      const randomIndex = Math.floor(Math.random() * availableIndices.length);
+      const powerupIndex = availableIndices.splice(randomIndex, 1)[0];
+      selected.push(availablePowerups[powerupIndex]);
+    }
+
+    // Populate dialog
+    selected.forEach((powerup, i) => {
+      powerupTitles[i].textContent = powerup?.name || 'None';
+      powerupDescs[i].textContent = powerup?.desc || 'No more powerups';
     });
 
     // Show dialog
@@ -3936,19 +3936,18 @@
 
     // Add click handlers
     const handleChoice = (choice) => {
-      const loadout = loadoutOptions[choice];
-      if (loadout) {
+      const powerup = selected[choice];
+      if (powerup) {
         // Add selection animation
         const selectedOption = powerupOptions[choice];
         selectedOption.classList.add('selected');
 
-        // Apply starting loadout
-        if (loadout.id !== 'normal' && game) {
-          game.startingPowerup = loadout.id;
-          const p = game.player;
-          p.bulletType = loadout.id;
-          p.bulletAmmo = 50; // Start with 50 shots
-        }
+        // Apply powerup (same as level-up)
+        powerup.apply(game.player);
+
+        // Track upgrade count
+        const currentCount = game.player.upgradeCounts.get(powerup.id) || 0;
+        game.player.upgradeCounts.set(powerup.id, currentCount + 1);
 
         // Delay dialog close to show selection animation
         setTimeout(() => {
@@ -3957,15 +3956,11 @@
           setTimeout(() => {
             powerupDialog.style.display = 'none';
             selectedOption.classList.remove('selected');
-            // Reset title colors
-            powerupTitles.forEach(title => title.style.color = '');
             if (game && game.state === STATE.POWERUP) {
               setState(game, STATE.RUN);
             }
-            // Show notification of selected loadout
-            if (loadout.id !== 'normal') {
-              showPowerupNotification(loadout.name);
-            }
+            // Show notification
+            showPowerupNotification(powerup.name);
           }, 300);
         }, 200);
       }
@@ -3973,9 +3968,7 @@
 
     // Set up click handlers
     powerupOptions.forEach((option, i) => {
-      if (i < loadoutOptions.length) {
-        option.onclick = () => handleChoice(i);
-      }
+      option.onclick = () => handleChoice(i);
     });
   }
 
@@ -4147,6 +4140,7 @@
       // Juice effects
       timeScale: 1.0, // Time dilation multiplier (1.0 = normal, 0.3 = slow-mo)
       timeScaleTarget: 1.0, // Target timeScale for smooth transitions
+      slowMoTimeout: null, // Timeout ID for slow-mo reset
       screenShake: 0, // Screen shake intensity
       screenShakeX: 0, // Screen shake offset X
       screenShakeY: 0, // Screen shake offset Y
@@ -4620,9 +4614,16 @@
       // Boss death slow-mo effect!
       if (enemy.behavior === 'boss' || enemy.behavior === 'superboss') {
         game.timeScaleTarget = 0.3; // Slow to 30% speed
+        // Clear any existing slow-mo timeout to prevent conflicts
+        if (game.slowMoTimeout) {
+          clearTimeout(game.slowMoTimeout);
+        }
         // Return to normal after 0.8 seconds
-        setTimeout(() => {
-          if (game) game.timeScaleTarget = 1.0;
+        game.slowMoTimeout = setTimeout(() => {
+          if (game) {
+            game.timeScaleTarget = 1.0;
+            game.slowMoTimeout = null;
+          }
         }, 800);
       }
 
@@ -4797,8 +4798,17 @@
       }
       
       // Create realistic blood spray stains (CRATER EFFECT!)
+      // Check cap BEFORE looping to avoid wasted iterations
+      let activeStains = 0;
+      for (const s of bloodStains.items) {
+        if (s.alive) activeStains++;
+      }
+
       const numStains = isBoss ? randRange(40, 60) : randRange(20, 30); // More stains for bosses
-      for (let i = 0; i < numStains; i++) {
+      const stainBudget = Math.max(0, MAX_BLOOD_STAINS - activeStains); // How many we can spawn
+      const actualStains = Math.min(numStains, stainBudget); // Don't exceed cap
+
+      for (let i = 0; i < actualStains; i++) {
         bloodStains.spawn(stain => {
           // Spray pattern - blood lands in burst around death point
           const angle = Math.random() * TAU;
