@@ -5564,17 +5564,20 @@
     const rightEdge = gameWidth - edgeThreshold;
     const bottomEdge = gameHeight - edgeThreshold;
     
+    // Apply time scale to enemies only (player unaffected for boss death advantage)
+    const enemyDt = dt * g.timeScale;
+
     for (const e of enemies.items){
       if (!e.alive) continue;
-      
+
       // Update spawn timer
       if (e.spawnTimer && e.spawnTimer > 0) {
-        e.spawnTimer -= dt;
+        e.spawnTimer -= enemyDt;
       }
-      
+
       // Handle death animation
       if (e.dying) {
-        e.deathTimer -= dt;
+        e.deathTimer -= enemyDt;
         // Death animation: white flash → red flash → fade
         const progress = 1 - (e.deathTimer / 0.2);
         if (progress < 0.3) {
@@ -5596,26 +5599,26 @@
       
       // Update critical hit flash timer
       if (e.critFlashTimer > 0) {
-        e.critFlashTimer -= dt;
+        e.critFlashTimer -= enemyDt;
       }
-      
+
       // Check edge proximity (using cached values)
       if (e.y < edgeThreshold) nearTop = true;
       if (e.y > bottomEdge) nearBottom = true;
       if (e.x < edgeThreshold) nearLeft = true;
       if (e.x > rightEdge) nearRight = true;
-      
+
       // Handle freeze effect
-      if (e.frozen > 0) e.frozen -= dt;
+      if (e.frozen > 0) e.frozen -= enemyDt;
       const freezeMultiplier = e.frozen > 0 ? 0.5 : 1.0; // 50% speed when frozen
-      
+
       // Apply behavior-specific movement (replaces old generic movement)
       const dirVec = normInPlace(p.x - e.x, p.y - e.y, vecPool.temp1);
       const dx = dirVec.x, dy = dirVec.y;
-      
+
       // Add human-like walking cadence to all enemies
       if (!e.cadence) e.cadence = Math.random() * TAU; // Random starting phase
-      e.cadence += dt * 4; // Walking rhythm frequency
+      e.cadence += enemyDt * 4; // Walking rhythm frequency
       const walkRhythm = 0.8 + 0.2 * fastSin(e.cadence); // 0.6 to 1.0 speed multiplier
       
       if (e.behavior === 'stalker') {
@@ -5625,17 +5628,17 @@
         const perpX = -dy; // Perpendicular to movement direction
         const perpY = dx;
         
-        e.vx += dx * e.speed * dt * 2.6 * gaitPattern * freezeMultiplier; // Increased 30% from 2.0 to 2.6
-        e.vy += dy * e.speed * dt * 2.6 * gaitPattern * freezeMultiplier;
-        e.vx += perpX * stepSway * dt * freezeMultiplier; // Add subtle sway
-        e.vy += perpY * stepSway * dt * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 2.6 * gaitPattern * freezeMultiplier; // Increased 30% from 2.0 to 2.6
+        e.vy += dy * e.speed * enemyDt * 2.6 * gaitPattern * freezeMultiplier;
+        e.vx += perpX * stepSway * enemyDt * freezeMultiplier; // Add subtle sway
+        e.vy += perpY * stepSway * enemyDt * freezeMultiplier;
       } else if (e.behavior === 'serpent') {
         // Strong zigzag movement - very noticeable serpentine pattern
-        e.vx += dx * e.speed * dt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
-        e.vy += dy * e.speed * dt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * enemyDt * AI_CONSTANTS.SERPENT_SPEED_MULTIPLIER * walkRhythm * freezeMultiplier;
         // Much stronger zigzag for clear serpentine movement
-        e.vx += fastSin(g.t * 10 + e.x * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_X * dt * freezeMultiplier;
-        e.vy += fastCos(g.t * 8 + e.y * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_Y * dt * freezeMultiplier;
+        e.vx += fastSin(g.t * 10 + e.x * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_X * enemyDt * freezeMultiplier;
+        e.vy += fastCos(g.t * 8 + e.y * 0.01) * AI_CONSTANTS.SERPENT_ZIGZAG_STRENGTH_Y * enemyDt * freezeMultiplier;
       } else if (e.behavior === 'prowler') {
         // Flanking movement - circles around to attack from sides
         const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
@@ -5644,22 +5647,22 @@
         const fx = fastCos(flankAngle);
         const fy = fastSin(flankAngle);
         // Faster flanking movement
-        e.vx += fx * e.speed * dt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
-        e.vy += fy * e.speed * dt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
+        e.vx += fx * e.speed * enemyDt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
+        e.vy += fy * e.speed * enemyDt * AI_CONSTANTS.PROWLER_FLANK_SPEED * walkRhythm * freezeMultiplier;
         // Less direct attraction for more flanking
-        e.vx += dx * e.speed * dt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
-        e.vy += dy * e.speed * dt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
+        e.vy += dy * e.speed * enemyDt * AI_CONSTANTS.PROWLER_DIRECT_ATTRACTION * freezeMultiplier;
       } else if (e.behavior === 'berserker') {
         // Enhanced dash zombie with telegraph system
         if (!e.dashState) e.dashState = 'prowling';
         if (!e.dashTimer) e.dashTimer = 2 + Math.random() * 3;
         
-        e.dashTimer -= dt;
+        e.dashTimer -= enemyDt;
         
         if (e.dashState === 'prowling') {
           // Prowl around player between dashes
-          e.vx += dx * e.speed * dt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
-          e.vy += dy * e.speed * dt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
+          e.vx += dx * e.speed * enemyDt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
+          e.vy += dy * e.speed * enemyDt * AI_CONSTANTS.BERSERKER_PROWL_SPEED * walkRhythm * freezeMultiplier;
 
           if (e.dashTimer <= 0) {
             // Start telegraph phase
@@ -5674,8 +5677,8 @@
           e.color = Math.sin(g.t * 12) > 0 ? '#ffffff' : e.originalColor;
 
           // Move very slowly during telegraph
-          e.vx += dx * e.speed * dt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
-          e.vy += dy * e.speed * dt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
+          e.vx += dx * e.speed * enemyDt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
+          e.vy += dy * e.speed * enemyDt * AI_CONSTANTS.BERSERKER_TELEGRAPH_SPEED * freezeMultiplier;
 
           if (e.dashTimer <= 0) {
             // Start dash
@@ -5687,8 +5690,8 @@
         } else if (e.dashState === 'dashing') {
           // Fast linear dash in locked direction
           const dashSpeed = e.speed * AI_CONSTANTS.BERSERKER_DASH_MULTIPLIER;
-          e.vx += e.dashDirection.x * dashSpeed * dt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
-          e.vy += e.dashDirection.y * dashSpeed * dt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
+          e.vx += e.dashDirection.x * dashSpeed * enemyDt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
+          e.vy += e.dashDirection.y * dashSpeed * enemyDt * AI_CONSTANTS.BERSERKER_DASH_IMPULSE;
 
           if (e.dashTimer <= 0) {
             // Return to prowling
@@ -5701,11 +5704,11 @@
         // Truly chaotic, unpredictable movement - much more erratic
         const panicRhythm = 0.5 + 0.5 * Math.sin(e.cadence * 3);
         // Much stronger random movement
-        e.vx += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * dt * panicRhythm;
-        e.vy += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * dt * panicRhythm;
+        e.vx += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * enemyDt * panicRhythm;
+        e.vy += (Math.random() - 0.5) * AI_CONSTANTS.MANIAC_CHAOS_FACTOR * enemyDt * panicRhythm;
         // Faster base movement toward player
-        e.vx += dx * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * dt * freezeMultiplier;
-        e.vy += dy * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * dt * freezeMultiplier;
+        e.vx += dx * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * enemyDt * freezeMultiplier;
+        e.vy += dy * e.speed * AI_CONSTANTS.MANIAC_SPEED_MULTIPLIER * enemyDt * freezeMultiplier;
       } else if (e.behavior === 'superboss') {
         // Super boss with changing movement phases every 20 seconds
         e.phaseTimer = (e.phaseTimer || 0) + dt;
@@ -5719,24 +5722,24 @@
         
         if (phase === 0) {
           // Phase 0: Relentless pursuit - direct aggressive chase
-          e.vx += dx * e.speed * dt * 2.0 * heavyStep;
-          e.vy += dy * e.speed * dt * 2.0 * heavyStep;
+          e.vx += dx * e.speed * enemyDt * 2.0 * heavyStep;
+          e.vy += dy * e.speed * enemyDt * 2.0 * heavyStep;
         } else if (phase === 1) {
           // Phase 1: Circling predator - orbits around player
           const orbitSpeed = 1.8;
           const perpDx = -dy; // Perpendicular to player direction  
           const perpDy = dx;
-          e.vx += (dx * 0.8 + perpDx * orbitSpeed) * e.speed * dt * heavyStep;
-          e.vy += (dy * 0.8 + perpDy * orbitSpeed) * e.speed * dt * heavyStep;
+          e.vx += (dx * 0.8 + perpDx * orbitSpeed) * e.speed * enemyDt * heavyStep;
+          e.vy += (dy * 0.8 + perpDy * orbitSpeed) * e.speed * enemyDt * heavyStep;
         } else if (phase === 2) {
           // Phase 2: Erratic berserker - unpredictable bursts
           const chaos = 0.7 + 0.6 * Math.sin(e.cadence * 4); // Chaotic rhythm
-          e.vx += ((Math.random() - 0.5) * 400 + dx * 150) * dt * chaos;
-          e.vy += ((Math.random() - 0.5) * 400 + dy * 150) * dt * chaos;
+          e.vx += ((Math.random() - 0.5) * 400 + dx * 150) * enemyDt * chaos;
+          e.vy += ((Math.random() - 0.5) * 400 + dy * 150) * enemyDt * chaos;
         } else {
           // Phase 3: Charging bull - periodic devastating rushes
           if (!e.rushPhase) e.rushPhase = { timer: 0, charging: false };
-          e.rushPhase.timer += dt;
+          e.rushPhase.timer += enemyDt;
           
           if (!e.rushPhase.charging && e.rushPhase.timer >= 2) {
             e.rushPhase.charging = true;
@@ -5748,8 +5751,8 @@
             if (e.rushPhase.timer < 1.5) {
               // Charging for 1.5 seconds
               const rushPower = 3.0 + Math.sin(e.rushPhase.timer * 8) * 0.5;
-              e.vx += e.rushDirection.x * e.speed * dt * rushPower;
-              e.vy += e.rushDirection.y * e.speed * dt * rushPower;
+              e.vx += e.rushDirection.x * e.speed * enemyDt * rushPower;
+              e.vy += e.rushDirection.y * e.speed * enemyDt * rushPower;
             } else {
               // Reset for next cycle
               e.rushPhase.charging = false;
@@ -5757,30 +5760,30 @@
             }
           } else {
             // Slow stalking between charges
-            e.vx += dx * e.speed * dt * 0.3 * heavyStep;
-            e.vy += dy * e.speed * dt * 0.3 * heavyStep;
+            e.vx += dx * e.speed * enemyDt * 0.3 * heavyStep;
+            e.vy += dy * e.speed * enemyDt * 0.3 * heavyStep;
           }
         }
       } else if (e.behavior === 'boss') {
         // Boss moves deliberately with heavy footsteps
         const heavyStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.5); // Still rhythmic but faster
-        e.vx += dx * e.speed * dt * 1.2 * heavyStep;
-        e.vy += dy * e.speed * dt * 1.2 * heavyStep;
+        e.vx += dx * e.speed * enemyDt * 1.2 * heavyStep;
+        e.vy += dy * e.speed * enemyDt * 1.2 * heavyStep;
       } else if (e.behavior === 'leaper') {
         // Zergling rush behavior - quick leap attacks like player emergency dash
         if (!e.rushTimer) e.rushTimer = Math.random() * 1.5 + 0.5; // Initial delay
-        e.rushTimer -= dt;
+        e.rushTimer -= enemyDt;
         
         if (e.rushTimer <= 0) {
           // Perform rush leap toward player
           const rushSpeed = e.speed * 4; // 4x speed burst (increased from 3x)
-          e.vx += dx * rushSpeed * dt * 10; // Stronger impulse
-          e.vy += dy * rushSpeed * dt * 10;
+          e.vx += dx * rushSpeed * enemyDt * 10; // Stronger impulse
+          e.vy += dy * rushSpeed * enemyDt * 10;
           e.rushTimer = 1.0 + Math.random() * 1.5; // 1.0-2.5 second cooldown (faster leaps)
         } else {
           // Fast movement between rushes (no longer slow!)
-          e.vx += dx * e.speed * dt * 1.8 * walkRhythm; // 1.8x speed (was 0.8x)
-          e.vy += dy * e.speed * dt * 1.8 * walkRhythm;
+          e.vx += dx * e.speed * enemyDt * 1.8 * walkRhythm; // 1.8x speed (was 0.8x)
+          e.vy += dy * e.speed * enemyDt * 1.8 * walkRhythm;
         }
       } else if (e.behavior === 'volatile') {
         // Suicide crawler - orbits player then charges periodically
@@ -5789,13 +5792,13 @@
         if (!e.orbitAngle) e.orbitAngle = Math.random() * TAU; // Random starting orbit position
         // baseColor is now set during enemy creation
         
-        e.chargeTimer -= dt;
+        e.chargeTimer -= enemyDt;
         
         if (e.chargeState === 'orbiting') {
           // Orbit around player at medium distance
           const orbitRadius = 120;
           const orbitSpeed = 1.2; // Orbit speed
-          e.orbitAngle += dt * orbitSpeed;
+          e.orbitAngle += enemyDt * orbitSpeed;
           
           const targetX = p.x + fastCos(e.orbitAngle) * orbitRadius;
           const targetY = p.y + fastSin(e.orbitAngle) * orbitRadius;
@@ -5805,10 +5808,10 @@
           const orbitVec = normInPlace(orbitDx, orbitDy, vecPool.temp3);
           
           // Move toward orbit position with some attraction to player
-          e.vx += orbitVec.x * e.speed * dt * 1.5;
-          e.vy += orbitVec.y * e.speed * dt * 1.5;
-          e.vx += dx * e.speed * dt * 0.2; // Slight player attraction
-          e.vy += dy * e.speed * dt * 0.2;
+          e.vx += orbitVec.x * e.speed * enemyDt * 1.5;
+          e.vy += orbitVec.y * e.speed * enemyDt * 1.5;
+          e.vx += dx * e.speed * enemyDt * 0.2; // Slight player attraction
+          e.vy += dy * e.speed * enemyDt * 0.2;
           
           e.color = e.baseColor || e.originalColor || '#8844ff'; // Use baseColor with fallbacks
           
@@ -5822,8 +5825,8 @@
           e.color = Math.sin(g.t * 15) > 0 ? '#ff0000' : (e.baseColor || e.originalColor || '#8844ff');
           
           // Slow down during telegraph
-          e.vx += dx * e.speed * dt * 0.2;
-          e.vy += dy * e.speed * dt * 0.2;
+          e.vx += dx * e.speed * enemyDt * 0.2;
+          e.vy += dy * e.speed * enemyDt * 0.2;
           
           if (e.chargeTimer <= 0) {
             // Start charging
@@ -5869,8 +5872,8 @@
       } else if (e.behavior === 'juggernaut') {
         // Slow push - deliberate tanky movement toward player
         const pushStep = 0.9 + 0.2 * Math.sin(e.cadence * 0.4); // Heavy, slow rhythm
-        e.vx += dx * e.speed * dt * 0.8 * pushStep * freezeMultiplier; // Slow but persistent
-        e.vy += dy * e.speed * dt * 0.8 * pushStep * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 0.8 * pushStep * freezeMultiplier; // Slow but persistent
+        e.vy += dy * e.speed * enemyDt * 0.8 * pushStep * freezeMultiplier;
         
         // Update shield direction at 90% of rotation speed for counterplay
         if (e.hasShield && e.shieldDirection) {
@@ -5878,8 +5881,8 @@
           const targetDir = { x: dx, y: dy };
           
           // Smoothly interpolate shield direction toward player direction
-          e.shieldDirection.x = e.shieldDirection.x * (1 - shieldRotationSpeed * dt) + targetDir.x * shieldRotationSpeed * dt;
-          e.shieldDirection.y = e.shieldDirection.y * (1 - shieldRotationSpeed * dt) + targetDir.y * shieldRotationSpeed * dt;
+          e.shieldDirection.x = e.shieldDirection.x * (1 - shieldRotationSpeed * enemyDt) + targetDir.x * shieldRotationSpeed * enemyDt;
+          e.shieldDirection.y = e.shieldDirection.y * (1 - shieldRotationSpeed * enemyDt) + targetDir.y * shieldRotationSpeed * enemyDt;
           
           // Normalize shield direction
           const len = fastLength(e.shieldDirection.x, e.shieldDirection.y);
@@ -5890,8 +5893,8 @@
         }
       } else if (e.behavior === 'vortex') {
         // Spiral shooter - slow movement, rotates aim and shoots in patterns
-        e.vx += dx * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier; // Slow movement
-        e.vy += dy * e.speed * dt * 0.6 * walkRhythm * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 0.6 * walkRhythm * freezeMultiplier; // Slow movement
+        e.vy += dy * e.speed * enemyDt * 0.6 * walkRhythm * freezeMultiplier;
         
         // Initialize spiral shooting properties
         if (!e.spiralAngle) e.spiralAngle = 0;
@@ -5899,10 +5902,10 @@
         
         // Rotate spiral angle continuously
         const rotationSpeed = 3.0; // radians per second
-        e.spiralAngle += rotationSpeed * dt;
+        e.spiralAngle += rotationSpeed * enemyDt;
         
         // Shoot periodically in spiral pattern
-        e.spiralShootTimer -= dt;
+        e.spiralShootTimer -= enemyDt;
         if (e.spiralShootTimer <= 0) {
           spawnEnemyBullet(e.x, e.y, 
             e.x + fastCos(e.spiralAngle) * 100, 
@@ -5913,15 +5916,15 @@
       } else if (e.behavior === 'divider') {
         // Splitter zombie - normal movement with slight erratic behavior
         const splitStep = 0.8 + 0.3 * Math.sin(e.cadence * 1.5); // Slightly erratic rhythm
-        e.vx += dx * e.speed * dt * 1.0 * splitStep * freezeMultiplier;
-        e.vy += dy * e.speed * dt * 1.0 * splitStep * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 1.0 * splitStep * freezeMultiplier;
+        e.vy += dy * e.speed * enemyDt * 1.0 * splitStep * freezeMultiplier;
         // Add slight random movement for unpredictability
-        e.vx += (Math.random() - 0.5) * 50 * dt;
-        e.vy += (Math.random() - 0.5) * 50 * dt;
+        e.vx += (Math.random() - 0.5) * 50 * enemyDt;
+        e.vy += (Math.random() - 0.5) * 50 * enemyDt;
       } else if (e.behavior === 'trapper') {
         // Mine layer - slow movement, drops mines periodically
-        e.vx += dx * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier; // 30% slower
-        e.vy += dy * e.speed * dt * 0.7 * walkRhythm * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 0.7 * walkRhythm * freezeMultiplier; // 30% slower
+        e.vy += dy * e.speed * enemyDt * 0.7 * walkRhythm * freezeMultiplier;
         
         // Initialize mine dropping properties
         if (!e.mineDropTimer) e.mineDropTimer = 1 + Math.random() * 2;
@@ -5929,7 +5932,7 @@
         const maxMines = 8; // Increased limit to 8 mines per enemy
         
         // Drop mines periodically every 6 seconds
-        e.mineDropTimer -= dt;
+        e.mineDropTimer -= enemyDt;
         if (e.mineDropTimer <= 0 && e.minesDropped < maxMines) {
           // Spawn mine at current position
           mines.spawn(mine => {
@@ -5964,7 +5967,7 @@
         }
         
         // Switch patterns every 2-3 seconds
-        e.patternTimer += dt;
+        e.patternTimer += enemyDt;
         if (e.patternTimer > 2 + Math.random()) {
           e.patternTimer = 0;
           e.currentPattern = (e.currentPattern + 1) % 3;
@@ -5974,25 +5977,25 @@
         if (e.currentPattern === 0) {
           // Normal chase pattern with walk rhythm
           const gaitPattern = 0.7 + 0.4 * fastSin(e.cadence) + 0.1 * fastSin(e.cadence * 2);
-          e.vx += dx * e.speed * dt * 1.2 * gaitPattern * freezeMultiplier;
-          e.vy += dy * e.speed * dt * 1.2 * gaitPattern * freezeMultiplier;
+          e.vx += dx * e.speed * enemyDt * 1.2 * gaitPattern * freezeMultiplier;
+          e.vy += dy * e.speed * enemyDt * 1.2 * gaitPattern * freezeMultiplier;
         } else if (e.currentPattern === 1) {
           // Zigzag approach
-          e.vx += dx * e.speed * dt * 0.8 * walkRhythm * freezeMultiplier;
-          e.vy += dy * e.speed * dt * 0.8 * walkRhythm * freezeMultiplier;
-          e.vx += fastSin(g.t * 4 + e.x * 0.01) * 60 * dt * freezeMultiplier;
-          e.vy += fastCos(g.t * 3 + e.y * 0.01) * 60 * dt * freezeMultiplier;
+          e.vx += dx * e.speed * enemyDt * 0.8 * walkRhythm * freezeMultiplier;
+          e.vy += dy * e.speed * enemyDt * 0.8 * walkRhythm * freezeMultiplier;
+          e.vx += fastSin(g.t * 4 + e.x * 0.01) * 60 * enemyDt * freezeMultiplier;
+          e.vy += fastCos(g.t * 3 + e.y * 0.01) * 60 * enemyDt * freezeMultiplier;
         } else {
           // Flanking movement
           const playerAngle = Math.atan2(p.y - e.y, p.x - e.x);
           const flankAngle = playerAngle + fastSin(g.t * 1.5 + e.x * 0.005) * Math.PI/3;
           const fx = fastCos(flankAngle);
           const fy = fastSin(flankAngle);
-          e.vx += fx * e.speed * dt * 0.9 * walkRhythm * freezeMultiplier;
-          e.vy += fy * e.speed * dt * 0.9 * walkRhythm * freezeMultiplier;
+          e.vx += fx * e.speed * enemyDt * 0.9 * walkRhythm * freezeMultiplier;
+          e.vy += fy * e.speed * enemyDt * 0.9 * walkRhythm * freezeMultiplier;
           // Some direct attraction
-          e.vx += dx * e.speed * dt * 0.3 * freezeMultiplier;
-          e.vy += dy * e.speed * dt * 0.3 * freezeMultiplier;
+          e.vx += dx * e.speed * enemyDt * 0.3 * freezeMultiplier;
+          e.vy += dy * e.speed * enemyDt * 0.3 * freezeMultiplier;
         }
         
         // Initialize grenade throwing properties
@@ -6001,7 +6004,7 @@
         const maxGrenades = 12; // Maximum grenades per enemy
         
         // Throw grenades periodically (range: 0-600 pixels ONLY)
-        e.grenadeTimer -= dt;
+        e.grenadeTimer -= enemyDt;
         if (e.grenadeTimer <= 0 && e.grenadesThrown < maxGrenades) {
           // STRICT distance check - only throw if within range
           if (currentDist <= 600 && currentDist > 0) {
@@ -6062,13 +6065,13 @@
         }
       } else {
         // DEFAULT MOVEMENT - Basic pursuit for any unrecognized behavior
-        e.vx += dx * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
-        e.vy += dy * e.speed * dt * 1.5 * walkRhythm * freezeMultiplier;
+        e.vx += dx * e.speed * enemyDt * 1.5 * walkRhythm * freezeMultiplier;
+        e.vy += dy * e.speed * enemyDt * 1.5 * walkRhythm * freezeMultiplier;
       }
       
       // Shooter enemy logic with different patterns
       if (e.isShooter) {
-        e.shootTimer -= dt;
+        e.shootTimer -= enemyDt;
         if (e.shootTimer <= 0) {
           if (e.shootPattern === 'spread') {
             spawnEnemySpreadShot(e.x, e.y, p.x, p.y, 3, Math.PI/3); // 3 bullets, 60° spread
@@ -6096,10 +6099,10 @@
       }
       
       // damp
-      e.vx *= (1 - 3*dt);
-      e.vy *= (1 - 3*dt);
-      e.x += e.vx*dt;
-      e.y += e.vy*dt;
+      e.vx *= (1 - 3*enemyDt);
+      e.vy *= (1 - 3*enemyDt);
+      e.x += e.vx*enemyDt;
+      e.y += e.vy*enemyDt;
       // clamp bounds
       e.x = clamp(e.x, e.r, g.width()-e.r);
       e.y = clamp(e.y, e.r, g.height()-e.r);
@@ -6108,7 +6111,7 @@
       if (!e.footstepTimer) e.footstepTimer = 0;
       const enemySpeed = fastLength(e.vx, e.vy);
       if (enemySpeed > 20) { // Lower threshold for enemies
-        e.footstepTimer -= dt;
+        e.footstepTimer -= enemyDt;
         if (e.footstepTimer <= 0) {
           const moveAngle = Math.atan2(e.vy, e.vx);
           spawnFootstep(e.x, e.y, moveAngle, false, e);
@@ -6391,12 +6394,13 @@
     }
 
     // enemy bullets
+    // Enemy bullets also affected by time scale
     for (const eb of enemyBullets.items) {
       if (!eb.alive) continue;
-      
-      eb.x += eb.vx * dt;
-      eb.y += eb.vy * dt;
-      eb.life += dt;
+
+      eb.x += eb.vx * enemyDt;
+      eb.y += eb.vy * enemyDt;
+      eb.life += enemyDt;
       
       // Remove bullets that go off screen or expire
       if (eb.life > eb.maxLife || eb.x < -20 || eb.y < -20 || eb.x > g.width() + 20 || eb.y > g.height() + 20) {
@@ -6671,19 +6675,20 @@
     }
 
     // mines and grenades - timed explosives
+    // Mines also affected by time scale (placed by enemies)
     for (const mine of mines.items) {
       if (!mine.alive) continue;
-      
+
       // Handle grenade projectile movement
       if (mine.isGrenade) {
         // Move grenade horizontally
-        mine.x += mine.vx * dt;
-        mine.y += mine.vy * dt;
-        
+        mine.x += mine.vx * enemyDt;
+        mine.y += mine.vy * enemyDt;
+
         // Handle vertical movement (arc)
         if (mine.z !== undefined && mine.z !== null) {
-          mine.z += mine.vz * dt;
-          mine.vz -= (mine.gravity || 600) * dt; // Use grenade's gravity or default
+          mine.z += mine.vz * enemyDt;
+          mine.vz -= (mine.gravity || 600) * enemyDt; // Use grenade's gravity or default
           
           // Check if grenade hit the ground
           if (mine.z <= 0 && mine.vz < 0) {
@@ -6717,8 +6722,8 @@
       }
       
       // Fuse timer
-      mine.fuseTime += dt;
-      mine.flashTimer += dt;
+      mine.fuseTime += enemyDt;
+      mine.flashTimer += enemyDt;
       
       // Arm mine after 0.5 seconds (can't be triggered immediately) - not for grenades
       if (!mine.isGrenade && !mine.isArmed && mine.fuseTime >= 0.5) {
@@ -8510,7 +8515,7 @@
           game.screenShakeY = 0;
         }
 
-        acc += rawDt * game.timeScale; // Apply time dilation
+        acc += rawDt; // Don't apply time dilation to accumulator - we'll apply it per-entity
         acc = Math.min(acc, dtFixed * 3); // Cap at 3 frames max to prevent spiral of death
         while (acc >= dtFixed){
           try {
