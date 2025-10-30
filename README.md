@@ -37,15 +37,21 @@
 
 ## 👋 Hey, I'm Zac
 
-I work on enterprise platforms by day and build unusually fun projects by night. This is **a 60 FPS arena shooter that runs entirely from a single 347KB HTML file** with zero dependencies.
+**60 FPS arena shooter in a single 347KB HTML file.** Zero dependencies, works offline forever.
 
-**What makes it interesting:**
-- Handles 200+ simultaneous entities at locked 60 FPS using spatial grid optimization
-- 11 crystal powerups with effects like homing shots, lightning chains, and freeze blasts
-- Zero runtime memory allocation through object pooling (no garbage collection during gameplay)
-- Works offline forever—download once, play in 10 years (no npm, no build tools, no external assets)
+<details>
+<summary><b>🔽 What makes this different</b></summary>
+
+<br/>
+
+- **200+ entities at locked 60 FPS** - Spatial grid optimization + object pooling
+- **11 crystal powerups** - Homing shots, lightning chains, freeze blasts, explosive rounds
+- **Zero garbage collection** - Pre-allocated memory, no runtime allocation
+- **Works forever** - Download once, play in 10 years (no npm, no build tools, no external dependencies)
 
 Built with vanilla JavaScript, Canvas API, and a lot of caffeine.
+
+</details>
 
 <div align="center">
 
@@ -79,7 +85,7 @@ Built with vanilla JavaScript, Canvas API, and a lot of caffeine.
 ## 📚 Table of Contents
 
 <details>
-<summary><b>Jump to a section</b></summary>
+<summary><b>🔽 Jump to a section</b></summary>
 
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Architecture & Design](#️-architecture--design)
@@ -128,7 +134,9 @@ Built with vanilla JavaScript, Canvas API, and a lot of caffeine.
 </div>
 
 <details>
-<summary><b>📦 See the full dependency list</b></summary>
+<summary><b>🔽 Why zero dependencies?</b></summary>
+
+<br/>
 
 ```json
 {
@@ -137,7 +145,7 @@ Built with vanilla JavaScript, Canvas API, and a lot of caffeine.
 }
 ```
 
-**Zero dependencies by design** — Everything is self-contained in a single HTML file. No npm packages, no CDN imports, no external assets. This ensures the game works offline indefinitely without breaking due to external service changes.
+**Everything self-contained in one HTML file.** No npm packages, no CDN imports, no external assets. Works offline indefinitely without breaking.
 
 </details>
 
@@ -146,7 +154,7 @@ Built with vanilla JavaScript, Canvas API, and a lot of caffeine.
 ## 🏗️ Architecture & Design
 
 <details>
-<summary><b>🎯 Entity Component System (ECS)</b></summary>
+<summary><b>🔽 Entity Component System (ECS)</b></summary>
 
 <br/>
 
@@ -162,7 +170,7 @@ The game uses an **Entity Component System architecture** for managing game obje
 </details>
 
 <details>
-<summary><b>⚡ Performance Optimizations</b></summary>
+<summary><b>🔽 Performance Optimizations</b></summary>
 
 <br/>
 
@@ -186,7 +194,7 @@ The game uses an **Entity Component System architecture** for managing game obje
 ## 🎮 Gameplay Features
 
 <details>
-<summary><b>💎 11 Crystal Powerups</b></summary>
+<summary><b>🔽 11 Crystal Powerups</b></summary>
 
 <br/>
 
@@ -209,7 +217,7 @@ Each powerup lasts 25-50 shots before reverting to normal fire.
 </details>
 
 <details>
-<summary><b>👾 12+ Enemy AI Behaviors</b></summary>
+<summary><b>🔽 12+ Enemy AI Behaviors</b></summary>
 
 <br/>
 
@@ -226,7 +234,7 @@ Each powerup lasts 25-50 shots before reverting to normal fire.
 </details>
 
 <details>
-<summary><b>📈 Endless Wave Scaling</b></summary>
+<summary><b>🔽 Endless Wave Scaling</b></summary>
 
 <br/>
 
@@ -248,24 +256,35 @@ Each powerup lasts 25-50 shots before reverting to normal fire.
 
 ## 💭 Why I Built This
 
-As someone who manages enterprise platforms serving 3,000+ users across 22 countries, I built this to maintain hands-on technical skills. The best leaders never stop coding.
+**I manage enterprise platforms by day (3,000+ users, 22 countries).** Built this to keep coding skills sharp—the best leaders never stop building.
 
-**This project specifically explores:**
-- ✅ **Performance constraints** - How far can you push Canvas 2D without WebGL?
-- ✅ **Game fundamentals** - Spatial partitioning, object pooling, ECS architecture from scratch
-- ✅ **Zero dependencies** - Works offline, forever (download today, works in 10 years)
-- ✅ **Creative problem-solving** - No physics engine → build delta-time physics. No audio library → procedural synthesis
-- ✅ **Maintainable code** - 9,280 lines in a single file, but structured with clear patterns
+<details>
+<summary><b>🔽 What I learned from this project</b></summary>
 
-The constraint of zero dependencies forced creative problem-solving. No physics engine meant building delta-time physics from first principles. No audio library meant synthesizing sounds procedurally. No sprite atlases meant rendering everything with Canvas primitives. These limitations became opportunities to understand the fundamentals.
+<br/>
+
+- **Performance constraints** - Pushing Canvas 2D to 60 FPS without WebGL
+- **Game fundamentals** - Spatial partitioning, object pooling, ECS architecture from scratch
+- **Zero dependencies** - Download once, works forever (even in 10 years)
+- **Creative problem-solving** - No physics engine? Build delta-time physics. No audio? Procedural synthesis.
+- **Maintainable code** - 9,280 lines in one file, but structured with clear patterns
+
+Zero dependencies forced creative solutions. No physics engine → built delta-time physics from first principles. No audio library → synthesized sounds procedurally. No sprites → rendered everything with Canvas primitives. **Constraints became opportunities.**
+
+</details>
 
 ---
 
 ## 📊 Performance Benchmarks
 
-<div align="center">
+**60 FPS locked • 200+ entities • 347KB total • <500ms load • ~80MB memory**
 
-### Real numbers from my production build
+<details>
+<summary><b>🔽 See detailed benchmarks (Desktop & Mobile)</b></summary>
+
+<br/>
+
+<div align="center">
 
 <table>
 <tr>
@@ -346,22 +365,23 @@ The constraint of zero dependencies forced creative problem-solving. No physics 
 
 </div>
 
+</details>
+
 <details>
-<summary><b>📦 Bundle size breakdown</b></summary>
+<summary><b>🔽 Bundle size breakdown</b></summary>
+
+<br/>
 
 ```
-index.html       347 KB → 93 KB gzipped
+index.html       347 KB → 93 KB gzipped (73% reduction)
 ├── HTML/CSS      15 KB → 5 KB gzipped
-├── JavaScript   332 KB → 88 KB gzipped
-└── Total        347 KB → 93 KB gzipped (73% reduction)
+└── JavaScript   332 KB → 88 KB gzipped
 ```
 
-**How I optimized it:**
-- ✅ Minified variable names and removed comments
-- ✅ Eliminated dead code and unused features
-- ✅ Cached canvas states to reduce draw calls
-- ✅ Pre-computed trigonometry lookups
-- ✅ Moved expensive computations to initialization
+**Key optimizations:**
+- Minified variables, removed comments, eliminated dead code
+- Cached canvas states, pre-computed trig lookups
+- Moved expensive computations to initialization
 
 </details>
 
@@ -369,11 +389,12 @@ index.html       347 KB → 93 KB gzipped
 
 ## 🚀 Quick Start
 
-<div align="center">
+**Clone → Open `index.html` → Play** (30 seconds total)
 
-### Want to try it locally? Takes about 30 seconds
+<details>
+<summary><b>🔽 See full setup instructions</b></summary>
 
-</div>
+<br/>
 
 ```bash
 # 1️⃣ Clone this repo
@@ -381,26 +402,24 @@ git clone https://github.com/Zacsluss/crystal_blitz.git
 cd crystal_blitz
 
 # 2️⃣ Open the file
-# Just double-click index.html or:
 open index.html  # macOS
 start index.html # Windows
 xdg-open index.html # Linux
 
 # 3️⃣ Play offline anywhere
 # Copy index.html to USB, email it, whatever
-# It works without internet, forever
 
 # 4️⃣ Optional: Serve with local server
 python -m http.server 8000
-# Opens at http://localhost:8000
 
 # 5️⃣ Deploy to GitHub Pages
-# Commit index.html to main branch
-# Enable Pages in Settings → Pages → main branch
+# Commit index.html → Settings → Pages → main branch
 ```
 
+</details>
+
 <details>
-<summary><b>🔧 How to customize it for yourself</b></summary>
+<summary><b>🔽 How to customize it</b></summary>
 
 <br/>
 
@@ -420,12 +439,10 @@ The entire game is in one file (`index.html`), so just search for what you want 
 
 ## 📄 License & Usage
 
-**MIT License** — Fork it, customize it, do whatever you want with it. No credit needed (but a ⭐ appreciated).
-
-**Quick setup:** `git clone` → open `index.html` → you're playing
+**MIT License** — Fork it, customize it, do whatever. No credit needed (⭐ appreciated though).
 
 <details>
-<summary><b>📋 Full customization instructions</b></summary>
+<summary><b>🔽 Customization guide (5 minutes)</b></summary>
 
 <br/>
 
@@ -454,11 +471,11 @@ Full license text in [LICENSE](LICENSE) file.
 
 ## 📬 About & Connect
 
-By day, I work as a Lead CRM Systems Analyst at Computershare, managing enterprise platforms and Salesforce integrations across global teams. By night, I build stuff like this.
+**Lead CRM Systems Analyst at Computershare** by day—managing enterprise platforms and Salesforce integrations across global teams. By night, I build projects like this.
 
-I'm into WebGL, particle systems, shader programming, AI/ML, digital art, and 360° drone photography. Always learning, always building.
+Into WebGL, particle systems, shader programming, AI/ML, digital art, and 360° drone photography.
 
-**Let's connect:**
+**Connect with me:**
 
 <div align="center">
 
