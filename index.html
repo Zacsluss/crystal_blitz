@@ -725,6 +725,26 @@
       transform: translateY(15px) scale(0.9);
       animation: menuButtonFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards;
     }
+    /* Starting Loadout Button Styles */
+    .loadout-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 12px rgba(90, 242, 199, 0.3);
+      filter: brightness(1.2);
+    }
+    .loadout-btn.selected {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px currentColor, inset 0 0 10px currentColor;
+      filter: brightness(1.3);
+      animation: loadoutPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes loadoutPulse {
+      0%, 100% {
+        box-shadow: 0 0 20px currentColor, inset 0 0 10px currentColor;
+      }
+      50% {
+        box-shadow: 0 0 30px currentColor, inset 0 0 15px currentColor;
+      }
+    }
     .controls-panel {
       margin: 16px 0;
       padding: 16px 20px;
@@ -2655,6 +2675,25 @@
       <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot<br>
         💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
     </div>
+    <!-- Starting Loadout Selection -->
+    <div class="starting-loadout" style="margin: 20px 0; padding: 16px; background: rgba(90, 242, 199, 0.05); border: 1px solid rgba(90, 242, 199, 0.2); border-radius: 12px;">
+      <div style="color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 12px; text-align: center;">Choose Starting Powerup</div>
+      <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <button class="loadout-btn" data-powerup="explosive" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(255, 69, 0, 0.15); border: 2px solid #FF4500; color: #FF4500; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
+          💥 Explosive
+        </button>
+        <button class="loadout-btn" data-powerup="lightning" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(0, 191, 255, 0.15); border: 2px solid #00BFFF; color: #00BFFF; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
+          ⚡ Lightning
+        </button>
+        <button class="loadout-btn" data-powerup="seeking" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(220, 20, 60, 0.15); border: 2px solid #DC143C; color: #DC143C; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
+          🎯 Seeking
+        </button>
+        <button class="loadout-btn" data-powerup="ricochet" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(255, 105, 180, 0.15); border: 2px solid #FF69B4; color: #FF69B4; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
+          🔄 Ricochet
+        </button>
+      </div>
+      <div style="margin-top: 8px; font-size: 11px; color: var(--muted); text-align: center;">Select a powerup to start with (or none for normal shots)</div>
+    </div>
     <button id="startBtn">Start</button>
     <button id="optionsBtn">Options</button>
   </div>
@@ -4050,12 +4089,20 @@
       fpsSum: 0, // Running sum for efficient FPS calculation
       invulTime: 0,
       damageFlash: 0, // Red vignette flash timer
+      // Juice effects
+      timeScale: 1.0, // Time dilation multiplier (1.0 = normal, 0.3 = slow-mo)
+      timeScaleTarget: 1.0, // Target timeScale for smooth transitions
+      screenShake: 0, // Screen shake intensity
+      screenShakeX: 0, // Screen shake offset X
+      screenShakeY: 0, // Screen shake offset Y
       // Stats tracking
       shotsFired: 0,
       shotsHit: 0,
       currentCombo: 0,
       highestCombo: 0,
       comboTimer: 0,
+      // Starting loadout
+      startingPowerup: null, // Selected starting powerup
     };
   }
 
@@ -4514,10 +4561,19 @@
       // Start death animation instead of immediate removal
       enemy.dying = true;
       enemy.deathTimer = 0.2; // 0.2 second death animation
-      
+
+      // Boss death slow-mo effect!
+      if (enemy.behavior === 'boss' || enemy.behavior === 'superboss') {
+        game.timeScaleTarget = 0.3; // Slow to 30% speed
+        // Return to normal after 0.8 seconds
+        setTimeout(() => {
+          if (game) game.timeScaleTarget = 1.0;
+        }, 800);
+      }
+
       // Enemy death sound based on type/size
       enemyDeathSound(enemy);
-      
+
       // Large blood burst on death
       spawnBlood(enemy.x, enemy.y, 0, 0, 'death');
       
@@ -4577,10 +4633,12 @@
           const explosionDamage = 8; // Base explosion damage
           const actualDamage = Math.ceil(explosionDamage * (1 - game.player.damageReduction));
           game.player.hp -= actualDamage;
-          
+
           // Set invulnerability and damage flash
           game.invulTime = 0.35;
           game.damageFlash = 0.3;
+          // Screen shake on damage!
+          game.screenShake = 1.0;
           
           // Knockback from explosion
           const knockbackForce = 400;
@@ -4665,41 +4723,42 @@
         beep(250, 0.08, 'sawtooth', 0.10); // Splitting sound
       }
       
-      // Enemy pop/burst effect - satisfying explosion
-      const popParticles = enemy.behavior === 'volatile' ? 20 : 15; // More particles for volatile
+      // Enemy pop/burst effect - satisfying explosion (DRAMATICALLY IMPROVED!)
+      const isBoss = enemy.behavior === 'boss' || enemy.behavior === 'superboss';
+      const popParticles = isBoss ? 40 : (enemy.behavior === 'volatile' ? 25 : 20); // More particles for bosses
       for (let i = 0; i < popParticles; i++) {
         particles.spawn(p => {
           const angle = (i / popParticles) * TAU + Math.random() * 0.3; // Even spread with variance
-          const speed = randRange(150, 300);
+          const speed = randRange(isBoss ? 200 : 150, isBoss ? 400 : 300); // Faster for bosses
           p.x = enemy.x; p.y = enemy.y;
           p.vx = fastCos(angle) * speed;
           p.vy = fastSin(angle) * speed;
-          p.life = 0; p.maxLife = randRange(0.4, 0.8);
-          p.size = randRange(3, 6);
+          p.life = 0; p.maxLife = randRange(isBoss ? 0.8 : 0.4, isBoss ? 1.5 : 0.8); // Longer for bosses
+          p.size = randRange(isBoss ? 5 : 3, isBoss ? 10 : 6); // Bigger for bosses
           p.color = enemy.originalColor; // Match enemy color
           p.hasGravity = false; // Pure radial burst
           p.alive = true;
         });
       }
       
-      // Create realistic blood spray stains
-      const numStains = randRange(15, 25);
+      // Create realistic blood spray stains (CRATER EFFECT!)
+      const numStains = isBoss ? randRange(40, 60) : randRange(20, 30); // More stains for bosses
       for (let i = 0; i < numStains; i++) {
         bloodStains.spawn(stain => {
           // Spray pattern - blood lands in burst around death point
           const angle = Math.random() * TAU;
-          const distance = randRange(5, 35);
+          const distance = randRange(isBoss ? 10 : 5, isBoss ? 50 : 35); // Wider spread for bosses
           stain.x = enemy.x + Math.cos(angle) * distance;
           stain.y = enemy.y + Math.sin(angle) * distance;
-          
+
           // Initial movement (blood droplets still traveling)
           stain.vx = Math.cos(angle) * randRange(20, 80);
           stain.vy = Math.sin(angle) * randRange(20, 80);
-          
+
           stain.life = 0;
-          stain.maxLife = 6.0;
-          stain.size = randRange(1, 4); // Smaller individual droplets
-          stain.alpha = 0.8;
+          stain.maxLife = isBoss ? 12.0 : 8.0; // Craters persist much longer, especially for bosses!
+          stain.size = randRange(isBoss ? 2 : 1, isBoss ? 6 : 4); // Bigger droplets for bosses
+          stain.alpha = isBoss ? 0.9 : 0.8; // Darker for bosses
           stain.settled = false;
           stain.alive = true;
         });
@@ -6292,6 +6351,7 @@
           p.hp -= actualDamage;
           g.invulTime = 0.35;
           g.damageFlash = 0.3;
+          g.screenShake = 0.7; // Screen shake on projectile hit!
           hurtSound();
           
           // Knockback effect - push player away from bullet (no array allocation)
@@ -6348,6 +6408,7 @@
           p.hp -= damage;
           g.invulTime = 0.35;
           g.damageFlash = 0.3; // Red vignette flash for 0.3 seconds
+          g.screenShake = 0.8; // Screen shake on damage!
           hurtSound();
           
           // Suicide crawlers reset to orbiting after hitting player
@@ -6619,6 +6680,7 @@
         if (explosionDist <= mine.explosionRadius) {
           // Damage player
           p.hp -= mine.explosionDamage;
+          g.screenShake = 1.2; // Strong screen shake from mine explosion!
           beep(100, 0.15, 'sawtooth', 0.2); // Deep explosion
           spawnBlood(p.x, p.y, 0, 0, 'player');
           hurtSound();
@@ -6908,6 +6970,11 @@
     // clear
     setFillStyle('#0d1015');
     ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // Apply screen shake transform
+    if (g.screenShake > 0) {
+      ctx.translate(g.screenShakeX, g.screenShakeY);
+    }
 
     // Draw cached background grid (only when needed)
     if (bgNeedsRedraw) {
@@ -8356,7 +8423,29 @@
       updatePerformanceLevel(rawDt * 1000); // Convert to milliseconds
       last = now;
       if (game && game.state === STATE.RUN){
-        acc += rawDt;
+        // Smoothly lerp timeScale towards target for smooth slow-mo transitions
+        if (game.timeScale !== game.timeScaleTarget) {
+          const lerpSpeed = 5.0; // How fast to transition
+          game.timeScale += (game.timeScaleTarget - game.timeScale) * Math.min(1.0, rawDt * lerpSpeed);
+          // Snap to target if very close
+          if (Math.abs(game.timeScale - game.timeScaleTarget) < 0.01) {
+            game.timeScale = game.timeScaleTarget;
+          }
+        }
+
+        // Update screen shake
+        if (game.screenShake > 0) {
+          game.screenShake -= rawDt * 8; // Decay shake over time
+          if (game.screenShake < 0) game.screenShake = 0;
+          // Generate shake offsets
+          game.screenShakeX = (Math.random() - 0.5) * game.screenShake * 20;
+          game.screenShakeY = (Math.random() - 0.5) * game.screenShake * 20;
+        } else {
+          game.screenShakeX = 0;
+          game.screenShakeY = 0;
+        }
+
+        acc += rawDt * game.timeScale; // Apply time dilation
         acc = Math.min(acc, dtFixed * 3); // Cap at 3 frames max to prevent spiral of death
         while (acc >= dtFixed){
           try {
@@ -9760,9 +9849,27 @@
     }
   }
 
-  startBtn.addEventListener('click', () => { 
-    initAudio(); 
-    
+  // Starting loadout selection logic
+  let selectedLoadout = null;
+  const loadoutButtons = document.querySelectorAll('.loadout-btn');
+  loadoutButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove selected class from all buttons
+      loadoutButtons.forEach(b => b.classList.remove('selected'));
+
+      // Toggle selection
+      if (selectedLoadout === btn.dataset.powerup) {
+        selectedLoadout = null; // Deselect
+      } else {
+        selectedLoadout = btn.dataset.powerup;
+        btn.classList.add('selected');
+      }
+    });
+  });
+
+  startBtn.addEventListener('click', () => {
+    initAudio();
+
     // Check orientation before starting on mobile
     if (isMobile && window.innerHeight > window.innerWidth) {
       if (orientationWarning) {
@@ -9770,13 +9877,23 @@
       }
       return; // Don't start if in portrait
     }
-    
+
     if (game && game.state === STATE.PAUSE) {
       // Resume from pause
       togglePause();
     } else {
-      // Start new game
-      start(); 
+      // Start new game with selected loadout
+      start();
+
+      // Apply starting powerup if selected
+      if (selectedLoadout && game) {
+        game.startingPowerup = selectedLoadout;
+        // Apply the powerup immediately
+        const p = game.player;
+        p.bulletType = selectedLoadout;
+        p.bulletAmmo = 50; // Start with 50 shots of the selected powerup
+        beep(500, 0.1, 'square', 0.08); // Powerup sound
+      }
     }
   });
   restartBtn.addEventListener('click', () => { start(); });
