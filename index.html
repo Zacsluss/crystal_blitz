@@ -725,26 +725,6 @@
       transform: translateY(15px) scale(0.9);
       animation: menuButtonFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards;
     }
-    /* Starting Loadout Button Styles */
-    .loadout-btn:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 4px 12px rgba(90, 242, 199, 0.3);
-      filter: brightness(1.2);
-    }
-    .loadout-btn.selected {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px currentColor, inset 0 0 10px currentColor;
-      filter: brightness(1.3);
-      animation: loadoutPulse 1.5s ease-in-out infinite;
-    }
-    @keyframes loadoutPulse {
-      0%, 100% {
-        box-shadow: 0 0 20px currentColor, inset 0 0 10px currentColor;
-      }
-      50% {
-        box-shadow: 0 0 30px currentColor, inset 0 0 15px currentColor;
-      }
-    }
     .controls-panel {
       margin: 16px 0;
       padding: 16px 20px;
@@ -2675,25 +2655,6 @@
       <div class="mobile-note">Mobile: Touch left side to move, right side to aim/shoot<br>
         💨 Sprint (bottom left) | ⚡ Leap (bottom right) | ⏸️ Pause (top right)</div>
     </div>
-    <!-- Starting Loadout Selection -->
-    <div class="starting-loadout" style="margin: 20px 0; padding: 16px; background: rgba(90, 242, 199, 0.05); border: 1px solid rgba(90, 242, 199, 0.2); border-radius: 12px;">
-      <div style="color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 12px; text-align: center;">Choose Starting Powerup</div>
-      <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-        <button class="loadout-btn" data-powerup="explosive" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(255, 69, 0, 0.15); border: 2px solid #FF4500; color: #FF4500; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
-          💥 Explosive
-        </button>
-        <button class="loadout-btn" data-powerup="lightning" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(0, 191, 255, 0.15); border: 2px solid #00BFFF; color: #00BFFF; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
-          ⚡ Lightning
-        </button>
-        <button class="loadout-btn" data-powerup="seeking" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(220, 20, 60, 0.15); border: 2px solid #DC143C; color: #DC143C; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
-          🎯 Seeking
-        </button>
-        <button class="loadout-btn" data-powerup="ricochet" style="flex: 1; min-width: 120px; padding: 8px; background: rgba(255, 105, 180, 0.15); border: 2px solid #FF69B4; color: #FF69B4; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">
-          🔄 Ricochet
-        </button>
-      </div>
-      <div style="margin-top: 8px; font-size: 11px; color: var(--muted); text-align: center;">Select a powerup to start with (or none for normal shots)</div>
-    </div>
     <button id="startBtn">Start</button>
     <button id="optionsBtn">Options</button>
   </div>
@@ -3922,6 +3883,100 @@
       }
     }, 2500);
     waveAnnouncementTimeouts.push(hideTimeout);
+  }
+
+  // ===== Starting Loadout Selection =====
+  function showStartingLoadoutDialog() {
+    // Set game to POWERUP state to prevent game loop updates
+    if (game && game.state === STATE.RUN) {
+      setState(game, STATE.POWERUP);
+    }
+
+    // Define starting loadout options (shuffle to keep it interesting)
+    const allLoadouts = [
+      {id: 'explosive', name: '💥 Explosive', desc: 'Area damage on impact (50 shots)', color: '#FF4500'},
+      {id: 'lightning', name: '⚡ Lightning', desc: 'Chain damage to nearby foes (50 shots)', color: '#00BFFF'},
+      {id: 'seeking', name: '🎯 Seeking', desc: 'Mild homing effect (50 shots)', color: '#DC143C'},
+      {id: 'ricochet', name: '🔄 Ricochet', desc: 'Bullets bounce off enemies (50 shots)', color: '#FF69B4'}
+    ];
+
+    // Pick 2 random powerups + always include "Normal" as 3rd option
+    const shuffled = [...allLoadouts].sort(() => Math.random() - 0.5);
+    const loadoutOptions = [
+      shuffled[0],
+      shuffled[1],
+      {id: 'normal', name: '⚪ Normal Bullets', desc: 'No powerup (standard shots)', color: '#5af2c7'}
+    ];
+
+    // Populate dialog with loadout options
+    loadoutOptions.forEach((loadout, i) => {
+      if (powerupTitles[i]) {
+        powerupTitles[i].textContent = loadout.name;
+        powerupTitles[i].style.color = loadout.color;
+      }
+      if (powerupDescs[i]) {
+        powerupDescs[i].textContent = loadout.desc;
+      }
+    });
+
+    // Show dialog
+    setTimeout(() => {
+      powerupDialog.style.display = 'block';
+      powerupDialog.style.animation = 'powerupDialogEntry 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+
+      // Animate in powerup options with staggered delays
+      const powerupOptionsElements = powerupDialog.querySelectorAll('.powerup-option');
+      powerupOptionsElements.forEach((option, index) => {
+        option.classList.remove('animate-in');
+        setTimeout(() => {
+          option.classList.add('animate-in');
+        }, 200 + index * 100);
+      });
+    }, 50);
+
+    // Add click handlers
+    const handleChoice = (choice) => {
+      const loadout = loadoutOptions[choice];
+      if (loadout) {
+        // Add selection animation
+        const selectedOption = powerupOptions[choice];
+        selectedOption.classList.add('selected');
+
+        // Apply starting loadout
+        if (loadout.id !== 'normal' && game) {
+          game.startingPowerup = loadout.id;
+          const p = game.player;
+          p.bulletType = loadout.id;
+          p.bulletAmmo = 50; // Start with 50 shots
+        }
+
+        // Delay dialog close to show selection animation
+        setTimeout(() => {
+          // Hide dialog with animation and resume game
+          powerupDialog.style.animation = 'powerupDialogExit 0.3s ease-out forwards';
+          setTimeout(() => {
+            powerupDialog.style.display = 'none';
+            selectedOption.classList.remove('selected');
+            // Reset title colors
+            powerupTitles.forEach(title => title.style.color = '');
+            if (game && game.state === STATE.POWERUP) {
+              setState(game, STATE.RUN);
+            }
+            // Show notification of selected loadout
+            if (loadout.id !== 'normal') {
+              showPowerupNotification(loadout.name);
+            }
+          }, 300);
+        }, 200);
+      }
+    };
+
+    // Set up click handlers
+    powerupOptions.forEach((option, i) => {
+      if (i < loadoutOptions.length) {
+        option.onclick = () => handleChoice(i);
+      }
+    });
   }
 
   // ===== Powerup Selection =====
@@ -9849,24 +9904,6 @@
     }
   }
 
-  // Starting loadout selection logic
-  let selectedLoadout = null;
-  const loadoutButtons = document.querySelectorAll('.loadout-btn');
-  loadoutButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Remove selected class from all buttons
-      loadoutButtons.forEach(b => b.classList.remove('selected'));
-
-      // Toggle selection
-      if (selectedLoadout === btn.dataset.powerup) {
-        selectedLoadout = null; // Deselect
-      } else {
-        selectedLoadout = btn.dataset.powerup;
-        btn.classList.add('selected');
-      }
-    });
-  });
-
   startBtn.addEventListener('click', () => {
     initAudio();
 
@@ -9882,21 +9919,21 @@
       // Resume from pause
       togglePause();
     } else {
-      // Start new game with selected loadout
+      // Start new game - this will trigger the starting loadout popup
       start();
-
-      // Apply starting powerup if selected
-      if (selectedLoadout && game) {
-        game.startingPowerup = selectedLoadout;
-        // Apply the powerup immediately
-        const p = game.player;
-        p.bulletType = selectedLoadout;
-        p.bulletAmmo = 50; // Start with 50 shots of the selected powerup
-        beep(500, 0.1, 'square', 0.08); // Powerup sound
-      }
+      // Show starting loadout dialog after a brief delay (let game start animation play)
+      setTimeout(() => {
+        showStartingLoadoutDialog();
+      }, 800); // After game start overlay begins
     }
   });
-  restartBtn.addEventListener('click', () => { start(); });
+  restartBtn.addEventListener('click', () => {
+    start();
+    // Show starting loadout dialog after a brief delay
+    setTimeout(() => {
+      showStartingLoadoutDialog();
+    }, 800);
+  });
   
   // Options button listener
   optionsBtn.addEventListener('click', () => {
