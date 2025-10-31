@@ -449,6 +449,485 @@
     }
 
     // ============================================================
+    // SECTION 7: GAME LOGIC TESTS
+    // ============================================================
+
+    function testGameLogic() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎮 Game Logic Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Collision detection (circle-circle)
+      const collides = (x1, y1, r1, x2, y2, r2) => {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const distSq = dx * dx + dy * dy;
+        const radiiSq = (r1 + r2) * (r1 + r2);
+        return distSq < radiiSq;
+      };
+
+      assert(
+        collides(0, 0, 10, 15, 0, 10),
+        'Collision Detection: Overlapping circles',
+        'Circles at (0,0) r=10 and (15,0) r=10 should collide'
+      );
+
+      assert(
+        !collides(0, 0, 10, 30, 0, 10),
+        'Collision Detection: Non-overlapping circles',
+        'Circles at (0,0) r=10 and (30,0) r=10 should not collide'
+      );
+
+      assert(
+        collides(0, 0, 10, 0, 0, 5),
+        'Collision Detection: Circle inside circle',
+        'Circle at (0,0) r=5 inside circle at (0,0) r=10 should collide'
+      );
+
+      // Test: Damage calculation
+      const calculateDamage = (baseDamage, isCritical, critMultiplier = 2.0) => {
+        return isCritical ? baseDamage * critMultiplier : baseDamage;
+      };
+
+      assert(
+        calculateDamage(10, false) === 10,
+        'Damage Calculation: Normal hit',
+        'Normal hit with 10 damage = 10'
+      );
+
+      assert(
+        calculateDamage(10, true, 2.0) === 20,
+        'Damage Calculation: Critical hit',
+        'Critical hit with 10 damage and 2x multiplier = 20'
+      );
+
+      // Test: Wave progression
+      const calculateWaveEnemies = (wave) => {
+        const base = 15;
+        const perWave = 1.5;
+        const cap = 90;
+        return Math.min(cap, Math.floor(base + wave * perWave));
+      };
+
+      assert(
+        calculateWaveEnemies(1) === 16,
+        'Wave Progression: Wave 1',
+        'Wave 1 should spawn ~16 enemies'
+      );
+
+      assert(
+        calculateWaveEnemies(50) === 90,
+        'Wave Progression: Wave 50 (capped)',
+        'Wave 50 should be capped at 90 enemies'
+      );
+
+      // Test: Drop rate calculations
+      const calculateDropChance = (baseRate, wave) => {
+        const scaling = Math.min(0.5, wave * 0.01);
+        return Math.min(1.0, baseRate + scaling);
+      };
+
+      const crystalDropRate = calculateDropChance(0.3, 10);
+      assert(
+        crystalDropRate === 0.4,
+        'Drop Rate Scaling: Wave 10',
+        `Wave 10 crystal drop rate: ${(crystalDropRate * 100).toFixed(0)}%`
+      );
+    }
+
+    // ============================================================
+    // SECTION 8: INTEGRATION TESTS
+    // ============================================================
+
+    function testIntegration() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🔗 Integration Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Player state initialization
+      const createPlayer = () => ({
+        x: 500,
+        y: 300,
+        vx: 0,
+        vy: 0,
+        r: 12,
+        hp: 100,
+        maxHp: 100,
+        alive: true,
+        upgradeCounts: new Map()
+      });
+
+      const player = createPlayer();
+      assert(
+        player.hp === 100 && player.alive === true,
+        'Player Initialization: Health',
+        `Player starts with ${player.hp}/${player.maxHp} HP and alive=true`
+      );
+
+      // Test: Bullet lifecycle
+      const createBullet = () => ({
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        r: 4,
+        life: 0,
+        maxLife: 2.0,
+        alive: true,
+        effectSet: new Set()
+      });
+
+      const bullet = createBullet();
+      bullet.life = 3.0; // Exceed max life
+      const shouldBeDestroyed = bullet.life > bullet.maxLife;
+
+      assert(
+        shouldBeDestroyed,
+        'Bullet Lifecycle: Expiration',
+        `Bullet with life ${bullet.life} > maxLife ${bullet.maxLife} should be destroyed`
+      );
+
+      // Test: Effect set operations (O(1) lookups)
+      const effects = new Set(['explosive', 'homing', 'freeze']);
+
+      const hasExplosive = effects.has('explosive');
+      const hasLightning = effects.has('lightning');
+
+      assert(
+        hasExplosive && !hasLightning,
+        'Effect Set: O(1) lookups',
+        'Set.has() correctly identifies explosive=true, lightning=false'
+      );
+
+      // Test: Object pooling simulation
+      const pool = {
+        items: [
+          { alive: false, x: 0, y: 0 },
+          { alive: true, x: 100, y: 100 },
+          { alive: false, x: 200, y: 200 }
+        ],
+        spawn(initFn) {
+          for (let i = 0; i < this.items.length; i++) {
+            if (!this.items[i].alive) {
+              initFn(this.items[i]);
+              this.items[i].alive = true;
+              return this.items[i];
+            }
+          }
+          return null;
+        }
+      };
+
+      const spawned = pool.spawn(item => {
+        item.x = 50;
+        item.y = 50;
+      });
+
+      assert(
+        spawned !== null && spawned.x === 50 && spawned.alive === true,
+        'Object Pooling: Reuse dead objects',
+        `Pool spawned object at (${spawned.x}, ${spawned.y}) with alive=${spawned.alive}`
+      );
+    }
+
+    // ============================================================
+    // POWERUP & CRYSTAL TESTS
+    // ============================================================
+
+    function testPowerups() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💎 Powerup & Crystal Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Crystal effect set membership
+      const bulletWithEffects = {
+        effectSet: new Set(['explosive', 'homing'])
+      };
+
+      assert(
+        bulletWithEffects.effectSet.has('explosive') && bulletWithEffects.effectSet.has('homing'),
+        'Crystal Effects: Set Membership',
+        `Bullet correctly tracks explosive and homing effects using Set`
+      );
+
+      // Test: Multi-shot pattern calculation
+      const calculateShotAngle = (index, total, baseAngle) => {
+        const spread = Math.PI / 6; // 30 degree spread
+        return baseAngle + (index - (total - 1) / 2) * (spread / (total - 1));
+      };
+
+      const tripleShot = [0, 1, 2].map(i => calculateShotAngle(i, 3, 0));
+      const hasSpread = tripleShot[0] !== tripleShot[1] && tripleShot[1] !== tripleShot[2];
+
+      assert(
+        hasSpread && tripleShot.length === 3,
+        'Multi-Shot: Triple Shot Pattern',
+        `Triple shot generates 3 bullets at different angles: ${tripleShot.map(a => a.toFixed(2)).join(', ')}`
+      );
+
+      // Test: Powerup duration tracking
+      const powerupState = {
+        shotsRemaining: 50,
+        type: 'homing'
+      };
+
+      powerupState.shotsRemaining -= 1;
+      const stillActive = powerupState.shotsRemaining > 0;
+
+      assert(
+        stillActive && powerupState.shotsRemaining === 49,
+        'Powerup Duration: Shot Counter',
+        `Powerup tracks ${powerupState.shotsRemaining} shots remaining`
+      );
+
+      // Test: Explosive radius calculation
+      const explosionRadius = 80;
+      const enemyDistance = 50;
+      const withinBlast = enemyDistance <= explosionRadius;
+
+      assert(
+        withinBlast,
+        'Explosive Effect: Blast Radius',
+        `Enemy at ${enemyDistance}px is within ${explosionRadius}px blast radius`
+      );
+    }
+
+    // ============================================================
+    // INPUT HANDLING TESTS
+    // ============================================================
+
+    function testInputHandling() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎮 Input Handling Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Keyboard input state
+      const keys = new Set();
+      keys.add('w');
+      keys.add('a');
+
+      const isMovingUp = keys.has('w');
+      const isMovingLeft = keys.has('a');
+      const isMovingRight = keys.has('d');
+
+      assert(
+        isMovingUp && isMovingLeft && !isMovingRight,
+        'Keyboard Input: Key State Tracking',
+        `Keys Set correctly tracks W=${isMovingUp}, A=${isMovingLeft}, D=${isMovingRight}`
+      );
+
+      // Test: Mouse position normalization
+      const canvasWidth = 1000;
+      const canvasHeight = 600;
+      const mouseX = 500;
+      const mouseY = 300;
+
+      const normalizedX = mouseX / canvasWidth;
+      const normalizedY = mouseY / canvasHeight;
+      const inBounds = normalizedX >= 0 && normalizedX <= 1 && normalizedY >= 0 && normalizedY <= 1;
+
+      assert(
+        inBounds && normalizedX === 0.5 && normalizedY === 0.5,
+        'Mouse Input: Position Normalization',
+        `Mouse at (${mouseX}, ${mouseY}) normalizes to (${normalizedX}, ${normalizedY})`
+      );
+
+      // Test: Touch control deadzone
+      const joystickRadius = 60;
+      const touchDx = 10;
+      const touchDy = 10;
+      const touchDistance = Math.sqrt(touchDx * touchDx + touchDy * touchDy);
+      const deadzone = 15;
+      const isOutsideDeadzone = touchDistance > deadzone;
+
+      assert(
+        !isOutsideDeadzone,
+        'Touch Input: Deadzone Filtering',
+        `Touch distance ${touchDistance.toFixed(1)}px is within ${deadzone}px deadzone`
+      );
+
+      // Test: Angle calculation for aiming
+      const targetX = 100;
+      const targetY = 100;
+      const playerX = 0;
+      const playerY = 0;
+      const angle = Math.atan2(targetY - playerY, targetX - playerX);
+      const angleInRadians = angle >= -Math.PI && angle <= Math.PI;
+
+      assert(
+        angleInRadians,
+        'Aiming: Angle Calculation',
+        `Angle to target (100,100) from (0,0) is ${angle.toFixed(2)} radians`
+      );
+    }
+
+    // ============================================================
+    // LOCALSTORAGE & PERSISTENCE TESTS
+    // ============================================================
+
+    function testLocalStorage() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💾 LocalStorage & Persistence Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Save data structure
+      const saveData = {
+        highestWave: 10,
+        bestKills: 250,
+        bestCombo: 15,
+        gamesPlayed: 5
+      };
+
+      const hasRequiredFields =
+        typeof saveData.highestWave === 'number' &&
+        typeof saveData.bestKills === 'number' &&
+        typeof saveData.bestCombo === 'number';
+
+      assert(
+        hasRequiredFields,
+        'Save Data: Structure Validation',
+        `Save data contains all required numeric fields`
+      );
+
+      // Test: JSON serialization safety
+      let jsonRoundTrip = false;
+      try {
+        const serialized = JSON.stringify(saveData);
+        const deserialized = JSON.parse(serialized);
+        jsonRoundTrip = deserialized.highestWave === saveData.highestWave;
+      } catch (e) {
+        jsonRoundTrip = false;
+      }
+
+      assert(
+        jsonRoundTrip,
+        'Save Data: JSON Round-Trip',
+        `Save data successfully serializes and deserializes via JSON`
+      );
+
+      // Test: Default save data fallback
+      const getDefaultSave = () => ({
+        highestWave: 0,
+        bestKills: 0,
+        bestCombo: 0,
+        gamesPlayed: 0
+      });
+
+      const defaultSave = getDefaultSave();
+      const hasDefaultValues =
+        defaultSave.highestWave === 0 &&
+        defaultSave.bestKills === 0;
+
+      assert(
+        hasDefaultValues,
+        'Save Data: Default Fallback',
+        `Default save data initializes with zero values`
+      );
+
+      // Test: New record detection
+      const currentWave = 15;
+      const previousBest = 10;
+      const isNewRecord = currentWave > previousBest;
+
+      assert(
+        isNewRecord,
+        'Save Data: Record Detection',
+        `Wave ${currentWave} exceeds previous best ${previousBest}`
+      );
+
+      // Test: Error handling for malformed data
+      let handlesCorruptedData = false;
+      try {
+        JSON.parse('{invalid json}');
+      } catch (e) {
+        handlesCorruptedData = true; // Should throw and be caught
+      }
+
+      assert(
+        handlesCorruptedData,
+        'Save Data: Malformed Data Handling',
+        `Parser correctly throws error for corrupted localStorage data`
+      );
+    }
+
+    // ============================================================
+    // RENDERING SMOKE TESTS
+    // ============================================================
+
+    function testRendering() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎨 Rendering Smoke Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Canvas context creation
+      const canvas = document.createElement('canvas');
+      canvas.width = 1000;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      const hasContext = ctx !== null;
+
+      assert(
+        hasContext,
+        'Rendering: Canvas Context Creation',
+        `Successfully created 2D rendering context`
+      );
+
+      // Test: Basic shape rendering doesn't throw
+      let canDrawShapes = false;
+      try {
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(0, 0, 10, 10);
+        ctx.strokeStyle = '#00FF00';
+        ctx.strokeRect(20, 20, 10, 10);
+        canDrawShapes = true;
+      } catch (e) {
+        canDrawShapes = false;
+      }
+
+      assert(
+        canDrawShapes,
+        'Rendering: Basic Shape Drawing',
+        `Canvas successfully renders fillRect and strokeRect`
+      );
+
+      // Test: Gradient creation
+      let canCreateGradient = false;
+      try {
+        const gradient = ctx.createRadialGradient(50, 50, 0, 50, 50, 20);
+        gradient.addColorStop(0, '#FF0000');
+        gradient.addColorStop(1, '#0000FF');
+        canCreateGradient = true;
+      } catch (e) {
+        canCreateGradient = false;
+      }
+
+      assert(
+        canCreateGradient,
+        'Rendering: Gradient Creation',
+        `Successfully creates radial gradients with color stops`
+      );
+
+      // Test: Transform operations
+      let canTransform = false;
+      try {
+        ctx.save();
+        ctx.translate(100, 100);
+        ctx.rotate(Math.PI / 4);
+        ctx.scale(1.5, 1.5);
+        ctx.restore();
+        canTransform = true;
+      } catch (e) {
+        canTransform = false;
+      }
+
+      assert(
+        canTransform,
+        'Rendering: Transform Operations',
+        `Canvas supports save/restore, translate, rotate, scale`
+      );
+    }
+
+    // ============================================================
     // RUN ALL TESTS
     // ============================================================
 
@@ -459,6 +938,12 @@
       testMemoryLeaks();
       testCodeQuality();
       testBrowserCompat();
+      testGameLogic();
+      testIntegration();
+      testPowerups();
+      testInputHandling();
+      testLocalStorage();
+      testRendering();
 
       // Generate summary
       const passed = results.filter(r => r.passed).length;

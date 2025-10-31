@@ -7,7 +7,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Read(//e/AAA/Resume & Employment/Resume & Employment/**)",
+      "Bash(python -m http.server:*)",
+      "Bash(curl:*)",
+      "Bash(npx claude-code-templates@latest --command=utilities/code-review --yes)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
