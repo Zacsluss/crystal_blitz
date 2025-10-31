@@ -4,9 +4,9 @@
 
 Crystal Blitz is a client-side browser game contained entirely within a single HTML file. It runs locally in your browser and does not:
 - Make external API calls
-- Store or transmit personal data
+- Store or transmit personal data (only anonymous high scores)
 - Require authentication
-- Use cookies or local storage (currently)
+- Use cookies (minimal localStorage for high scores only)
 - Connect to external servers
 
 ## Supported Versions
@@ -19,10 +19,10 @@ Crystal Blitz is a client-side browser game contained entirely within a single H
 ## Security Considerations
 
 ### Safe to Use
-- ✅ **No data collection**: Game state exists only in browser memory
+- ✅ **Minimal data collection**: Only anonymous high scores stored locally (no PII)
 - ✅ **No external dependencies**: All code is self-contained
 - ✅ **No network requests**: Runs completely offline
-- ✅ **No persistent storage**: No cookies, localStorage, or indexedDB used
+- ✅ **Minimal persistent storage**: Only localStorage for high scores (no cookies or indexedDB)
 - ✅ **Input sanitization**: Text inputs are sanitized to prevent injection attacks
 - ✅ **Safe parsing**: All number parsing uses safe defaults
 

@@ -1587,79 +1587,173 @@
       }
     }
     
-    /* Trippy Shockwave Reality Ripple Effect */
-    @keyframes psychedelicRipple {
+    /* Modern Game Start Animation - Inspired by Valorant/Destiny */
+
+    @keyframes startVignette {
       0% {
-        width: 10px;
-        height: 10px;
-        transform: translate(-50%, -50%) rotate(0deg);
         opacity: 0;
-        filter: hue-rotate(0deg) blur(0px);
-      }
-      10% {
-        width: 100px;
-        height: 100px;
-        transform: translate(-50%, -50%) rotate(36deg);
-        opacity: 1;
-        filter: hue-rotate(60deg) blur(0px);
+        transform: scale(1.2);
       }
       30% {
-        width: 300px;
-        height: 300px;
-        transform: translate(-50%, -50%) rotate(120deg);
-        opacity: 0.9;
-        filter: hue-rotate(180deg) blur(1px);
-      }
-      50% {
-        width: 600px;
-        height: 600px;
-        transform: translate(-50%, -50%) rotate(180deg);
-        opacity: 0.7;
-        filter: hue-rotate(270deg) blur(2px);
+        opacity: 1;
+        transform: scale(1);
       }
       70% {
-        width: 900px;
-        height: 900px;
-        transform: translate(-50%, -50%) rotate(270deg);
-        opacity: 0.4;
-        filter: hue-rotate(360deg) blur(4px);
+        opacity: 1;
+        transform: scale(1);
       }
       100% {
-        width: 1500px;
-        height: 1500px;
-        transform: translate(-50%, -50%) rotate(360deg);
         opacity: 0;
-        filter: hue-rotate(420deg) blur(10px);
+        transform: scale(0.95);
       }
     }
-    
-    @keyframes realityTear {
+
+    @keyframes startEnergyBurst {
       0% {
-        clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%);
-        transform: rotate(0deg) scale(0);
-        filter: saturate(5) contrast(3);
+        transform: translate3d(-50%, -50%, 0) scale(0);
+        opacity: 0;
       }
-      25% {
-        clip-path: polygon(45% 45%, 55% 45%, 55% 55%, 45% 55%);
-        transform: rotate(90deg) scale(0.5);
+      20% {
+        transform: translate3d(-50%, -50%, 0) scale(0.3);
+        opacity: 1;
       }
       50% {
-        clip-path: polygon(30% 30%, 70% 30%, 70% 70%, 30% 70%);
-        transform: rotate(180deg) scale(1);
-        filter: saturate(2) contrast(1.5) brightness(1.5);
-      }
-      75% {
-        clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 90%);
-        transform: rotate(270deg) scale(1.5);
+        transform: translate3d(-50%, -50%, 0) scale(1.5);
+        opacity: 0.8;
       }
       100% {
-        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-        transform: rotate(360deg) scale(2);
-        filter: saturate(1) contrast(1) brightness(1);
+        transform: translate3d(-50%, -50%, 0) scale(3);
         opacity: 0;
       }
     }
-    
+
+    @keyframes startRays {
+      0% {
+        transform: translate3d(-50%, -50%, 0) scale(0) rotate(0deg);
+        opacity: 0;
+      }
+      30% {
+        transform: translate3d(-50%, -50%, 0) scale(1) rotate(90deg);
+        opacity: 0.6;
+      }
+      70% {
+        transform: translate3d(-50%, -50%, 0) scale(1.5) rotate(180deg);
+        opacity: 0.3;
+      }
+      100% {
+        transform: translate3d(-50%, -50%, 0) scale(2) rotate(270deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes startParticles {
+      0% {
+        opacity: 0;
+        transform: scale(2);
+      }
+      30% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      70% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+
+    @keyframes startImpactFlash {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes startEnergyBurstChromaOffset {
+      0% {
+        transform: translate3d(-48%, -48%, 0) scale(0);
+        opacity: 0;
+      }
+      20% {
+        transform: translate3d(-48%, -48%, 0) scale(0.3);
+        opacity: 1;
+      }
+      50% {
+        transform: translate3d(-48%, -48%, 0) scale(1.5);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate3d(-48%, -48%, 0) scale(3);
+        opacity: 0;
+      }
+    }
+
+    @keyframes startRingExpansion {
+      0% {
+        transform: translate3d(-50%, -50%, 0) scale(0);
+        opacity: 1;
+        border-width: 8px;
+      }
+      30% {
+        transform: translate3d(-50%, -50%, 0) scale(8);
+        opacity: 0.8;
+        border-width: 4px;
+      }
+      70% {
+        transform: translate3d(-50%, -50%, 0) scale(16);
+        opacity: 0.3;
+        border-width: 2px;
+      }
+      100% {
+        transform: translate3d(-50%, -50%, 0) scale(24);
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    @keyframes startEnergyBurstCorner {
+      0% {
+        transform: translate3d(-50%, -50%, 0) scale(0);
+        opacity: 0;
+      }
+      20% {
+        transform: translate3d(-50%, -50%, 0) scale(0.5);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translate3d(-50%, -50%, 0) scale(1.2);
+        opacity: 0.6;
+      }
+      100% {
+        transform: translate3d(-50%, -50%, 0) scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes startRaysCornerReverse {
+      0% {
+        transform: translate3d(-50%, -50%, 0) scale(0) rotate(0deg);
+        opacity: 0;
+      }
+      30% {
+        transform: translate3d(-50%, -50%, 0) scale(1) rotate(-90deg);
+        opacity: 0.5;
+      }
+      70% {
+        transform: translate3d(-50%, -50%, 0) scale(1.5) rotate(-180deg);
+        opacity: 0.2;
+      }
+      100% {
+        transform: translate3d(-50%, -50%, 0) scale(2) rotate(-270deg);
+        opacity: 0;
+      }
+    }
+
     @keyframes chromaShift {
       0%, 100% { filter: hue-rotate(0deg) saturate(3); }
       25% { filter: hue-rotate(90deg) saturate(4); }
@@ -1669,54 +1763,17 @@
     
     @keyframes screenShake {
       0%, 100% { transform: translate(0, 0); }
-      10% { transform: translate(-2px, 2px); }
-      20% { transform: translate(2px, -2px); }
-      30% { transform: translate(-2px, -2px); }
-      40% { transform: translate(2px, 2px); }
-      50% { transform: translate(-1px, 1px); }
-      60% { transform: translate(1px, -1px); }
-      70% { transform: translate(-1px, -1px); }
-      80% { transform: translate(1px, 1px); }
+      10% { transform: translate(-5px, 4px); }
+      20% { transform: translate(4px, -5px); }
+      30% { transform: translate(-4px, -4px); }
+      40% { transform: translate(5px, 5px); }
+      50% { transform: translate(-3px, 3px); }
+      60% { transform: translate(3px, -3px); }
+      70% { transform: translate(-2px, -2px); }
+      80% { transform: translate(2px, 2px); }
       90% { transform: translate(0, 0); }
     }
-    
-    @keyframes warpGrid {
-      0% {
-        transform: perspective(1000px) rotateX(0deg) rotateZ(0deg) scale(1);
-        background-position: 0 0, 0 0, 0 0, 0 0;
-        opacity: 0;
-        filter: blur(0px);
-      }
-      10% {
-        transform: perspective(1000px) rotateX(60deg) rotateZ(10deg) scale(1.5);
-        opacity: 1;
-        filter: blur(0px);
-      }
-      25% {
-        transform: perspective(1000px) rotateX(-30deg) rotateZ(-5deg) scale(0.8);
-        background-position: -10px -10px, 10px 10px, -20px 20px, 20px -20px;
-        opacity: 0.9;
-      }
-      50% {
-        transform: perspective(1000px) rotateX(45deg) rotateZ(180deg) scale(1.2);
-        background-position: 20px 20px, -20px -20px, 40px -40px, -40px 40px;
-        opacity: 0.7;
-        filter: blur(1px);
-      }
-      75% {
-        transform: perspective(1000px) rotateX(-60deg) rotateZ(270deg) scale(1.8);
-        background-position: -5px -5px, 5px 5px, -10px 10px, 10px -10px;
-        opacity: 0.4;
-        filter: blur(2px);
-      }
-      100% {
-        transform: perspective(1000px) rotateX(0deg) rotateZ(360deg) scale(3);
-        background-position: 50px 50px, -50px -50px, 100px -100px, -100px 100px;
-        opacity: 0;
-        filter: blur(5px);
-      }
-    }
-    
+
     .game-start-overlay {
       position: fixed;
       top: 0;
@@ -1728,99 +1785,254 @@
       opacity: 0;
       overflow: hidden;
       background: radial-gradient(ellipse at center, transparent 0%, rgba(11,13,16,0.4) 100%);
+      will-change: opacity;
+      transform: translateZ(0);
     }
     
-    .ripple-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100vw;
-      height: 100vh;
-      z-index: 2;
-      pointer-events: none;
-    }
-    
-    .ripple {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      opacity: 0;
-      background: transparent;
-    }
-    
-    .ripple1 {
-      border: 8px solid rgba(90,242,199,0.9);
-      box-shadow: 
-        0 0 40px rgba(90,242,199,0.8),
-        inset 0 0 40px rgba(90,242,199,0.4);
-      animation: psychedelicRipple 1.5s ease-out;
-    }
-    
-    .ripple2 {
-      border: 6px solid rgba(255,91,110,0.9);
-      box-shadow: 
-        0 0 40px rgba(255,91,110,0.8),
-        inset 0 0 40px rgba(255,91,110,0.4);
-      animation: psychedelicRipple 1.5s ease-out 0.2s;
-    }
-    
-    .ripple3 {
-      border: 4px solid rgba(52,209,255,0.9);
-      box-shadow: 
-        0 0 40px rgba(52,209,255,0.8),
-        inset 0 0 40px rgba(52,209,255,0.4);
-      animation: psychedelicRipple 1.5s ease-out 0.4s;
-    }
-    
-    .ripple4 {
-      border: 10px solid rgba(255,209,102,0.9);
-      box-shadow: 
-        0 0 40px rgba(255,209,102,0.8),
-        inset 0 0 40px rgba(255,209,102,0.4);
-      animation: psychedelicRipple 1.5s ease-out 0.6s;
-    }
-    
-    .reality-tear {
+    /* Modern Start Animation Layers */
+
+    .start-impact-flash {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(45deg, 
-        rgba(90,242,199,0.3) 0%, 
-        rgba(255,91,110,0.3) 25%, 
-        rgba(52,209,255,0.3) 50%, 
-        rgba(255,209,102,0.3) 75%, 
-        rgba(90,242,199,0.3) 100%);
-      animation: realityTear 1.8s ease-in-out;
-      mix-blend-mode: screen;
-      opacity: 0.6;
+      background: radial-gradient(circle at center, rgba(90,242,199,0.4) 0%, transparent 60%);
+      animation: startImpactFlash 0.2s ease-out;
       pointer-events: none;
+      z-index: 10;
     }
-    
-    .warp-grid {
+
+    .start-vignette {
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background-image: 
-        linear-gradient(rgba(90,242,199,0.6) 2px, transparent 2px),
-        linear-gradient(90deg, rgba(90,242,199,0.6) 2px, transparent 2px),
-        linear-gradient(45deg, rgba(255,91,110,0.3) 1px, transparent 1px),
-        linear-gradient(-45deg, rgba(52,209,255,0.3) 1px, transparent 1px);
-      background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
-      animation: warpGrid 1.8s ease-out;
-      transform-origin: center center;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center,
+        transparent 0%,
+        transparent 40%,
+        rgba(90,242,199,0.1) 70%,
+        rgba(90,242,199,0.3) 100%);
+      animation: startVignette 1.8s ease-out;
       pointer-events: none;
-      overflow: hidden;
+      will-change: transform, opacity;
     }
-    
+
+    .start-energy-burst {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.5) 0%,
+        rgba(90,242,199,0.6) 10%,
+        rgba(90,242,199,0.4) 25%,
+        rgba(90,242,199,0.2) 45%,
+        transparent 70%);
+      border-radius: 50%;
+      animation: startEnergyBurst 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+      will-change: transform, opacity;
+      box-shadow: 0 0 100px rgba(90,242,199,0.6), 0 0 50px rgba(90,242,199,0.7);
+    }
+
+    .start-energy-burst-chroma-r {
+      width: 820px;
+      height: 820px;
+      background: radial-gradient(circle,
+        rgba(255,100,100,0.15) 0%,
+        rgba(255,100,100,0.1) 20%,
+        transparent 40%);
+      box-shadow: none;
+      mix-blend-mode: screen;
+      animation: startEnergyBurst 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .start-energy-burst-chroma-b {
+      width: 820px;
+      height: 820px;
+      background: radial-gradient(circle,
+        rgba(100,150,255,0.15) 0%,
+        rgba(100,150,255,0.1) 20%,
+        transparent 40%);
+      box-shadow: none;
+      mix-blend-mode: screen;
+      animation: startEnergyBurstChromaOffset 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .start-energy-burst-tl {
+      top: 0;
+      left: 0;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.4) 0%,
+        rgba(150,100,255,0.5) 12%,
+        rgba(90,242,199,0.3) 28%,
+        transparent 60%);
+      box-shadow: 0 0 80px rgba(150,100,255,0.5);
+      animation: startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .start-energy-burst-tr {
+      top: 0;
+      left: 100%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.4) 0%,
+        rgba(100,200,255,0.5) 12%,
+        rgba(90,242,199,0.3) 28%,
+        transparent 60%);
+      box-shadow: 0 0 80px rgba(100,200,255,0.5);
+      animation: startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+    }
+
+    .start-energy-burst-bl {
+      top: 100%;
+      left: 0;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.4) 0%,
+        rgba(100,200,255,0.5) 12%,
+        rgba(90,242,199,0.3) 28%,
+        transparent 60%);
+      box-shadow: 0 0 80px rgba(100,200,255,0.5);
+      animation: startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s;
+    }
+
+    .start-energy-burst-br {
+      top: 100%;
+      left: 100%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.4) 0%,
+        rgba(150,100,255,0.5) 12%,
+        rgba(90,242,199,0.3) 28%,
+        transparent 60%);
+      box-shadow: 0 0 80px rgba(150,100,255,0.5);
+      animation: startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s;
+    }
+
+    .start-rays {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200vw;
+      height: 200vw;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(90,242,199,0.4) 10deg,
+        transparent 20deg,
+        transparent 30deg,
+        rgba(90,242,199,0.3) 40deg,
+        transparent 50deg,
+        transparent 60deg,
+        rgba(90,242,199,0.4) 70deg,
+        transparent 80deg,
+        transparent 90deg,
+        rgba(90,242,199,0.3) 100deg,
+        transparent 110deg,
+        transparent 120deg,
+        rgba(90,242,199,0.4) 130deg,
+        transparent 140deg,
+        transparent 150deg,
+        rgba(90,242,199,0.3) 160deg,
+        transparent 170deg,
+        transparent 180deg
+      );
+      animation: startRays 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+      will-change: transform, opacity;
+      mix-blend-mode: screen;
+    }
+
+    .start-rays-tl {
+      top: 0;
+      left: 0;
+      width: 150vw;
+      height: 150vw;
+      animation: startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .start-rays-tr {
+      top: 0;
+      left: 100%;
+      width: 150vw;
+      height: 150vw;
+      animation: startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+    }
+
+    .start-rays-bl {
+      top: 100%;
+      left: 0;
+      width: 150vw;
+      height: 150vw;
+      animation: startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s;
+    }
+
+    .start-rays-br {
+      top: 100%;
+      left: 100%;
+      width: 150vw;
+      height: 150vw;
+      animation: startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s;
+    }
+
+    .start-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(90,242,199,0.6) 2px, transparent 2px),
+        radial-gradient(circle at 80% 20%, rgba(90,242,199,0.5) 3px, transparent 3px),
+        radial-gradient(circle at 40% 70%, rgba(90,242,199,0.7) 2px, transparent 2px),
+        radial-gradient(circle at 90% 80%, rgba(90,242,199,0.4) 2px, transparent 2px),
+        radial-gradient(circle at 10% 90%, rgba(90,242,199,0.6) 3px, transparent 3px),
+        radial-gradient(circle at 70% 50%, rgba(90,242,199,0.5) 2px, transparent 2px),
+        radial-gradient(circle at 30% 40%, rgba(90,242,199,0.6) 2px, transparent 2px),
+        radial-gradient(circle at 60% 85%, rgba(90,242,199,0.5) 3px, transparent 3px);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      animation: startParticles 1.8s ease-out;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .start-particles-mirror {
+      background-image:
+        radial-gradient(circle at 80% 70%, rgba(90,242,199,0.6) 2px, transparent 2px),
+        radial-gradient(circle at 20% 80%, rgba(90,242,199,0.5) 3px, transparent 3px),
+        radial-gradient(circle at 60% 30%, rgba(90,242,199,0.7) 2px, transparent 2px),
+        radial-gradient(circle at 10% 20%, rgba(90,242,199,0.4) 2px, transparent 2px),
+        radial-gradient(circle at 90% 10%, rgba(90,242,199,0.6) 3px, transparent 3px),
+        radial-gradient(circle at 30% 50%, rgba(90,242,199,0.5) 2px, transparent 2px),
+        radial-gradient(circle at 70% 60%, rgba(90,242,199,0.6) 2px, transparent 2px),
+        radial-gradient(circle at 40% 15%, rgba(90,242,199,0.5) 3px, transparent 3px);
+      animation: startParticles 1.8s ease-out 0.15s;
+    }
+
+    .start-ring-wave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      border: 3px solid rgba(90,242,199,0.9);
+      border-radius: 50%;
+      animation: startRingExpansion 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+      will-change: transform, opacity;
+      box-shadow: 0 0 40px rgba(90,242,199,0.8), inset 0 0 40px rgba(90,242,199,0.6);
+    }
+
     /* Powerup Selection Animations */
     @keyframes powerupSelected {
       0% { 
@@ -2571,14 +2783,23 @@
 <body>
   <canvas id="c"></canvas>
   <div class="game-start-overlay" id="gameStartOverlay">
-    <div class="warp-grid"></div>
-    <div class="reality-tear"></div>
-    <div class="ripple-container">
-      <div class="ripple ripple1"></div>
-      <div class="ripple ripple2"></div>
-      <div class="ripple ripple3"></div>
-      <div class="ripple ripple4"></div>
-    </div>
+    <div class="start-impact-flash"></div>
+    <div class="start-vignette"></div>
+    <div class="start-energy-burst"></div>
+    <div class="start-energy-burst start-energy-burst-chroma-r"></div>
+    <div class="start-energy-burst start-energy-burst-chroma-b"></div>
+    <div class="start-energy-burst start-energy-burst-tl"></div>
+    <div class="start-energy-burst start-energy-burst-tr"></div>
+    <div class="start-energy-burst start-energy-burst-bl"></div>
+    <div class="start-energy-burst start-energy-burst-br"></div>
+    <div class="start-ring-wave"></div>
+    <div class="start-rays"></div>
+    <div class="start-rays start-rays-tl"></div>
+    <div class="start-rays start-rays-tr"></div>
+    <div class="start-rays start-rays-bl"></div>
+    <div class="start-rays start-rays-br"></div>
+    <div class="start-particles"></div>
+    <div class="start-particles start-particles-mirror"></div>
   </div>
   <div id="hud">
     <div class="row">Health
@@ -2919,6 +3140,10 @@
     };
   }
 
+  /**
+   * Loads save data from localStorage with error handling
+   * @returns {Object} Save data object with high scores and stats
+   */
   function loadSaveData() {
     try {
       const data = localStorage.getItem(SAVE_KEY);
@@ -2930,6 +3155,10 @@
     }
   }
 
+  /**
+   * Saves current save data to localStorage
+   * Includes error handling for quota exceeded and other failures
+   */
   function saveSaveData() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
@@ -2940,6 +3169,11 @@
 
   let saveData = loadSaveData();
 
+  /**
+   * Updates high scores and returns list of new records achieved
+   * @param {Object} game - Game state object containing wave, kills, time, etc.
+   * @returns {string[]} Array of record names (e.g., "Highest Wave", "Best Combo")
+   */
   function updateHighScores(game) {
     let newRecords = [];
 
@@ -3054,6 +3288,58 @@
     GRADIENT_CACHE_SIZE: 100,
     MAX_PARTICLES: 500,
     MAX_BLOOD_STAINS: 200,
+    MAX_FOOTSTEPS: 300,
+    MAX_BULLETS_PER_SHOT: 16,
+  };
+
+  /**
+   * Gameplay Balance Constants
+   */
+  const GAME_CONSTANTS = {
+    PLAYER_BULLET_BASE_SPEED: 720,
+    PLAYER_BULLET_BASE_SIZE: 4,
+    ENEMY_BULLET_BASE_SPEED: 200,
+    ENEMY_BULLET_MAX_SPEED: 350,
+  };
+
+  /**
+   * Animation & Visual Effect Timing Constants
+   */
+  const ANIMATION_CONSTANTS = {
+    GAME_START_DURATION: 1800,        // Game start animation duration (ms)
+    GAME_START_FADEOUT: 300,          // Game start fadeout duration (ms)
+    SCREEN_SHAKE_DURATION: 300,       // Screen shake effect duration (ms)
+    PAUSE_SLIDE_DURATION: 300,        // Pause menu slide animation (ms)
+    POWERUP_NOTIFICATION_DURATION: 2000, // Powerup notification display time (ms)
+    WAVE_ANNOUNCEMENT_DURATION: 3000, // Wave announcement display time (ms)
+  };
+
+  /**
+   * Difficulty Scaling Constants - Controls wave progression
+   */
+  const DIFFICULTY_CONSTANTS = {
+    BASE_ENEMY_COUNT: 15,             // Starting enemy count (wave 1)
+    ENEMY_COUNT_INCREMENT: 1.5,       // Enemies added per wave
+    MAX_ENEMY_COUNT: 90,              // Maximum enemies per wave
+    ENEMY_SPEED_INCREMENT: 4,         // Speed increase per wave
+    ENEMY_DAMAGE_INCREMENT_WAVES: 5,  // Waves between damage increases
+    BOSS_WAVE_INTERVAL: 5,            // Mini-boss every N waves
+    SUPER_BOSS_WAVE_INTERVAL: 10,    // Super-boss every N waves
+    MINI_BOSS_HP_MULTIPLIER: 2,       // Mini-boss health multiplier
+    SUPER_BOSS_HP_MULTIPLIER: 9,      // Super-boss health multiplier
+  };
+
+  /**
+   * Color Palette Constants - Theme colors for consistency
+   */
+  const THEME_CONSTANTS = {
+    PRIMARY_TEAL: 'rgba(90,242,199',     // Main accent color (without closing paren for opacity flexibility)
+    PLAYER_COLOR: '#5af2c7',              // Player character color
+    BACKGROUND_COLOR: '#0b0d10',          // Arena background
+    HUD_COLOR: 'rgba(200,200,200,0.8)',  // HUD text color
+    WARNING_COLOR: 'rgba(255,100,100',    // Danger/warning color
+    CRYSTAL_COMMON: 'rgba(90,242,199',    // Common crystal drops
+    CRYSTAL_RARE: 'rgba(255,215,0',       // Rare crystal drops (gold)
   };
 
   // ============================================================
@@ -3606,7 +3892,12 @@
     const recordsList = document.getElementById('recordsList');
     if (newRecords.length > 0) {
       recordBanner.style.display = 'block';
-      recordsList.innerHTML = newRecords.map(r => `<div>• ${r}</div>`).join('');
+      // Use safe DOM manipulation instead of innerHTML
+      recordsList.replaceChildren(...newRecords.map(r => {
+        const div = document.createElement('div');
+        div.textContent = `• ${r}`;
+        return div;
+      }));
     } else {
       recordBanner.style.display = 'none';
     }
@@ -4114,6 +4405,10 @@
     return false;
   }
 
+  /**
+   * Creates a new game state object with all initial values
+   * @returns {Object} Complete game state including player, grid, stats, and wave tracking
+   */
   function newGame(){
     return {
       state: STATE.MENU,
@@ -4155,7 +4450,12 @@
     };
   }
 
-  // ===== Spatial Hash (for enemy lookup) =====
+  /**
+   * Creates a spatial hash grid for O(n) collision detection
+   * Divides play area into cells for efficient neighbor queries
+   * @param {number} cell - Cell size in pixels (typically 64px)
+   * @returns {Object} Spatial hash data structure with insert/query methods
+   */
   function makeSpatialHash(cell){
     return {
       cell: cell,
@@ -4188,9 +4488,10 @@
   }
 
   // ===== Object Pools =====
-  const MAX_PARTICLES = 500; // Hard cap on total particles
-  const MAX_BLOOD_STAINS = 200; // Hard cap on blood stains
-  const MAX_FOOTSTEPS = 300; // Hard cap on footstep marks
+  // Performance limits defined in PERF_CONSTANTS above
+  const MAX_PARTICLES = PERF_CONSTANTS.MAX_PARTICLES;
+  const MAX_BLOOD_STAINS = PERF_CONSTANTS.MAX_BLOOD_STAINS;
+  const MAX_FOOTSTEPS = PERF_CONSTANTS.MAX_FOOTSTEPS;
   let activeParticleCount = 0; // Used for efficient particle limit checking
   
   function makePool(createFn, initial=0, maxSize=1000){
@@ -5007,8 +5308,8 @@
       }
     }
     
-    // Cap at 16 bullets maximum
-    totalBullets = Math.min(totalBullets, 16);
+    // Cap at maximum bullets per shot
+    totalBullets = Math.min(totalBullets, PERF_CONSTANTS.MAX_BULLETS_PER_SHOT);
     
     // Get mouse direction as the center of the pattern
     const [baseDx, baseDy] = norm(mouseX - player.x, mouseY - player.y);
@@ -5038,10 +5339,10 @@
   }
 
   function spawnBullet(x,y,dirX,dirY,effects=[]){
-    const baseSpeed = 720;
+    const baseSpeed = GAME_CONSTANTS.PLAYER_BULLET_BASE_SPEED;
     const player = game?.player;
     const speed = baseSpeed * (player?.bulletSpeed || 1.0);
-    const size = 4 * (player?.bulletSize || 1.0);
+    const size = GAME_CONSTANTS.PLAYER_BULLET_BASE_SIZE * (player?.bulletSize || 1.0);
     
     // Critical hit calculation
     const critChance = player?.criticalChance || 0;
@@ -5076,7 +5377,7 @@
   function spawnEnemyBullet(x, y, targetX, targetY, angleOffset = 0, speedMult = 1.0) {
     const baseAngle = Math.atan2(targetY - y, targetX - x) + angleOffset;
     const dx = fastCos(baseAngle), dy = fastSin(baseAngle);
-    const speed = Math.min(350, 200 + game.wave) * speedMult; // 200 base + 1 per wave, capped at 350
+    const speed = Math.min(GAME_CONSTANTS.ENEMY_BULLET_MAX_SPEED, GAME_CONSTANTS.ENEMY_BULLET_BASE_SPEED + game.wave) * speedMult;
     
     enemyBullets.spawn(b => {
       b.x = x;
@@ -5296,6 +5597,11 @@
   const MAX_GRADIENT_CACHE_SIZE = 100;
   
   // ===== Update & Draw =====
+  /**
+   * Main game update loop - handles physics, AI, collisions, and game logic
+   * @param {Object} g - Game state object
+   * @param {number} dt - Delta time since last frame (in seconds)
+   */
   function update(g, dt){
     g.t += dt;
     if (g.invulTime > 0) g.invulTime -= dt;
@@ -7020,10 +7326,16 @@
     }
   }
 
+  /**
+   * Main render loop - draws all game entities and UI elements
+   * Uses interpolation for smooth 60 FPS regardless of update rate
+   * @param {Object} g - Game state object
+   * @param {number} alpha - Interpolation factor between frames (0.0 to 1.0)
+   */
   function draw(g, alpha){
     // Reset render state for new frame
     resetRenderState();
-    
+
     // CRITICAL: Reset canvas transform to prevent accumulation bugs
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     
@@ -9839,41 +10151,83 @@
     game.player.x = canvas.width/2;
     game.player.y = canvas.height/2;
     
-    // Trippy psychedelic game start effect
+    // AAA Game Start Effect - Ultimate Edition with ALL enhancements!
     gameStartOverlay.style.opacity = '1';
     gameStartOverlay.style.display = 'block';
-    
-    // Trigger all the ripple animations by re-adding the elements
-    const rippleContainer = gameStartOverlay.querySelector('.ripple-container');
-    const warpGrid = gameStartOverlay.querySelector('.warp-grid');
-    const realityTear = gameStartOverlay.querySelector('.reality-tear');
-    
-    // Reset animations by removing and re-adding classes
-    const ripples = rippleContainer.innerHTML;
-    rippleContainer.innerHTML = '';
-    warpGrid.style.animation = 'none';
-    realityTear.style.animation = 'none';
-    
+
+    // Get all effect layers (impact flash, center bursts, chromatic aberration, corners, ring wave, rays, particles)
+    const startImpactFlash = gameStartOverlay.querySelector('.start-impact-flash');
+    const startVignette = gameStartOverlay.querySelector('.start-vignette');
+    const startEnergyBurst = gameStartOverlay.querySelector('.start-energy-burst:not([class*="-t"]):not([class*="-b"]):not([class*="-chroma"])');
+    const startEnergyBurstChromaR = gameStartOverlay.querySelector('.start-energy-burst-chroma-r');
+    const startEnergyBurstChromaB = gameStartOverlay.querySelector('.start-energy-burst-chroma-b');
+    const startEnergyBurstTL = gameStartOverlay.querySelector('.start-energy-burst-tl');
+    const startEnergyBurstTR = gameStartOverlay.querySelector('.start-energy-burst-tr');
+    const startEnergyBurstBL = gameStartOverlay.querySelector('.start-energy-burst-bl');
+    const startEnergyBurstBR = gameStartOverlay.querySelector('.start-energy-burst-br');
+    const startRingWave = gameStartOverlay.querySelector('.start-ring-wave');
+    const startRays = gameStartOverlay.querySelector('.start-rays:not([class*="-t"]):not([class*="-b"])');
+    const startRaysTL = gameStartOverlay.querySelector('.start-rays-tl');
+    const startRaysTR = gameStartOverlay.querySelector('.start-rays-tr');
+    const startRaysBL = gameStartOverlay.querySelector('.start-rays-bl');
+    const startRaysBR = gameStartOverlay.querySelector('.start-rays-br');
+    const startParticles = gameStartOverlay.querySelector('.start-particles:not(.start-particles-mirror)');
+    const startParticlesMirror = gameStartOverlay.querySelector('.start-particles-mirror');
+
+    // Reset all animations
+    if (startImpactFlash) startImpactFlash.style.animation = 'none';
+    if (startVignette) startVignette.style.animation = 'none';
+    if (startEnergyBurst) startEnergyBurst.style.animation = 'none';
+    if (startEnergyBurstChromaR) startEnergyBurstChromaR.style.animation = 'none';
+    if (startEnergyBurstChromaB) startEnergyBurstChromaB.style.animation = 'none';
+    if (startEnergyBurstTL) startEnergyBurstTL.style.animation = 'none';
+    if (startEnergyBurstTR) startEnergyBurstTR.style.animation = 'none';
+    if (startEnergyBurstBL) startEnergyBurstBL.style.animation = 'none';
+    if (startEnergyBurstBR) startEnergyBurstBR.style.animation = 'none';
+    if (startRingWave) startRingWave.style.animation = 'none';
+    if (startRays) startRays.style.animation = 'none';
+    if (startRaysTL) startRaysTL.style.animation = 'none';
+    if (startRaysTR) startRaysTR.style.animation = 'none';
+    if (startRaysBL) startRaysBL.style.animation = 'none';
+    if (startRaysBR) startRaysBR.style.animation = 'none';
+    if (startParticles) startParticles.style.animation = 'none';
+    if (startParticlesMirror) startParticlesMirror.style.animation = 'none';
+
+    // Trigger all animations with ultimate polish!
     setTimeout(() => {
-      rippleContainer.innerHTML = ripples;
-      warpGrid.style.animation = 'warpGrid 1.8s ease-out';
-      realityTear.style.animation = 'realityTear 1.8s ease-in-out';
+      if (startImpactFlash) startImpactFlash.style.animation = 'startImpactFlash 0.2s ease-out';
+      if (startVignette) startVignette.style.animation = 'startVignette 1.8s ease-out';
+      if (startEnergyBurst) startEnergyBurst.style.animation = 'startEnergyBurst 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startEnergyBurstChromaR) startEnergyBurstChromaR.style.animation = 'startEnergyBurst 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startEnergyBurstChromaB) startEnergyBurstChromaB.style.animation = 'startEnergyBurstChromaOffset 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startEnergyBurstTL) startEnergyBurstTL.style.animation = 'startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startEnergyBurstTR) startEnergyBurstTR.style.animation = 'startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s';
+      if (startEnergyBurstBL) startEnergyBurstBL.style.animation = 'startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s';
+      if (startEnergyBurstBR) startEnergyBurstBR.style.animation = 'startEnergyBurstCorner 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s';
+      if (startRingWave) startRingWave.style.animation = 'startRingExpansion 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startRays) startRays.style.animation = 'startRays 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startRaysTL) startRaysTL.style.animation = 'startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if (startRaysTR) startRaysTR.style.animation = 'startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s';
+      if (startRaysBL) startRaysBL.style.animation = 'startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s';
+      if (startRaysBR) startRaysBR.style.animation = 'startRaysCornerReverse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s';
+      if (startParticles) startParticles.style.animation = 'startParticles 1.8s ease-out';
+      if (startParticlesMirror) startParticlesMirror.style.animation = 'startParticles 1.8s ease-out 0.15s';
     }, 10);
-    
-    // Add screen shake for extra impact
-    canvas.style.animation = 'screenShake 0.5s ease-out';
+
+    // Aggressive screen shake for maximum impact!
+    canvas.style.animation = 'screenShake 0.3s ease-out';
     setTimeout(() => {
       canvas.style.animation = '';
-    }, 500);
-    
-    // Hide overlay after animation completes
+    }, 300);
+
+    // Hide overlay after animation completes (1.8s + 0.3s fadeout)
     setTimeout(() => {
-      gameStartOverlay.style.transition = 'opacity 0.5s ease-out';
+      gameStartOverlay.style.transition = 'opacity 0.3s ease-out';
       gameStartOverlay.style.opacity = '0';
       setTimeout(() => {
         gameStartOverlay.style.display = 'none';
         gameStartOverlay.style.transition = '';
-      }, 500);
+      }, 300);
     }, 1800);
     // Clear pools
     for (const it of bullets.items) it.alive = false;
