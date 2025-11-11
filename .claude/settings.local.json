@@ -12,7 +12,8 @@
       "Bash(python -m http.server:*)",
       "Bash(curl:*)",
       "Bash(npx claude-code-templates@latest --command=utilities/code-review --yes)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(gh repo view:*)"
     ],
     "deny": [],
     "ask": []
