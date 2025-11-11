@@ -5133,18 +5133,18 @@
       // Crystal drop logic - bosses get special treatment
       const p = game.player;
       if (enemy.behavior === 'boss' || enemy.behavior === 'superboss') {
-        // Bosses: 20% chance to drop homing crystal
-        if (Math.random() < 0.20) {
+        // Bosses: 22% chance to drop homing crystal (+10% from original 20%)
+        if (Math.random() < 0.22) {
           spawnBossPickup(enemy.x, enemy.y);
         }
       } else {
         // Special drops for specific enemy types
-        if ((enemy.behavior === 'trapper' || enemy.behavior === 'bomber') && Math.random() < 0.01) {
-          // 1% chance for minelayers and grenadiers to drop Remote Detonator
+        if ((enemy.behavior === 'trapper' || enemy.behavior === 'bomber') && Math.random() < 0.011) {
+          // 1.1% chance for minelayers and grenadiers to drop Remote Detonator (+10% from original 1%)
           spawnDetonatorPickup(enemy.x, enemy.y);
         } else {
-          // Regular enemies: 4% chance to drop any crystal (+20% per lucky upgrade)
-          const baseRate = 0.04;
+          // Regular enemies: 4.4% chance to drop any crystal (+10% from original 4%, +20% per lucky upgrade)
+          const baseRate = 0.044;
           const luckyMultiplier = 1 + (p.luckyBonus || 0);
           const dropRate = baseRate * luckyMultiplier;
           const roll = Math.random();
