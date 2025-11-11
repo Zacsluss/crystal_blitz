@@ -14,7 +14,10 @@
       "Bash(npx claude-code-templates@latest --command=utilities/code-review --yes)",
       "Bash(npm run build:*)",
       "Bash(gh repo view:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(git remote:*)",
+      "Bash(cat:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
