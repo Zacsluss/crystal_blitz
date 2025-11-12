@@ -52,5 +52,5 @@ dist/
 build/
 out/
 
-# Claude Code local settings (optional - uncomment to exclude)
-# .claude/settings.local.json
+# Claude Code AI assistant files (excluded from production repository)
+.claude/
