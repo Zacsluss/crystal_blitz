@@ -40,20 +40,20 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      background: linear-gradient(135deg, rgba(14, 18, 24, 0.1), rgba(11, 15, 21, 0.075)), var(--glass-noise);
-      padding: 24px 28px;
-      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(14, 18, 24, 0.05), rgba(11, 15, 21, 0.0375)), var(--glass-noise);
+      padding: 16px 19px;
+      border-radius: 12px;
       box-shadow:
         0 8px 32px var(--shadow-elevated),
         inset 0 1px 0 var(--glass-highlight),
         inset 0 -1px 0 rgba(0, 0, 0, 0.2);
       border: 1px solid var(--glass-border);
-      font-size: 28px;
+      font-size: 19px;
       user-select: none;
       pointer-events: none;
-      min-width: 440px;
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      min-width: 295px;
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
       z-index: 200;
       opacity: 0;
       visibility: hidden;
@@ -68,10 +68,10 @@
       white-space: nowrap;
     }
     #hud .bar {
-      --w: 320px;
+      --w: 214px;
       position: relative;
       width: var(--w);
-      height: 18px;
+      height: 12px;
       background: linear-gradient(180deg, rgba(10, 14, 20, 0.8), rgba(15, 19, 25, 0.6));
       border-radius: 999px;
       overflow: hidden;
@@ -2500,14 +2500,14 @@
       #hud {
         top: 5px;
         left: 10px;
-        padding: 10px 14px;
-        font-size: 18px;
-        min-width: 320px;
+        padding: 8px 12px;
+        font-size: 14px;
+        min-width: 240px;
       }
-      
+
       #hud .bar {
-        --w: 220px;
-        height: 10px;
+        --w: 180px;
+        height: 8px;
       }
       
       .mobile-btn {
