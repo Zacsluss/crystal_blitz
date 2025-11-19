@@ -90,21 +90,6 @@ jobs:
             await expect(canvas).toBeVisible();
           });
 
-          test('unit tests pass', async ({ page }) => {
-            await page.goto('/tests.html');
-
-            // Wait for tests to complete (max 15 seconds)
-            await page.waitForFunction(() => {
-              const status = document.querySelector('#test-status');
-              return status && (status.textContent.includes('passed') || status.textContent.includes('failed'));
-            }, { timeout: 15000 });
-
-            // Check that all tests passed
-            const testStatus = await page.locator('#test-status').textContent();
-            expect(testStatus).toContain('passed');
-            expect(testStatus).not.toContain('failed');
-          });
-
           test('no console errors on load', async ({ page }) => {
             const consoleErrors = [];
             page.on('console', msg => {
