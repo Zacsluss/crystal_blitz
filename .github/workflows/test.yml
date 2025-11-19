@@ -28,10 +28,10 @@ jobs:
         npm install -D @playwright/test
         npx playwright install --with-deps ${{ matrix.browser }}
 
-    - name: Create Playwright test
+    - name: Create Playwright config
       run: |
         cat > playwright.config.js << 'EOF'
-        import { defineConfig } from '@playwright/test';
+        import { defineConfig, devices } from '@playwright/test';
 
         export default defineConfig({
           testDir: './e2e',
@@ -45,6 +45,20 @@ jobs:
             baseURL: 'http://localhost:8000',
             trace: 'on-first-retry',
           },
+          projects: [
+            {
+              name: 'chromium',
+              use: { ...devices['Desktop Chrome'] },
+            },
+            {
+              name: 'firefox',
+              use: { ...devices['Desktop Firefox'] },
+            },
+            {
+              name: 'webkit',
+              use: { ...devices['Desktop Safari'] },
+            },
+          ],
           webServer: {
             command: 'python3 -m http.server 8000',
             port: 8000,
@@ -207,8 +221,8 @@ jobs:
 
     - name: Validate HTML structure
       run: |
-        # Check for basic HTML structure
-        if ! grep -q "<!DOCTYPE html>" index.html; then
+        # Check for basic HTML structure (case-insensitive)
+        if ! grep -qi "<!doctype html>" index.html; then
           echo "❌ Missing DOCTYPE declaration"
           exit 1
         fi
