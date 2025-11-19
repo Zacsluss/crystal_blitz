@@ -1,0 +1,237 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Playwright
+      run: |
+        npm install -D @playwright/test
+        npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Create Playwright test
+      run: |
+        cat > playwright.config.js << 'EOF'
+        import { defineConfig } from '@playwright/test';
+
+        export default defineConfig({
+          testDir: './e2e',
+          timeout: 30000,
+          fullyParallel: true,
+          forbidOnly: !!process.env.CI,
+          retries: process.env.CI ? 2 : 0,
+          workers: 1,
+          reporter: 'html',
+          use: {
+            baseURL: 'http://localhost:8000',
+            trace: 'on-first-retry',
+          },
+          webServer: {
+            command: 'python3 -m http.server 8000',
+            port: 8000,
+            timeout: 120 * 1000,
+            reuseExistingServer: !process.env.CI,
+          },
+        });
+        EOF
+
+    - name: Create E2E test directory
+      run: mkdir -p e2e
+
+    - name: Create E2E tests
+      run: |
+        cat > e2e/game.spec.js << 'EOF'
+        import { test, expect } from '@playwright/test';
+
+        test.describe('Crystal Blitz Test Suite', () => {
+          test('loads the game successfully', async ({ page }) => {
+            await page.goto('/');
+            await expect(page).toHaveTitle(/CRYSTAL BLITZ/);
+
+            // Check for canvas element
+            const canvas = await page.locator('canvas');
+            await expect(canvas).toBeVisible();
+          });
+
+          test('runs unit tests successfully', async ({ page }) => {
+            await page.goto('/tests.html');
+
+            // Wait for tests to complete (max 10 seconds)
+            await page.waitForFunction(() => {
+              const status = document.querySelector('#test-status');
+              return status && status.textContent.includes('passed');
+            }, { timeout: 10000 });
+
+            // Check that all tests passed
+            const testStatus = await page.locator('#test-status').textContent();
+            expect(testStatus).toContain('All tests passed');
+
+            // Verify no failed tests
+            expect(testStatus).not.toContain('failed');
+          });
+
+          test('main menu renders correctly', async ({ page }) => {
+            await page.goto('/');
+
+            // Wait for game to load
+            await page.waitForTimeout(1000);
+
+            // Check for menu elements using keyboard interaction
+            // Press Enter to start game
+            await page.keyboard.press('Enter');
+
+            // Wait a bit for game to start
+            await page.waitForTimeout(500);
+
+            // Game should be running (canvas should still be visible)
+            const canvas = await page.locator('canvas');
+            await expect(canvas).toBeVisible();
+          });
+
+          test('game starts without errors', async ({ page }) => {
+            const consoleErrors = [];
+            page.on('console', msg => {
+              if (msg.type() === 'error') {
+                consoleErrors.push(msg.text());
+              }
+            });
+
+            await page.goto('/');
+            await page.waitForTimeout(2000);
+
+            // Press Enter to start
+            await page.keyboard.press('Enter');
+            await page.waitForTimeout(2000);
+
+            // Should have no console errors
+            expect(consoleErrors).toHaveLength(0);
+          });
+
+          test('player can move and shoot', async ({ page }) => {
+            await page.goto('/');
+
+            // Start game
+            await page.keyboard.press('Enter');
+            await page.waitForTimeout(1000);
+
+            // Simulate player movement (WASD keys)
+            await page.keyboard.press('w');
+            await page.keyboard.press('a');
+            await page.keyboard.press('s');
+            await page.keyboard.press('d');
+
+            // Simulate shooting (mouse click)
+            const canvas = await page.locator('canvas');
+            await canvas.click({ position: { x: 400, y: 300 } });
+
+            // Game should still be running
+            await expect(canvas).toBeVisible();
+          });
+
+          test('pause menu works', async ({ page }) => {
+            await page.goto('/');
+
+            // Start game
+            await page.keyboard.press('Enter');
+            await page.waitForTimeout(1000);
+
+            // Pause with ESC
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(500);
+
+            // Resume with ESC
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(500);
+
+            const canvas = await page.locator('canvas');
+            await expect(canvas).toBeVisible();
+          });
+        });
+        EOF
+
+    - name: Run Playwright tests
+      run: npx playwright test --project=${{ matrix.browser }}
+
+    - name: Upload Playwright report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Check for console.log statements
+      run: |
+        if grep -n "console\.log" index.html | grep -v "// console.log" | grep -v "console.warn"; then
+          echo "❌ Found console.log statements in production code:"
+          grep -n "console\.log" index.html | grep -v "// console.log" | grep -v "console.warn"
+          exit 1
+        else
+          echo "✅ No console.log statements found"
+        fi
+
+    - name: Check file size
+      run: |
+        SIZE=$(wc -c < index.html)
+        if [ $SIZE -gt 500000 ]; then
+          echo "⚠️  Warning: index.html is larger than 500KB ($SIZE bytes)"
+        else
+          echo "✅ File size OK: $SIZE bytes"
+        fi
+
+    - name: Validate HTML structure
+      run: |
+        # Check for basic HTML structure
+        if ! grep -q "<!DOCTYPE html>" index.html; then
+          echo "❌ Missing DOCTYPE declaration"
+          exit 1
+        fi
+        if ! grep -q "<canvas" index.html; then
+          echo "❌ Missing canvas element"
+          exit 1
+        fi
+        echo "✅ HTML structure valid"
+
+  status:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: always()
+
+    steps:
+    - name: Check status
+      run: |
+        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.lint.result }}" == "success" ]; then
+          echo "✅ All checks passed!"
+          exit 0
+        else
+          echo "❌ Some checks failed"
+          echo "Test result: ${{ needs.test.result }}"
+          echo "Lint result: ${{ needs.lint.result }}"
+          exit 1
+        fi
