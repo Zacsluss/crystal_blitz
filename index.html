@@ -4841,6 +4841,192 @@
     ['stalker', 'serpent', 'prowler', 'prowler', 'berserker', 'maniac', 'leaper', 'volatile', 'juggernaut', 'vortex', 'divider', 'trapper', 'bomber']
   ];
 
+  // ============================================================
+  // ENEMY AI NAMESPACE MODULE
+  // ============================================================
+  /**
+   * Centralized enemy AI system handling spawning, behavior, and rendering
+   * Extracted to reduce god-function complexity and improve maintainability
+   */
+  const EnemyAI = {
+    /**
+     * Spawns enemy bullets with directional targeting
+     * @param {number} x - Starting X position
+     * @param {number} y - Starting Y position
+     * @param {number} targetX - Target X position
+     * @param {number} targetY - Target Y position
+     * @param {number} angleOffset - Angle offset in radians (default: 0)
+     * @param {number} speedMult - Speed multiplier (default: 1.0)
+     */
+    spawnBullet(x, y, targetX, targetY, angleOffset = 0, speedMult = 1.0) {
+      const baseAngle = Math.atan2(targetY - y, targetX - x) + angleOffset;
+      const dx = fastCos(baseAngle), dy = fastSin(baseAngle);
+      const speed = Math.min(GAME_CONSTANTS.ENEMY_BULLET_MAX_SPEED, GAME_CONSTANTS.ENEMY_BULLET_BASE_SPEED + game.wave) * speedMult;
+
+      enemyBullets.spawn(b => {
+        b.x = x;
+        b.y = y;
+        b.vx = dx * speed;
+        b.vy = dy * speed;
+        b.r = 3;
+        b.life = 0;
+        b.maxLife = 3.0;
+        b.alive = true;
+      });
+    },
+
+    /**
+     * Spawns a burst of enemy bullets in rapid succession
+     * @param {number} x - Starting X position
+     * @param {number} y - Starting Y position
+     * @param {number} targetX - Target X position
+     * @param {number} targetY - Target Y position
+     * @param {number} burstCount - Number of bullets in burst (default: 3)
+     */
+    spawnBurstFire(x, y, targetX, targetY, burstCount = 3) {
+      for (let i = 0; i < burstCount; i++) {
+        this.spawnBullet(x, y, targetX, targetY);
+      }
+    },
+
+    /**
+     * Spawns a spread pattern of enemy bullets
+     * @param {number} x - Starting X position
+     * @param {number} y - Starting Y position
+     * @param {number} targetX - Target X position
+     * @param {number} targetY - Target Y position
+     * @param {number} bulletCount - Number of bullets in spread (default: 3)
+     * @param {number} spreadAngle - Total spread angle in radians (default: Math.PI/4)
+     */
+    spawnSpreadShot(x, y, targetX, targetY, bulletCount = 3, spreadAngle = Math.PI/4) {
+      const halfSpread = spreadAngle / 2;
+      for (let i = 0; i < bulletCount; i++) {
+        const angleOffset = bulletCount === 1 ? 0 :
+          -halfSpread + (i / (bulletCount - 1)) * spreadAngle;
+        this.spawnBullet(x, y, targetX, targetY, angleOffset);
+      }
+    },
+
+    /**
+     * Draws behavior-specific symbol overlay on enemy
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {Object} e - Enemy entity
+     * @param {number} x - Screen X coordinate
+     * @param {number} y - Screen Y coordinate
+     * @param {number} r - Enemy radius
+     */
+    drawSymbol(ctx, e, x, y, r) {
+      ctx.save();
+      ctx.strokeStyle = '#000000';
+      ctx.fillStyle = '#000000';
+      ctx.lineWidth = Math.max(1, r * 0.15);
+      ctx.globalAlpha = 0.9;
+
+      const symbolSize = r * 0.6;
+
+      // Shooters get priority for crosshair symbol
+      if (e.isShooter) {
+        ctx.lineWidth = Math.max(2, r * 0.15);
+        ctx.beginPath();
+        ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
+        ctx.moveTo(x - symbolSize * 0.6, y);
+        ctx.lineTo(x + symbolSize * 0.6, y);
+        ctx.moveTo(x, y - symbolSize * 0.6);
+        ctx.lineTo(x, y + symbolSize * 0.6);
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      // Draw based on behavior type
+      switch(e.behavior) {
+        case 'stalker':
+          ctx.beginPath();
+          ctx.arc(x, y, symbolSize * 0.25, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'volatile':
+          ctx.fillStyle = '#000000';
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.beginPath();
+          ctx.moveTo(x, y - symbolSize * 0.5);
+          ctx.lineTo(x, y + symbolSize * 0.1);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x, y + symbolSize * 0.35, symbolSize * 0.12, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'berserker':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          for(let i = 0; i < 3; i++) {
+            const offset = (i - 1) * symbolSize * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(x + offset - symbolSize * 0.2, y - symbolSize * 0.3);
+            ctx.lineTo(x + offset + symbolSize * 0.2, y);
+            ctx.lineTo(x + offset - symbolSize * 0.2, y + symbolSize * 0.3);
+            ctx.stroke();
+          }
+          break;
+
+        case 'vortex':
+          ctx.lineWidth = Math.max(1.5, r * 0.12);
+          for(let i = 0; i < 3; i++) {
+            const angle = (i / 3) * TAU;
+            ctx.beginPath();
+            ctx.arc(x, y, symbolSize * 0.6, angle, angle + Math.PI * 0.6);
+            ctx.stroke();
+          }
+          break;
+
+        case 'bomber':
+          ctx.beginPath();
+          ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
+          ctx.fill();
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = Math.max(1, r * 0.1);
+          ctx.beginPath();
+          ctx.moveTo(x + symbolSize * 0.3, y - symbolSize * 0.3);
+          ctx.lineTo(x + symbolSize * 0.6, y - symbolSize * 0.6);
+          ctx.stroke();
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          ctx.arc(x + symbolSize * 0.6, y - symbolSize * 0.6, symbolSize * 0.15, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'juggernaut':
+          ctx.lineWidth = Math.max(2, r * 0.2);
+          ctx.beginPath();
+          ctx.moveTo(x, y - symbolSize * 0.6);
+          ctx.lineTo(x - symbolSize * 0.5, y - symbolSize * 0.3);
+          ctx.lineTo(x - symbolSize * 0.5, y + symbolSize * 0.3);
+          ctx.lineTo(x, y + symbolSize * 0.6);
+          ctx.lineTo(x + symbolSize * 0.5, y + symbolSize * 0.3);
+          ctx.lineTo(x + symbolSize * 0.5, y - symbolSize * 0.3);
+          ctx.closePath();
+          ctx.stroke();
+          break;
+
+        default:
+          // No symbol for other behaviors
+          break;
+      }
+
+      ctx.restore();
+    },
+
+    // TODO: Extract spawnEnemy() function here (~238 lines)
+    // spawn(g, clusterX = null, clusterY = null) { ... }
+
+    // TODO: Extract handleEnemyDeath() function here (~30 lines)
+    // handleDeath(enemy, game) { ... }
+
+    // TODO: Extract enemy update loop here (~553 lines from main update())
+    // updateAll(enemies, game, player, dt, grid) { ... }
+  };
+
   /**
    * Spawns a new enemy at the edge of the screen or in a cluster
    * @param {Object} g - Game state object
@@ -5577,54 +5763,7 @@
    * @param {number} angleOffset - Angle offset in radians (default: 0)
    * @param {number} speedMult - Speed multiplier (default: 1.0)
    */
-  function spawnEnemyBullet(x, y, targetX, targetY, angleOffset = 0, speedMult = 1.0) {
-    const baseAngle = Math.atan2(targetY - y, targetX - x) + angleOffset;
-    const dx = fastCos(baseAngle), dy = fastSin(baseAngle);
-    const speed = Math.min(GAME_CONSTANTS.ENEMY_BULLET_MAX_SPEED, GAME_CONSTANTS.ENEMY_BULLET_BASE_SPEED + game.wave) * speedMult;
-    
-    enemyBullets.spawn(b => {
-      b.x = x;
-      b.y = y;
-      b.vx = dx * speed;
-      b.vy = dy * speed;
-      b.r = 3;
-      b.life = 0;
-      b.maxLife = 3.0;
-      b.alive = true;
-    });
-  }
-
-  /**
-   * Spawns a burst of enemy bullets in rapid succession
-   * @param {number} x - Starting X position
-   * @param {number} y - Starting Y position
-   * @param {number} targetX - Target X position
-   * @param {number} targetY - Target Y position
-   * @param {number} burstCount - Number of bullets in burst (default: 3)
-   */
-  function spawnEnemyBurstFire(x, y, targetX, targetY, burstCount = 3) {
-    for (let i = 0; i < burstCount; i++) {
-      spawnEnemyBullet(x, y, targetX, targetY);
-    }
-  }
-
-  /**
-   * Spawns a spread pattern of enemy bullets
-   * @param {number} x - Starting X position
-   * @param {number} y - Starting Y position
-   * @param {number} targetX - Target X position
-   * @param {number} targetY - Target Y position
-   * @param {number} bulletCount - Number of bullets in spread (default: 3)
-   * @param {number} spreadAngle - Total spread angle in radians (default: Math.PI/4)
-   */
-  function spawnEnemySpreadShot(x, y, targetX, targetY, bulletCount = 3, spreadAngle = Math.PI/4) {
-    const halfSpread = spreadAngle / 2;
-    for (let i = 0; i < bulletCount; i++) {
-      const angleOffset = bulletCount === 1 ? 0 : 
-        -halfSpread + (i / (bulletCount - 1)) * spreadAngle;
-      spawnEnemyBullet(x, y, targetX, targetY, angleOffset);
-    }
-  }
+  // MIGRATED TO EnemyAI NAMESPACE - See EnemyAI.spawnBullet() above
 
   function spawnBulletPickup(x, y){
     pickups.spawn(p => {
@@ -6432,8 +6571,8 @@
         // Shoot periodically in spiral pattern
         e.spiralShootTimer -= enemyDt;
         if (e.spiralShootTimer <= 0) {
-          spawnEnemyBullet(e.x, e.y, 
-            e.x + fastCos(e.spiralAngle) * 100, 
+          EnemyAI.spawnBullet(e.x, e.y,
+            e.x + fastCos(e.spiralAngle) * 100,
             e.y + fastSin(e.spiralAngle) * 100);
           e.spiralShootTimer = 0.6; // Half frequency (was 0.3)
           beep(320, 0.04, 'triangle', 0.04); // High-pitched spiral sound
@@ -6599,13 +6738,13 @@
         e.shootTimer -= enemyDt;
         if (e.shootTimer <= 0) {
           if (e.shootPattern === 'spread') {
-            spawnEnemySpreadShot(e.x, e.y, p.x, p.y, 3, Math.PI/3); // 3 bullets, 60° spread
+            EnemyAI.spawnSpreadShot(e.x, e.y, p.x, p.y, 3, Math.PI/3); // 3 bullets, 60° spread
             e.shootTimer = 2.5; // Slightly slower for spread
             beep(280, 0.08, 'sine', 0.10); // Lower, longer sound for spread
           } else if (e.shootPattern === 'burst') {
-            spawnEnemyBullet(e.x, e.y, p.x, p.y);
+            EnemyAI.spawnBullet(e.x, e.y, p.x, p.y);
             e.burstCount++;
-            
+
             if (e.burstCount >= 3) {
               e.shootTimer = 3.0; // Long cooldown after burst
               e.burstCount = 0;
@@ -6616,7 +6755,7 @@
             }
           } else {
             // Single shot (default)
-            spawnEnemyBullet(e.x, e.y, p.x, p.y);
+            EnemyAI.spawnBullet(e.x, e.y, p.x, p.y);
             e.shootTimer = 2.0; // Reset timer
             beep(300, 0.06, 'sine', 0.08); // Enemy shooting sound
           }
@@ -7886,7 +8025,7 @@
         ctx.stroke();
         
         // Draw overlord symbol
-        drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+        EnemyAI.drawSymbol(ctx, e, e.x, e.y, e.r);
         
         ctx.restore();
       } else {
@@ -7931,7 +8070,7 @@
             ctx.restore(); // ALWAYS restore after scale
             
             // Draw enemy symbol AFTER scale restore to prevent distortion
-            drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+            EnemyAI.drawSymbol(ctx, e, e.x, e.y, e.r);
           } else {
             // No scale animation, draw normally
             let renderColor = '#ff4444';
@@ -7949,7 +8088,7 @@
             ctx.beginPath();
             ctx.arc(e.x, e.y, e.r, 0, TAU);
             ctx.fill();
-            drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+            EnemyAI.drawSymbol(ctx, e, e.x, e.y, e.r);
           }
         } else {
           // No spawn animation at all
@@ -7968,7 +8107,7 @@
           ctx.beginPath();
           ctx.arc(e.x, e.y, e.r, 0, TAU);
           ctx.fill();
-          drawEnemySymbol(ctx, e, e.x, e.y, e.r);
+          EnemyAI.drawSymbol(ctx, e, e.x, e.y, e.r);
         }
         
         ctx.restore();
@@ -8773,246 +8912,21 @@
   }
 
   // ===== Enemy Symbol Drawing =====
+  /**
+   * @deprecated Use EnemyAI.drawSymbol() instead - this wrapper maintained for compatibility
+   */
   function drawEnemySymbol(ctx, e, x, y, r) {
-    ctx.save();
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = '#000000';
-    ctx.lineWidth = Math.max(1, r * 0.15);
-    ctx.globalAlpha = 0.9; // More opaque for better visibility
-    
-    const symbolSize = r * 0.6; // Symbol is 60% of enemy radius
-    
-    // First check if it's a shooter - shooters get priority for crosshair
-    if (e.isShooter) {
-      // Crosshair for shooters - always draw this for shooters
-      ctx.lineWidth = Math.max(2, r * 0.15);
-      ctx.beginPath();
-      ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
-      ctx.moveTo(x - symbolSize * 0.6, y);
-      ctx.lineTo(x + symbolSize * 0.6, y);
-      ctx.moveTo(x, y - symbolSize * 0.6);
-      ctx.lineTo(x, y + symbolSize * 0.6);
-      ctx.stroke();
-      ctx.restore();
-      return;
-    }
-    
-    // Draw based on behavior type
-    switch(e.behavior) {
-      case 'stalker':
-        // Single dot - basic enemy
-        ctx.beginPath();
-        ctx.arc(x, y, symbolSize * 0.25, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'volatile':
-        // Radiation/danger symbol - exclamation mark !
-        ctx.fillStyle = '#000000';
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        // Main stroke
-        ctx.beginPath();
-        ctx.moveTo(x, y - symbolSize * 0.5);
-        ctx.lineTo(x, y + symbolSize * 0.1);
-        ctx.stroke();
-        // Dot
-        ctx.beginPath();
-        ctx.arc(x, y + symbolSize * 0.35, symbolSize * 0.12, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'berserker':
-        // Forward arrows >>>
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        for(let i = 0; i < 3; i++) {
-          const offset = (i - 1) * symbolSize * 0.3;
-          ctx.beginPath();
-          ctx.moveTo(x + offset - symbolSize * 0.2, y - symbolSize * 0.3);
-          ctx.lineTo(x + offset + symbolSize * 0.2, y);
-          ctx.lineTo(x + offset - symbolSize * 0.2, y + symbolSize * 0.3);
-          ctx.stroke();
-        }
-        break;
-        
-      case 'vortex':
-        // Spiral pattern
-        ctx.lineWidth = Math.max(1.5, r * 0.12);
-        for(let i = 0; i < 3; i++) {
-          const angle = (i / 3) * TAU;
-          ctx.beginPath();
-          ctx.arc(x, y, symbolSize * 0.6, angle, angle + Math.PI * 0.6);
-          ctx.stroke();
-        }
-        break;
-        
-      case 'bomber':
-        // Bomb with fuse
-        ctx.beginPath();
-        ctx.arc(x, y, symbolSize * 0.4, 0, TAU);
-        ctx.fill();
-        // Fuse
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = Math.max(1, r * 0.1);
-        ctx.beginPath();
-        ctx.moveTo(x + symbolSize * 0.3, y - symbolSize * 0.3);
-        ctx.lineTo(x + symbolSize * 0.6, y - symbolSize * 0.6);
-        ctx.stroke();
-        // Spark
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(x + symbolSize * 0.6, y - symbolSize * 0.6, symbolSize * 0.15, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'juggernaut':
-        // Shield shape
-        ctx.lineWidth = Math.max(2, r * 0.2);
-        ctx.beginPath();
-        ctx.moveTo(x, y - symbolSize * 0.6);
-        ctx.lineTo(x - symbolSize * 0.5, y - symbolSize * 0.3);
-        ctx.lineTo(x - symbolSize * 0.5, y + symbolSize * 0.3);
-        ctx.lineTo(x, y + symbolSize * 0.6);
-        ctx.lineTo(x + symbolSize * 0.5, y + symbolSize * 0.3);
-        ctx.lineTo(x + symbolSize * 0.5, y - symbolSize * 0.3);
-        ctx.closePath();
-        ctx.stroke();
-        break;
-        
-      case 'divider':
-        // Y shape with dots
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x - symbolSize * 0.4, y - symbolSize * 0.5);
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + symbolSize * 0.4, y - symbolSize * 0.5);
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y + symbolSize * 0.5);
-        ctx.stroke();
-        // Dots at ends
-        ctx.beginPath();
-        ctx.arc(x - symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
-        ctx.arc(x + symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
-        ctx.arc(x, y + symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'trapper':
-        // Hexagon mine shape
-        ctx.lineWidth = Math.max(1.5, r * 0.15);
-        ctx.beginPath();
-        for(let i = 0; i < 6; i++) {
-          const angle = (i / 6) * TAU;
-          const px = x + Math.cos(angle) * symbolSize * 0.5;
-          const py = y + Math.sin(angle) * symbolSize * 0.5;
-          if(i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-        ctx.stroke();
-        // Center spike
-        ctx.beginPath();
-        ctx.arc(x, y, symbolSize * 0.15, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'serpent':
-        // Wavy line
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.beginPath();
-        ctx.moveTo(x - symbolSize * 0.6, y);
-        ctx.quadraticCurveTo(x - symbolSize * 0.3, y - symbolSize * 0.4, x, y);
-        ctx.quadraticCurveTo(x + symbolSize * 0.3, y + symbolSize * 0.4, x + symbolSize * 0.6, y);
-        ctx.stroke();
-        break;
-        
-      case 'prowler':
-        // Parentheses ( ) for flanking
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.beginPath();
-        ctx.arc(x - symbolSize * 0.25, y, symbolSize * 0.4, -Math.PI * 0.4, Math.PI * 0.4);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(x + symbolSize * 0.25, y, symbolSize * 0.4, Math.PI * 0.6, Math.PI * 1.4);
-        ctx.stroke();
-        break;
-        
-      case 'leaper':
-        // Up arrow for jumping
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.beginPath();
-        ctx.moveTo(x, y - symbolSize * 0.5);
-        ctx.lineTo(x - symbolSize * 0.3, y);
-        ctx.moveTo(x, y - symbolSize * 0.5);
-        ctx.lineTo(x + symbolSize * 0.3, y);
-        ctx.moveTo(x, y - symbolSize * 0.5);
-        ctx.lineTo(x, y + symbolSize * 0.5);
-        ctx.stroke();
-        break;
-        
-      case 'maniac':
-        // Chaotic X marks
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.strokeStyle = '#000000';
-        ctx.beginPath();
-        ctx.moveTo(x - symbolSize * 0.4, y - symbolSize * 0.4);
-        ctx.lineTo(x + symbolSize * 0.4, y + symbolSize * 0.4);
-        ctx.moveTo(x + symbolSize * 0.4, y - symbolSize * 0.4);
-        ctx.lineTo(x - symbolSize * 0.4, y + symbolSize * 0.4);
-        ctx.stroke();
-        // Question mark dot
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(x, y + symbolSize * 0.6, symbolSize * 0.1, 0, TAU);
-        ctx.fill();
-        break;
-        
-      case 'boss':
-        // Diamond (two-pointed triangle) for mini-boss
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.strokeStyle = '#000000';
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        // Diamond shape
-        ctx.moveTo(x, y - symbolSize * 0.6); // Top
-        ctx.lineTo(x + symbolSize * 0.5, y); // Right
-        ctx.lineTo(x, y + symbolSize * 0.6); // Bottom
-        ctx.lineTo(x - symbolSize * 0.5, y); // Left
-        ctx.closePath();
-        ctx.stroke();
-        break;
-        
-      case 'superboss':
-        // Three-pointed triangle for super boss
-        ctx.lineWidth = Math.max(2, r * 0.15);
-        ctx.strokeStyle = '#000000';
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        // Equilateral triangle
-        const triRadius = symbolSize * 0.6;
-        for(let i = 0; i < 3; i++) {
-          const angle = (i / 3) * TAU - Math.PI/2; // Start from top
-          const px = x + Math.cos(angle) * triRadius;
-          const py = y + Math.sin(angle) * triRadius;
-          if(i === 0) {
-            ctx.moveTo(px, py);
-          } else {
-            ctx.lineTo(px, py);
-          }
-        }
-        ctx.closePath();
-        ctx.stroke();
-        break;
-        
-      default:
-        // Simple dot for unknown behaviors (should never happen)
-        ctx.beginPath();
-        ctx.arc(x, y, symbolSize * 0.3, 0, TAU);
-        ctx.fill();
-    }
-    
-    ctx.restore();
+    // MIGRATED: This function now delegates to EnemyAI.drawSymbol()
+    return EnemyAI.drawSymbol(ctx, e, x, y, r);
   }
+
+  // OLD IMPLEMENTATION REMOVED - See EnemyAI namespace above (lines 4851-5028)
+  //
+  // The full 239-line implementation has been moved to EnemyAI.drawSymbol()
+  // to reduce god-function complexity and improve code organization.
+  //
+  // This wrapper is maintained temporarily for backwards compatibility,
+  // but all new code should call EnemyAI.drawSymbol() directly.
 
   // ===== Loop (fixed-timestep with interpolation) =====
   let last = performance.now();
@@ -9305,7 +9219,7 @@
         ctx.fill();
         
         // Draw enemy symbol
-        drawEnemySymbol(ctx, mockEnemy, mockEnemy.x, mockEnemy.y, mockEnemy.r);
+        EnemyAI.drawSymbol(ctx, mockEnemy, mockEnemy.x, mockEnemy.y, mockEnemy.r);
         
         ctx.restore();
         
