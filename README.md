@@ -14,8 +14,7 @@
 <p align="center">
   <a href="https://zacsluss.github.io/crystal_blitz/">
     <img src="https://img.shields.io/badge/🎮_PLAY-GAME!-2e8b57?style=for-the-badge&labelColor=000000&logo=vercel&logoColor=white" alt="Play Game"/>
-  </a>
-  <a href="https://github.com/Zacsluss/crystal_blitz/archive/refs/heads/main.zip">
+  </a><a href="https://github.com/Zacsluss/crystal_blitz/archive/refs/heads/main.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-PROJECT-d97706?style=for-the-badge&labelColor=000000&logo=github&logoColor=white" alt="Download"/>
   </a>
 </p>
