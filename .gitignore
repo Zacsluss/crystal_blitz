@@ -54,3 +54,9 @@ out/
 
 # Development tools
 .claude/
+
+# Playwright local testing
+playwright.config.js
+e2e/performance-local-test.spec.js
+playwright-report/
+test-results/
