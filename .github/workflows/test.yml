@@ -269,9 +269,115 @@ jobs:
         path: playwright-report/
         retention-days: 30
 
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Playwright
+      run: |
+        npm install -D @playwright/test
+        npx playwright install --with-deps chromium
+
+    - name: Create Playwright config
+      run: |
+        cat > playwright.config.js << 'EOF'
+        import { defineConfig, devices } from '@playwright/test';
+
+        export default defineConfig({
+          testDir: './e2e',
+          timeout: 30000,
+          fullyParallel: false,
+          forbidOnly: !!process.env.CI,
+          retries: process.env.CI ? 2 : 0,
+          workers: 1,
+          reporter: [['html'], ['list']],
+          use: {
+            baseURL: 'http://localhost:8000',
+            trace: 'on-first-retry',
+            screenshot: 'only-on-failure',
+            video: 'retain-on-failure',
+          },
+          projects: [
+            {
+              name: 'chromium',
+              use: { ...devices['Desktop Chrome'] },
+            },
+          ],
+        });
+        EOF
+
+    - name: Create e2e directory
+      run: mkdir -p e2e
+
+    - name: Create unit test runner
+      run: |
+        cat > e2e/unit-tests.spec.js << 'EOF'
+        import { test, expect } from '@playwright/test';
+
+        test.describe('Crystal Blitz - Unit Tests', () => {
+          test('all unit tests pass', async ({ page }) => {
+            // Navigate to unit tests page
+            await page.goto('http://localhost:8000/unit-tests.html', { waitUntil: 'load' });
+
+            // Wait for tests to complete
+            await page.waitForTimeout(2000);
+
+            // Check summary for failures
+            const summary = await page.locator('#summary').textContent();
+
+            console.log('Summary:', summary);
+
+            // Extract pass/fail counts
+            const passMatch = summary.match(/(\d+) passed/);
+            const failMatch = summary.match(/(\d+) failed/);
+
+            const passed = passMatch ? parseInt(passMatch[1]) : 0;
+            const failed = failMatch ? parseInt(failMatch[1]) : 0;
+
+            console.log(`Unit Test Results: ${passed} passed, ${failed} failed`);
+
+            // Fail if any tests failed
+            expect(failed).toBe(0);
+            expect(passed).toBeGreaterThan(0);
+          });
+        });
+        EOF
+
+    - name: Start HTTP server
+      run: |
+        python3 -m http.server 8000 > /dev/null 2>&1 &
+        echo $! > server.pid
+
+    - name: Wait for server to be ready
+      run: |
+        for i in {1..30}; do
+          if curl -s http://localhost:8000/ > /dev/null; then
+            echo "Server is ready!"
+            break
+          fi
+          echo "Waiting for server... ($i/30)"
+          sleep 1
+        done
+
+    - name: Run unit tests
+      run: npx playwright test e2e/unit-tests.spec.js --project=chromium
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: unit-test-results
+        path: playwright-report/
+        retention-days: 30
+
   status:
     runs-on: ubuntu-latest
-    needs: [test, lint, performance]
+    needs: [test, lint, performance, unit-tests]
     if: always()
 
     steps:
