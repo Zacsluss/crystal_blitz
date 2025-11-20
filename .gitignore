@@ -52,5 +52,5 @@ dist/
 build/
 out/
 
-# Claude Code AI assistant files (excluded from production repository)
+# Development tools
 .claude/
