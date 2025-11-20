@@ -5955,6 +5955,154 @@
   const MAX_GRADIENT_CACHE_SIZE = 100;
   
   // ===== Update & Draw =====
+  // ============================================================
+  // EXTRACTED UPDATE HELPERS - Breaking up god function
+  // ============================================================
+
+  /**
+   * Processes player input, movement, stamina, and position updates
+   * Extracted from update() to reduce god-function complexity (was 1730 lines)
+   * @param {Object} game - Game state object
+   * @param {Object} player - Player entity
+   * @param {number} dt - Delta time in seconds
+   * @returns {{ax: number, ay: number, isSprinting: boolean, canFire: boolean, heatSpreadMod: number, heatFireRateMod: number}}
+   */
+  function updatePlayerMovement(game, player, dt) {
+    // Input -> movement (keyboard + touch)
+    let ax = 0, ay = 0;
+    if (keys.has('KeyW')) ay -= 1;
+    if (keys.has('KeyS')) ay += 1;
+    if (keys.has('KeyA')) ax -= 1;
+    if (keys.has('KeyD')) ax += 1;
+
+    // Improved touch movement with virtual joystick
+    if (touchMove.active) {
+      const deadZone = 15;
+      const touchDx = touchMove.x - touchMove.startX;
+      const touchDy = touchMove.y - touchMove.startY;
+      const touchDist = fastLength(touchDx, touchDy);
+
+      if (touchDist > deadZone) {
+        const maxDist = 60;
+        const scale = Math.min(touchDist, maxDist) / maxDist;
+        const angle = Math.atan2(touchDy, touchDx);
+        ax += Math.cos(angle) * scale * 1.2;
+        ay += Math.sin(angle) * scale * 1.2;
+      }
+    }
+
+    // Exhaustion cooldown
+    if (player.exhausted > 0) player.exhausted -= dt;
+
+    // Adrenaline timer countdown
+    if (player.adrenalineTimer > 0) player.adrenalineTimer -= dt;
+
+    // Leap cooldown
+    if (player.leapCd > 0) {
+      player.leapCd -= dt;
+      if (player.leapCd <= 0) player.leapReady = true;
+    }
+
+    // Emergency leap (Space key)
+    if (keys.has('Space') && player.leapReady && (ax || ay)) {
+      const leapVec = normInPlace(ax, ay, vecPool.temp1);
+      player.vx += leapVec.x * player.leapSpeed;
+      player.vy += leapVec.y * player.leapSpeed;
+      player.leapCd = 3.0;
+      player.leapReady = false;
+      beep(400, 0.08, 'triangle', 0.03);
+    }
+
+    // Stamina system
+    const wantsToSprint = keys.has('ShiftLeft') || keys.has('ShiftRight');
+    const canSprint = player.stamina > 0 && player.exhausted <= 0;
+    const isSprinting = wantsToSprint && canSprint && (ax || ay);
+    player.isSprinting = isSprinting;
+
+    if (isSprinting) {
+      const oldStamina = player.stamina;
+      player.stamina = Math.max(0, player.stamina - 20 * dt);
+      if (oldStamina > 0 && player.stamina <= 0) {
+        const baseExhaustion = 2.0;
+        const reduction = player.dashCooldownReduction || 0;
+        player.exhausted = baseExhaustion * (1 - reduction);
+        staminaDepletedSound();
+      }
+    } else {
+      player.stamina = Math.min(100, player.stamina + 12.5 * dt * player.staminaRegen);
+    }
+
+    // Apply movement if input detected
+    if (ax || ay) {
+      const moveVec = normInPlace(ax, ay, vecPool.temp1);
+      const nx = moveVec.x, ny = moveVec.y;
+      const waveSpeedBonus = game.wave * GAME_CONSTANTS.PLAYER_WAVE_SPEED_BONUS;
+      const adrenalineBonus = (player.adrenalineTimer > 0) ? GAME_CONSTANTS.PLAYER_ADRENALINE_MULTIPLIER : 1.0;
+      const baseSpeed = (player.speed + waveSpeedBonus) * adrenalineBonus;
+      const speed = Math.min(GAME_CONSTANTS.PLAYER_MAX_SPEED, isSprinting ? baseSpeed * GAME_CONSTANTS.PLAYER_SPRINT_MULTIPLIER : baseSpeed);
+      player.vx += nx * speed * dt * GAME_CONSTANTS.PLAYER_ACCELERATION;
+      player.vy += ny * speed * dt * GAME_CONSTANTS.PLAYER_ACCELERATION;
+    }
+
+    // Friction
+    player.vx *= (1 - GAME_CONSTANTS.PLAYER_FRICTION * dt);
+    player.vy *= (1 - GAME_CONSTANTS.PLAYER_FRICTION * dt);
+
+    // Integrate position with bounds clamping
+    player.x = clamp(player.x + player.vx * dt, player.radius, game.width() - player.radius);
+    player.y = clamp(player.y + player.vy * dt, player.radius, game.height() - player.radius);
+
+    // Spawn footsteps when moving
+    if (!player.footstepTimer) player.footstepTimer = 0;
+    const playerSpeed = fastLength(player.vx, player.vy);
+    if (playerSpeed > GAME_CONSTANTS.PLAYER_FOOTSTEP_SPEED_THRESHOLD) {
+      player.footstepTimer -= dt;
+      if (player.footstepTimer <= 0) {
+        const moveAngle = Math.atan2(player.vy, player.vx);
+        spawnFootstep(player.x, player.y, moveAngle, true, player);
+        player.footstepTimer = isSprinting ? GAME_CONSTANTS.PLAYER_FOOTSTEP_SPRINT_INTERVAL : GAME_CONSTANTS.PLAYER_FOOTSTEP_INTERVAL;
+      }
+    }
+
+    // Heat dissipation when not firing
+    if (!mouseDown || player.overheated) {
+      player.heat = Math.max(0, player.heat - player.heatDissipation * dt);
+      if (player.overheated && player.heat <= player.overheatCooldown) {
+        player.overheated = false;
+      }
+    }
+
+    // Calculate heat-based penalties
+    let heatSpreadMod = 0;
+    let heatFireRateMod = 1.0;
+    let canFire = true;
+
+    const weaponHeatPercent = player.heat / player.maxHeat;
+    if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_LOW && weaponHeatPercent < GAME_CONSTANTS.HEAT_THRESHOLD_MED) {
+      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_LOW;
+    } else if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_MED && weaponHeatPercent < GAME_CONSTANTS.HEAT_THRESHOLD_HIGH) {
+      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_MED;
+      heatFireRateMod = GAME_CONSTANTS.HEAT_FIRERATE_MED;
+    } else if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_HIGH && weaponHeatPercent < 1.0) {
+      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_HIGH;
+      heatFireRateMod = GAME_CONSTANTS.HEAT_FIRERATE_HIGH;
+    } else if (player.heat >= player.maxHeat) {
+      player.overheated = true;
+      player.heat = Math.min(player.heat, player.maxHeat);
+      canFire = false;
+    }
+
+    return { ax, ay, isSprinting, canFire, heatSpreadMod, heatFireRateMod };
+  }
+
+  // TODO: Extract additional update() subsystems (~1600 lines remaining):
+  // - updatePlayerShooting(game, player, dt, {canFire, heatSpreadMod, heatFireRateMod}) - ~150 lines
+  // - updateBullets(game, dt) - ~200 lines (homing, seeking, ricochet logic)
+  // - updateEnemies(game, dt) - ~600 lines (PARTIALLY in EnemyAI namespace)
+  // - updateCollisions(game, dt) - ~400 lines (enemy hits, pickups, mines, shields)
+  // - updateWaveProgression(game, dt) - ~200 lines (spawning, wave completion)
+  // - updateParticles(game, dt) - ~100 lines (explosions, blood, footsteps)
+
   /**
    * Main game update loop - handles physics, AI, collisions, and game logic
    * @param {Object} g - Game state object
@@ -5983,141 +6131,8 @@
       }
     }
 
-    // Input -> movement (keyboard + touch)
-    let ax=0, ay=0;
-    if (keys.has('KeyW')) ay -= 1;
-    if (keys.has('KeyS')) ay += 1;
-    if (keys.has('KeyA')) ax -= 1;
-    if (keys.has('KeyD')) ax += 1;
-    
-    // Improved touch movement with virtual joystick
-    if (touchMove.active) {
-      const deadZone = 15; // Smaller dead zone for better responsiveness
-      const touchDx = touchMove.x - touchMove.startX;
-      const touchDy = touchMove.y - touchMove.startY;
-      const touchDist = fastLength(touchDx, touchDy);
-      
-      if (touchDist > deadZone) {
-        // Normalize and scale the input
-        const maxDist = 60; // Maximum joystick distance
-        const scale = Math.min(touchDist, maxDist) / maxDist;
-        const angle = Math.atan2(touchDy, touchDx);
-        
-        ax += Math.cos(angle) * scale * 1.2; // Increased sensitivity
-        ay += Math.sin(angle) * scale * 1.2;
-      }
-    }
-    
-    // Exhaustion cooldown
-    if (p.exhausted > 0) p.exhausted -= dt;
-    
-    // Adrenaline timer countdown
-    if (p.adrenalineTimer > 0) p.adrenalineTimer -= dt;
-    
-    // Leap cooldown
-    if (p.leapCd > 0) {
-      p.leapCd -= dt;
-      if (p.leapCd <= 0) p.leapReady = true;
-    }
-    
-    // Emergency leap (Space key)
-    if (keys.has('Space') && p.leapReady && (ax || ay)) {
-      const leapVec = normInPlace(ax, ay, vecPool.temp1);
-      p.vx += leapVec.x * p.leapSpeed;
-      p.vy += leapVec.y * p.leapSpeed;
-      p.leapCd = 3.0; // 3 second cooldown
-      p.leapReady = false;
-      beep(400, 0.08, 'triangle', 0.03); // Leap sound effect
-    }
-    
-    // Stamina system
-    const wantsToSprint = keys.has('ShiftLeft') || keys.has('ShiftRight');
-    const canSprint = p.stamina > 0 && p.exhausted <= 0;
-    const isSprinting = wantsToSprint && canSprint && (ax || ay);
-    
-    // Store sprinting state for HUD updates
-    p.isSprinting = isSprinting;
-    
-    if (isSprinting) {
-      // Drain stamina: 20% per second (100% in 5 seconds)
-      const oldStamina = p.stamina;
-      p.stamina = Math.max(0, p.stamina - 20 * dt);
-      
-      // If stamina just hit 0, trigger exhaustion
-      if (oldStamina > 0 && p.stamina <= 0) {
-        const baseExhaustion = 2.0; // 2 second cooldown
-        const reduction = p.dashCooldownReduction || 0;
-        p.exhausted = baseExhaustion * (1 - reduction);
-        staminaDepletedSound(); // Play unique 2-pulse sound
-      }
-    } else {
-      // Regenerate stamina: 12.5% per second (0% to 100% in 8 seconds) + stamina boost
-      p.stamina = Math.min(100, p.stamina + 12.5 * dt * p.staminaRegen);
-    }
-    
-    if (ax || ay){
-      const moveVec = normInPlace(ax, ay, vecPool.temp1);
-      const nx = moveVec.x, ny = moveVec.y;
-      const waveSpeedBonus = g.wave * GAME_CONSTANTS.PLAYER_WAVE_SPEED_BONUS;
-      const adrenalineBonus = (p.adrenalineTimer > 0) ? GAME_CONSTANTS.PLAYER_ADRENALINE_MULTIPLIER : 1.0;
-      const baseSpeed = (p.speed + waveSpeedBonus) * adrenalineBonus;
-      const speed = Math.min(GAME_CONSTANTS.PLAYER_MAX_SPEED, isSprinting ? baseSpeed * GAME_CONSTANTS.PLAYER_SPRINT_MULTIPLIER : baseSpeed);
-      p.vx += nx * speed * dt * GAME_CONSTANTS.PLAYER_ACCELERATION;
-      p.vy += ny * speed * dt * GAME_CONSTANTS.PLAYER_ACCELERATION;
-    }
-    // friction
-    p.vx *= (1 - GAME_CONSTANTS.PLAYER_FRICTION * dt);
-    p.vy *= (1 - GAME_CONSTANTS.PLAYER_FRICTION * dt);
-    // integrate
-    p.x = clamp(p.x + p.vx*dt, p.radius, g.width()-p.radius);
-    p.y = clamp(p.y + p.vy*dt, p.radius, g.height()-p.radius);
-    
-    // Spawn footsteps when moving
-    if (!p.footstepTimer) p.footstepTimer = 0;
-    const playerSpeed = fastLength(p.vx, p.vy);
-    if (playerSpeed > GAME_CONSTANTS.PLAYER_FOOTSTEP_SPEED_THRESHOLD) {
-      p.footstepTimer -= dt;
-      if (p.footstepTimer <= 0) {
-        const moveAngle = Math.atan2(p.vy, p.vx);
-        spawnFootstep(p.x, p.y, moveAngle, true, p);
-        // Faster footsteps when sprinting
-        p.footstepTimer = isSprinting ? GAME_CONSTANTS.PLAYER_FOOTSTEP_SPRINT_INTERVAL : GAME_CONSTANTS.PLAYER_FOOTSTEP_INTERVAL;
-      }
-    }
-
-    // Heat dissipation when not firing
-    if (!mouseDown || p.overheated) {
-      p.heat = Math.max(0, p.heat - p.heatDissipation * dt);
-      
-      // Recovery from overheat state
-      if (p.overheated && p.heat <= p.overheatCooldown) {
-        p.overheated = false;
-      }
-    }
-    
-    // Calculate heat-based penalties
-    let heatSpreadMod = 0;
-    let heatFireRateMod = 1.0;
-    let canFire = true;
-
-    const weaponHeatPercent = p.heat / p.maxHeat;
-    if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_LOW && weaponHeatPercent < GAME_CONSTANTS.HEAT_THRESHOLD_MED) {
-      // 50-75% heat: Slight spread increase
-      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_LOW;
-    } else if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_MED && weaponHeatPercent < GAME_CONSTANTS.HEAT_THRESHOLD_HIGH) {
-      // 75-90% heat: More spread, 15% slower fire rate
-      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_MED;
-      heatFireRateMod = GAME_CONSTANTS.HEAT_FIRERATE_MED;
-    } else if (weaponHeatPercent >= GAME_CONSTANTS.HEAT_THRESHOLD_HIGH && weaponHeatPercent < 1.0) {
-      // 90-100% heat: Heavy spread, 30% slower fire rate, rapid heat gain
-      heatSpreadMod = GAME_CONSTANTS.HEAT_SPREAD_HIGH;
-      heatFireRateMod = GAME_CONSTANTS.HEAT_FIRERATE_HIGH;
-    } else if (p.heat >= p.maxHeat) {
-      // Overheated: Weapon locked
-      p.overheated = true;
-      p.heat = Math.min(p.heat, p.maxHeat); // Cap at max
-      canFire = false;
-    }
+    // Process player movement, input, stamina, and heat (EXTRACTED to reduce god-function size)
+    const {ax, ay, isSprinting, canFire, heatSpreadMod, heatFireRateMod} = updatePlayerMovement(g, p, dt);
     
     // shooting
     if (p.fireTimer > 0) p.fireTimer -= dt;
