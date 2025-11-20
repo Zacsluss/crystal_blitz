@@ -157,20 +157,87 @@ jobs:
         fi
         echo "✅ HTML structure valid"
 
+  performance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Playwright
+      run: |
+        npm install -D @playwright/test
+        npx playwright install --with-deps chromium
+
+    - name: Create performance test runner
+      run: |
+        cat > e2e/performance.spec.js << 'EOF'
+        import { test, expect } from '@playwright/test';
+
+        test.describe('Crystal Blitz - Performance Benchmarks', () => {
+          test('performance benchmarks pass thresholds', async ({ page }) => {
+            // Navigate to performance test page
+            await page.goto('http://localhost:8000/performance-test.html');
+
+            // Wait for benchmarks to complete (max 10 seconds)
+            await page.waitForTimeout(10000);
+
+            // Check summary for failures
+            const summary = await page.locator('#summary').textContent();
+
+            // Extract pass/fail counts
+            const passMatch = summary.match(/(\d+) passed/);
+            const failMatch = summary.match(/(\d+) failed/);
+
+            const passed = passMatch ? parseInt(passMatch[1]) : 0;
+            const failed = failMatch ? parseInt(failMatch[1]) : 0;
+
+            console.log(`Performance Results: ${passed} passed, ${failed} failed`);
+
+            // Fail if any benchmarks failed
+            expect(failed).toBe(0);
+            expect(passed).toBeGreaterThan(0);
+          });
+        });
+        EOF
+
+    - name: Start HTTP server
+      run: python3 -m http.server 8000 &
+
+    - name: Wait for server
+      run: sleep 2
+
+    - name: Run performance benchmarks
+      run: npx playwright test e2e/performance.spec.js --project=chromium
+
+    - name: Upload performance results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: playwright-report/
+        retention-days: 30
+
   status:
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [test, lint, performance]
     if: always()
 
     steps:
     - name: Check status
       run: |
-        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.lint.result }}" == "success" ]; then
+        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.lint.result }}" == "success" ] && [ "${{ needs.performance.result }}" == "success" ]; then
           echo "✅ All checks passed!"
           exit 0
         else
           echo "❌ Some checks failed"
           echo "Test result: ${{ needs.test.result }}"
           echo "Lint result: ${{ needs.lint.result }}"
+          echo "Performance result: ${{ needs.performance.result }}"
           exit 1
         fi

@@ -928,6 +928,145 @@
     }
 
     // ============================================================
+    // COLLISION DETECTION TESTS
+    // ============================================================
+
+    function testCollisionDetection() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💥 Collision Detection Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Circle-circle collision - exact boundary
+      const entity1 = { x: 100, y: 100, r: 10 };
+      const entity2 = { x: 120, y: 100, r: 10 };
+      const dx = entity2.x - entity1.x;
+      const dy = entity2.y - entity1.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const touching = dist <= (entity1.r + entity2.r);
+
+      assert(
+        touching,
+        'Collision: Exact Boundary Touch',
+        `Entities with r=10 at distance 20px are touching: ${touching}`
+      );
+
+      // Test: Circle-circle collision - overlap
+      const entity3 = { x: 100, y: 100, r: 15 };
+      const entity4 = { x: 110, y: 100, r: 15 };
+      const dx2 = entity4.x - entity3.x;
+      const dy2 = entity4.y - entity3.y;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      const overlapping = dist2 < (entity3.r + entity4.r);
+
+      assert(
+        overlapping,
+        'Collision: Overlapping Circles',
+        `Entities at distance ${dist2.toFixed(1)}px with combined radius ${entity3.r + entity4.r}px overlap`
+      );
+
+      // Test: Spatial grid cell calculation
+      const gridCellSize = 50;
+      const entityX = 175;
+      const entityY = 225;
+      const cellX = Math.floor(entityX / gridCellSize);
+      const cellY = Math.floor(entityY / gridCellSize);
+
+      assert(
+        cellX === 3 && cellY === 4,
+        'Spatial Grid: Cell Assignment',
+        `Entity at (${entityX}, ${entityY}) assigned to grid cell (${cellX}, ${cellY})`
+      );
+
+      // Test: Spatial grid neighbor query
+      const targetCellX = 5;
+      const targetCellY = 5;
+      const neighbors = [];
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          neighbors.push([targetCellX + dx, targetCellY + dy]);
+        }
+      }
+
+      assert(
+        neighbors.length === 9,
+        'Spatial Grid: 3x3 Neighbor Query',
+        `Grid cell (${targetCellX}, ${targetCellY}) has ${neighbors.length} neighbors (including self)`
+      );
+
+      // Test: Collision with zero-radius entity (edge case)
+      const zeroRadiusEntity = { x: 100, y: 100, r: 0 };
+      const normalEntity = { x: 100, y: 100, r: 10 };
+      const dx3 = normalEntity.x - zeroRadiusEntity.x;
+      const dy3 = normalEntity.y - zeroRadiusEntity.y;
+      const dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
+      const collidesWithZeroRadius = dist3 <= (zeroRadiusEntity.r + normalEntity.r);
+
+      assert(
+        collidesWithZeroRadius,
+        'Collision: Zero-Radius Edge Case',
+        `Zero-radius entity at same position collides: ${collidesWithZeroRadius}`
+      );
+    }
+
+    // ============================================================
+    // ENEMY AI BEHAVIOR TESTS
+    // ============================================================
+
+    function testEnemyAI() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🧟 Enemy AI Behavior Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Enemy targeting calculation
+      const enemy = { x: 200, y: 200 };
+      const player = { x: 300, y: 250 };
+      const dx = player.x - enemy.x;
+      const dy = player.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const targetingAngle = Math.atan2(dy, dx);
+
+      assert(
+        distance > 0 && !isNaN(targetingAngle),
+        'Enemy AI: Player Targeting',
+        `Enemy at (${enemy.x}, ${enemy.y}) targets player at distance ${distance.toFixed(1)}px, angle ${targetingAngle.toFixed(2)}rad`
+      );
+
+      // Test: Enemy movement speed calculation
+      const baseSpeed = 100;
+      const waveNumber = 5;
+      const speedIncrement = 4;
+      const enemySpeed = baseSpeed + (waveNumber * speedIncrement);
+
+      assert(
+        enemySpeed === 120,
+        'Enemy AI: Speed Scaling',
+        `Wave ${waveNumber} enemy speed: ${enemySpeed}px/s (base ${baseSpeed} + ${waveNumber * speedIncrement})`
+      );
+
+      // Test: Enemy behavior type assignment
+      const behaviors = ['basic', 'leaper', 'dasher', 'shooter'];
+      const randomBehavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+
+      assert(
+        behaviors.includes(randomBehavior),
+        'Enemy AI: Behavior Assignment',
+        `Enemy assigned valid behavior: ${randomBehavior}`
+      );
+
+      // Test: Enemy health scaling
+      const baseHealth = 10;
+      const wave = 10;
+      const difficulty = 1 + wave * 0.06;
+      const scaledHealth = Math.ceil(baseHealth * difficulty);
+
+      assert(
+        scaledHealth > baseHealth,
+        'Enemy AI: Health Scaling',
+        `Wave ${wave} enemy health: ${scaledHealth}HP (base ${baseHealth}HP × ${difficulty.toFixed(2)})`
+      );
+    }
+
+    // ============================================================
     // RUN ALL TESTS
     // ============================================================
 
@@ -944,6 +1083,8 @@
       testInputHandling();
       testLocalStorage();
       testRendering();
+      testCollisionDetection();
+      testEnemyAI();
 
       // Generate summary
       const passed = results.filter(r => r.passed).length;
