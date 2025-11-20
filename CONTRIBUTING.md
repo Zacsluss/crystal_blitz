@@ -325,8 +325,8 @@ git push origin feature/add-new-crystal-type
 
 ## Questions or Issues?
 
-- **Bug reports**: [Open a bug report](https://github.com/USERNAME/crystal_blitz/issues/new?template=bug_report.md)
-- **Feature requests**: [Open a feature request](https://github.com/USERNAME/crystal_blitz/issues/new?template=feature_request.md)
+- **Bug reports**: [Open a bug report](https://github.com/Zacsluss/crystal_blitz/issues/new?template=bug_report.md)
+- **Feature requests**: [Open a feature request](https://github.com/Zacsluss/crystal_blitz/issues/new?template=feature_request.md)
 - **Questions**: Open a discussion or comment on an existing issue
 
 ## License
