@@ -5009,6 +5009,119 @@
           ctx.stroke();
           break;
 
+        case 'divider':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x - symbolSize * 0.4, y - symbolSize * 0.5);
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + symbolSize * 0.4, y - symbolSize * 0.5);
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + symbolSize * 0.5);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x - symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+          ctx.arc(x + symbolSize * 0.4, y - symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+          ctx.arc(x, y + symbolSize * 0.5, symbolSize * 0.12, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'trapper':
+          ctx.lineWidth = Math.max(1.5, r * 0.15);
+          ctx.beginPath();
+          for(let i = 0; i < 6; i++) {
+            const angle = (i / 6) * TAU;
+            const px = x + Math.cos(angle) * symbolSize * 0.5;
+            const py = y + Math.sin(angle) * symbolSize * 0.5;
+            if(i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x, y, symbolSize * 0.15, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'serpent':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.beginPath();
+          ctx.moveTo(x - symbolSize * 0.6, y);
+          ctx.quadraticCurveTo(x - symbolSize * 0.3, y - symbolSize * 0.4, x, y);
+          ctx.quadraticCurveTo(x + symbolSize * 0.3, y + symbolSize * 0.4, x + symbolSize * 0.6, y);
+          ctx.stroke();
+          break;
+
+        case 'prowler':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.beginPath();
+          ctx.arc(x - symbolSize * 0.25, y, symbolSize * 0.4, -Math.PI * 0.4, Math.PI * 0.4);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x + symbolSize * 0.25, y, symbolSize * 0.4, Math.PI * 0.6, Math.PI * 1.4);
+          ctx.stroke();
+          break;
+
+        case 'leaper':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.beginPath();
+          ctx.moveTo(x, y - symbolSize * 0.5);
+          ctx.lineTo(x - symbolSize * 0.3, y);
+          ctx.moveTo(x, y - symbolSize * 0.5);
+          ctx.lineTo(x + symbolSize * 0.3, y);
+          ctx.moveTo(x, y - symbolSize * 0.5);
+          ctx.lineTo(x, y + symbolSize * 0.5);
+          ctx.stroke();
+          break;
+
+        case 'maniac':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.strokeStyle = '#000000';
+          ctx.beginPath();
+          ctx.moveTo(x - symbolSize * 0.4, y - symbolSize * 0.4);
+          ctx.lineTo(x + symbolSize * 0.4, y + symbolSize * 0.4);
+          ctx.moveTo(x + symbolSize * 0.4, y - symbolSize * 0.4);
+          ctx.lineTo(x - symbolSize * 0.4, y + symbolSize * 0.4);
+          ctx.stroke();
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          ctx.arc(x, y + symbolSize * 0.6, symbolSize * 0.1, 0, TAU);
+          ctx.fill();
+          break;
+
+        case 'boss':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.strokeStyle = '#000000';
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          ctx.moveTo(x, y - symbolSize * 0.6);
+          ctx.lineTo(x + symbolSize * 0.5, y);
+          ctx.lineTo(x, y + symbolSize * 0.6);
+          ctx.lineTo(x - symbolSize * 0.5, y);
+          ctx.closePath();
+          ctx.stroke();
+          break;
+
+        case 'superboss':
+          ctx.lineWidth = Math.max(2, r * 0.15);
+          ctx.strokeStyle = '#000000';
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          const triRadius = symbolSize * 0.6;
+          for(let i = 0; i < 3; i++) {
+            const angle = (i / 3) * TAU - Math.PI/2;
+            const px = x + Math.cos(angle) * triRadius;
+            const py = y + Math.sin(angle) * triRadius;
+            if(i === 0) {
+              ctx.moveTo(px, py);
+            } else {
+              ctx.lineTo(px, py);
+            }
+          }
+          ctx.closePath();
+          ctx.stroke();
+          break;
+
         default:
           // No symbol for other behaviors
           break;
