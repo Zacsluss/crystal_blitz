@@ -32,7 +32,7 @@
 
 ## 👋 Hey, I'm Zac
 
-**60 FPS arena shooter in a single 347KB HTML file.** Zero dependencies, works offline forever.
+I work on enterprise platforms by day and build unusually fun projects by night. This is a **60 FPS arena shooter in a single 347KB HTML file** — zero dependencies, works offline forever.
 
 <details>
 <summary><b>🔽 What makes this different</b></summary>
