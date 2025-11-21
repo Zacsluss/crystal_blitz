@@ -57,6 +57,9 @@ out/
 
 # Playwright local testing
 playwright.config.js
-e2e/performance-local-test.spec.js
+e2e/
 playwright-report/
 test-results/
+package.json
+package-lock.json
+node_modules/
