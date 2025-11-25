@@ -56,7 +56,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 ---
 
 <details>
-<summary><h2>📚 Table of Contents</h2></summary>
+<summary><b>📚 Table of Contents</b></summary>
 
 <br/>
 
@@ -73,7 +73,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 ---
 
 <details>
-<summary><h2>⚡ What This Does</h2></summary>
+<summary><b>⚡ What This Does</b></summary>
 
 <br/>
 
@@ -100,7 +100,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 ---
 
 <details open>
-<summary><h2>🛠️ Tech Stack</h2></summary>
+<summary><b>🛠️ Tech Stack</b></summary>
 
 <br/>
 
@@ -186,7 +186,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 ---
 
 <details open>
-<summary><h2>🏗️ How It Works - Architecture</h2></summary>
+<summary><b>🏗️ How It Works - Architecture</b></summary>
 
 <br/>
 
@@ -456,7 +456,7 @@ Formula: 1 + Math.floor(wave / 5)
 ---
 
 <details>
-<summary><h2>🚀 Quick Start</h2></summary>
+<summary><b>🚀 Quick Start</b></summary>
 
 <br/>
 
@@ -682,12 +682,12 @@ python -m http.server 8080
 ---
 
 <details>
-<summary><h2>🔧 Technical Deep Dive</h2></summary>
+<summary><b>🔧 Technical Deep Dive</b></summary>
 
 <br/>
 
 <details>
-<summary><h3>Performance Optimizations</h3></summary>
+<summary><b>Performance Optimizations</b></summary>
 
 <br/>
 
@@ -931,7 +931,7 @@ Garbage collection pauses cause frame drops. Achieved via strict coding constrai
 </details>
 
 <details>
-<summary><h3>Game Architecture</h3></summary>
+<summary><b>Game Architecture</b></summary>
 
 <br/>
 
@@ -1050,7 +1050,7 @@ function updateGame(dt) {
 </details>
 
 <details>
-<summary><h3>Enemy AI System</h3></summary>
+<summary><b>Enemy AI System</b></summary>
 
 <br/>
 
@@ -1092,7 +1092,7 @@ graph TD
 </details>
 
 <details>
-<summary><h3>Powerup System</h3></summary>
+<summary><b>Powerup System</b></summary>
 
 <br/>
 
@@ -1127,7 +1127,7 @@ graph LR
 </details>
 
 <details>
-<summary><h3>Rendering Pipeline</h3></summary>
+<summary><b>Rendering Pipeline</b></summary>
 
 <br/>
 
@@ -1209,7 +1209,7 @@ for (const [color, group] of enemiesByColor) {
 </details>
 
 <details>
-<summary><h3>Performance Benchmarks</h3></summary>
+<summary><b>Performance Benchmarks</b></summary>
 
 <br/>
 
@@ -1354,7 +1354,7 @@ for (const [color, group] of enemiesByColor) {
 </details>
 
 <details>
-<summary><h3>Testing & Code Quality</h3></summary>
+<summary><b>Testing & Code Quality</b></summary>
 
 <br/>
 
@@ -1414,7 +1414,7 @@ npx playwright test
 </details>
 
 <details>
-<summary><h3>Troubleshooting</h3></summary>
+<summary><b>Troubleshooting</b></summary>
 
 <br/>
 
@@ -1495,7 +1495,7 @@ npx playwright test
 </details>
 
 <details>
-<summary><h3>Advanced Configuration</h3></summary>
+<summary><b>Advanced Configuration</b></summary>
 
 <br/>
 
@@ -1631,7 +1631,7 @@ debugMode = true
 ---
 
 <details>
-<summary><h2>📄 License & Contributing</h2></summary>
+<summary><b>📄 License & Contributing</b></summary>
 
 <br/>
 
@@ -1698,7 +1698,7 @@ Want to make this game yours? Takes ~5 minutes:
 ---
 
 <details open>
-<summary><h2>📬 About & Connect</h2></summary>
+<summary><b>📬 About & Connect</b></summary>
 
 <br/>
 
