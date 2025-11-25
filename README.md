@@ -1731,8 +1731,6 @@ Want to make this game yours? Takes ~5 minutes:
 
 **Why this project?** I wanted to prove you don't need frameworks, build tools, or dependencies to ship polished software. Just fundamentals: JavaScript, Canvas, and constraint-driven problem-solving.
 
-Into WebGL, particle systems, game optimization, procedural generation, and building things that work forever.
-
 **Connect with me:**
 
 <div align="center">
