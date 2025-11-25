@@ -462,7 +462,10 @@ Formula: 1 + Math.floor(wave / 5)
 
 **Clone → Open `index.html` → Play** (30 seconds total)
 
-### Prerequisites
+<details>
+<summary><b>Prerequisites</b></summary>
+
+<br/>
 
 **Minimum Requirements:**
 - Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
@@ -476,7 +479,12 @@ Formula: 1 + Math.floor(wave / 5)
 
 **No installation required** - Just download and open the HTML file.
 
-### Installation
+</details>
+
+<details>
+<summary><b>Installation</b></summary>
+
+<br/>
 
 ```bash
 # 1️⃣ Clone this repository
@@ -520,7 +528,12 @@ npx http-server -p 8000
 
 </details>
 
-### Usage
+</details>
+
+<details>
+<summary><b>Usage</b></summary>
+
+<br/>
 
 **Desktop Controls:**
 - **WASD** - Move your character
@@ -544,7 +557,12 @@ npx http-server -p 8000
 - Keep moving to avoid enemy swarms
 - Prioritize healer enemies (they restore nearby enemies)
 
-### Configuration
+</details>
+
+<details>
+<summary><b>Configuration</b></summary>
+
+<br/>
 
 **Game Settings (Options Menu):**
 - **Volume** - Master audio level (0-100%)
@@ -597,7 +615,12 @@ npx http-server -p 8000
 
 </details>
 
-### Deployment
+</details>
+
+<details>
+<summary><b>Deployment</b></summary>
+
+<br/>
 
 #### GitHub Pages (Recommended - Free)
 
@@ -674,6 +697,8 @@ python -m http.server 8080
 - [ ] Verify offline functionality (disconnect network, reload)
 - [ ] Optimize assets (already optimized - 347KB gzipped to 93KB)
 - [ ] Test mobile performance (iPhone 8+, Pixel 3+)
+
+</details>
 
 </details>
 
