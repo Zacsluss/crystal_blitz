@@ -1660,9 +1660,9 @@ debugMode = true
 
 <br/>
 
-**MIT License** — Fork it, customize it, do whatever. No credit needed (⭐ appreciated though).
-
 <div align="center">
+
+**MIT License** — Fork it, customize it, do whatever. No credit needed (⭐ appreciated though).
 
 <img src="https://img.shields.io/badge/License-MIT-555555?style=for-the-badge&logo=opensourceinitiative&logoColor=white"/>
 
