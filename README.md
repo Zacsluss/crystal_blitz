@@ -228,7 +228,10 @@ graph TB
     style K fill:#2e8b57,stroke:#fff,stroke-width:2px
 ```
 
-### Key Optimizations
+<details>
+<summary><b>🔽 Key Optimizations</b></summary>
+
+<br/>
 
 | Technique | Problem Solved | Impact |
 |-----------|---------------|--------|
@@ -238,7 +241,12 @@ graph TB
 | **Fixed Timestep** | Frame rate dependent physics | Consistent gameplay 30-240 FPS |
 | **Zero GC Constraints** | Memory allocation spikes | Stable 80MB memory usage |
 
-### Entity Component Pattern
+</details>
+
+<details>
+<summary><b>🔽 Entity Component Pattern</b></summary>
+
+<br/>
 
 All game entities (player, enemies, bullets, powerups) follow a consistent structure:
 
@@ -259,6 +267,8 @@ This enables:
 - **Polymorphic updates**: All entities update via same interface
 - **Efficient collision**: Simple circle-circle checks via radius
 - **Memory efficiency**: Dead entities recycled vs reallocated
+
+</details>
 
 <details>
 <summary><b>🔽 Data Flow: From Input to Render</b></summary>
