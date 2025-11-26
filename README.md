@@ -1240,9 +1240,12 @@ for (const [color, group] of enemiesByColor) {
 
 **60 FPS locked • 200+ entities • 347KB total • <500ms load • ~80MB memory**
 
-<div align="center">
+<details>
+<summary><b>Desktop vs Mobile Performance</b></summary>
 
-### Desktop vs Mobile Performance
+<br/>
+
+<div align="center">
 
 <table>
 <tr>
@@ -1339,7 +1342,12 @@ for (const [color, group] of enemiesByColor) {
 
 </div>
 
-#### System-Specific Benchmarks
+</details>
+
+<details>
+<summary><b>System-Specific Benchmarks</b></summary>
+
+<br/>
 
 **Collision Detection Performance**
 
@@ -1375,6 +1383,8 @@ for (const [color, group] of enemiesByColor) {
 | Firefox | 88+ | 60 FPS ✅ | Slightly slower gradient cache |
 | Safari | 14+ | 60 FPS ✅ | Excellent iOS performance |
 | Edge | 90+ | 60 FPS ✅ | Chromium-based, same as Chrome |
+
+</details>
 
 </details>
 
@@ -1443,7 +1453,10 @@ npx playwright test
 
 <br/>
 
-#### Performance issues (low FPS, stuttering)
+<details>
+<summary><b>Performance issues (low FPS, stuttering)</b></summary>
+
+<br/>
 
 **Problem: Game runs at <60 FPS**
 
@@ -1464,7 +1477,12 @@ npx playwright test
 4. **Outdated browser**
    - **Solution**: Update to latest version (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
 
-#### Controls not working (keyboard, mouse, touch)
+</details>
+
+<details>
+<summary><b>Controls not working (keyboard, mouse, touch)</b></summary>
+
+<br/>
 
 **Problem: WASD keys not responding**
 
@@ -1479,7 +1497,12 @@ npx playwright test
 3. **Keyboard layout**
    - **Solution**: Switch to QWERTY layout, or rebind keys in Options
 
-#### Audio issues (no sound, crackling)
+</details>
+
+<details>
+<summary><b>Audio issues (no sound, crackling)</b></summary>
+
+<br/>
 
 **Problem: No sound effects**
 
@@ -1494,7 +1517,12 @@ npx playwright test
 3. **System audio muted**
    - **Solution**: Check OS volume settings
 
-#### Save/Load issues (progress not saved)
+</details>
+
+<details>
+<summary><b>Save/Load issues (progress not saved)</b></summary>
+
+<br/>
 
 **Problem: Progress not persisting between sessions**
 
@@ -1519,12 +1547,17 @@ npx playwright test
 
 </details>
 
+</details>
+
 <details>
 <summary><b>Advanced Configuration</b></summary>
 
 <br/>
 
-#### Customizing game constants (difficulty, visuals)
+<details>
+<summary><b>Customizing game constants (difficulty, visuals)</b></summary>
+
+<br/>
 
 All game constants are defined in `index.html` starting at **line 3350**. Edit these values to customize gameplay:
 
@@ -1601,7 +1634,12 @@ GRADIENT_CACHE_SIZE: 50       // Smaller cache
 
 **After editing:** Save `index.html` and reload in browser. Changes apply immediately (no build process).
 
-#### Performance profiling and debugging
+</details>
+
+<details>
+<summary><b>Performance profiling and debugging</b></summary>
+
+<br/>
 
 **Enable In-Game Stats Overlay**
 
@@ -1648,6 +1686,8 @@ for (let i = 0; i < 100; i++) spawnEnemy()
 // Enable debug rendering (shows spatial grid)
 debugMode = true
 ```
+
+</details>
 
 </details>
 
