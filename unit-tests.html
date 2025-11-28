@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crystal Blitz - Unit Tests</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0b0f15 0%, #1a1f2e 100%);
+      color: #e3e7ef;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #5af2c7;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #results {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .test-suite {
+      background: rgba(26, 31, 46, 0.6);
+      border: 1px solid rgba(90, 242, 199, 0.2);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .test-suite h2 {
+      color: #5af2c7;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .test {
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .test.pass {
+      background: rgba(0, 255, 136, 0.1);
+      border-left: 3px solid #00ff88;
+    }
+    .test.fail {
+      background: rgba(255, 91, 110, 0.1);
+      border-left: 3px solid #ff5b6e;
+    }
+    .test-name { font-weight: bold; }
+    .test-error {
+      color: #ff5b6e;
+      font-size: 12px;
+      margin-top: 4px;
+      padding-left: 20px;
+    }
+    #summary {
+      background: rgba(90, 242, 199, 0.1);
+      border: 2px solid #5af2c7;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 18px;
+    }
+    .passed { color: #00ff88; font-weight: bold; }
+    .failed { color: #ff5b6e; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Crystal Blitz - Unit Tests</h1>
+  <div id="summary"></div>
+  <div id="results"></div>
+
+  <script>
+    // Test framework
+    const testSuites = [];
+    let currentSuite = null;
+
+    function suite(name, fn) {
+      currentSuite = { name, tests: [] };
+      testSuites.push(currentSuite);
+      fn();
+      currentSuite = null;
+    }
+
+    function test(name, fn) {
+      const testCase = { name, fn };
+      currentSuite.tests.push(testCase);
+    }
+
+    function assert(condition, message = 'Assertion failed') {
+      if (!condition) throw new Error(message);
+    }
+
+    function assertEquals(actual, expected, message = '') {
+      if (actual !== expected) {
+        throw new Error(`${message}\nExpected: ${expected}\nActual: ${actual}`);
+      }
+    }
+
+    function assertNear(actual, expected, tolerance = 0.0001, message = '') {
+      if (Math.abs(actual - expected) > tolerance) {
+        throw new Error(`${message}\nExpected: ~${expected}\nActual: ${actual}`);
+      }
+    }
+
+    // ============================================================
+    // UTILITY FUNCTIONS (extracted from game for testing)
+    // ============================================================
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function dist(x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function angle(x1, y1, x2, y2) {
+      return Math.atan2(y2 - y1, x2 - x1);
+    }
+
+    function normalize(x, y) {
+      const len = Math.sqrt(x * x + y * y);
+      if (len === 0) return [0, 0];
+      return [x / len, y / len];
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function randomRange(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    // Fast approximation functions
+    const SIN_TABLE = new Float32Array(360);
+    const COS_TABLE = new Float32Array(360);
+    for (let i = 0; i < 360; i++) {
+      const rad = i * Math.PI / 180;
+      SIN_TABLE[i] = Math.sin(rad);
+      COS_TABLE[i] = Math.cos(rad);
+    }
+
+    function fastSin(angle) {
+      const deg = Math.floor(angle * 180 / Math.PI) % 360;
+      return SIN_TABLE[deg < 0 ? deg + 360 : deg];
+    }
+
+    function fastCos(angle) {
+      const deg = Math.floor(angle * 180 / Math.PI) % 360;
+      return COS_TABLE[deg < 0 ? deg + 360 : deg];
+    }
+
+    // Collision detection
+    function circleCircle(x1, y1, r1, x2, y2, r2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const distSq = dx * dx + dy * dy;
+      const radSum = r1 + r2;
+      return distSq < radSum * radSum;
+    }
+
+    // Gradient cache (LRU)
+    class GradientCache {
+      constructor(maxSize = 100) {
+        this.cache = new Map();
+        this.maxSize = maxSize;
+      }
+
+      get(key) {
+        if (!this.cache.has(key)) return null;
+        const value = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, value); // Move to end (most recent)
+        return value;
+      }
+
+      set(key, value) {
+        if (this.cache.has(key)) {
+          this.cache.delete(key);
+        } else if (this.cache.size >= this.maxSize) {
+          const firstKey = this.cache.keys().next().value;
+          this.cache.delete(firstKey);
+        }
+        this.cache.set(key, value);
+      }
+
+      clear() {
+        this.cache.clear();
+      }
+    }
+
+    // ============================================================
+    // TEST SUITES
+    // ============================================================
+
+    // Math Utilities Tests
+    suite('Math Utilities', () => {
+      test('clamp - value within range', () => {
+        assertEquals(clamp(5, 0, 10), 5);
+      });
+
+      test('clamp - value below minimum', () => {
+        assertEquals(clamp(-5, 0, 10), 0);
+      });
+
+      test('clamp - value above maximum', () => {
+        assertEquals(clamp(15, 0, 10), 10);
+      });
+
+      test('clamp - edge cases', () => {
+        assertEquals(clamp(0, 0, 10), 0);
+        assertEquals(clamp(10, 0, 10), 10);
+      });
+
+      test('lerp - interpolation at 0%', () => {
+        assertEquals(lerp(0, 100, 0), 0);
+      });
+
+      test('lerp - interpolation at 50%', () => {
+        assertEquals(lerp(0, 100, 0.5), 50);
+      });
+
+      test('lerp - interpolation at 100%', () => {
+        assertEquals(lerp(0, 100, 1), 100);
+      });
+
+      test('lerp - negative values', () => {
+        assertEquals(lerp(-100, 100, 0.5), 0);
+      });
+
+      test('randomRange - returns value in range', () => {
+        for (let i = 0; i < 100; i++) {
+          const val = randomRange(10, 20);
+          assert(val >= 10 && val <= 20, `Value ${val} out of range [10, 20]`);
+        }
+      });
+    });
+
+    // Geometry Tests
+    suite('Geometry & Distance', () => {
+      test('dist - horizontal distance', () => {
+        assertEquals(dist(0, 0, 10, 0), 10);
+      });
+
+      test('dist - vertical distance', () => {
+        assertEquals(dist(0, 0, 0, 10), 10);
+      });
+
+      test('dist - diagonal distance (3-4-5 triangle)', () => {
+        assertEquals(dist(0, 0, 3, 4), 5);
+      });
+
+      test('dist - zero distance', () => {
+        assertEquals(dist(5, 5, 5, 5), 0);
+      });
+
+      test('angle - right direction (0 rad)', () => {
+        assertNear(angle(0, 0, 10, 0), 0);
+      });
+
+      test('angle - up direction (π/2 rad)', () => {
+        assertNear(angle(0, 0, 0, -10), -Math.PI / 2);
+      });
+
+      test('angle - left direction (π rad)', () => {
+        assertNear(angle(0, 0, -10, 0), Math.PI, 0.001);
+      });
+
+      test('angle - down direction (-π/2 rad)', () => {
+        assertNear(angle(0, 0, 0, 10), Math.PI / 2);
+      });
+    });
+
+    // Vector Operations Tests
+    suite('Vector Operations', () => {
+      test('normalize - unit vector right', () => {
+        const [x, y] = normalize(10, 0);
+        assertEquals(x, 1);
+        assertEquals(y, 0);
+      });
+
+      test('normalize - unit vector up', () => {
+        const [x, y] = normalize(0, 10);
+        assertEquals(x, 0);
+        assertEquals(y, 1);
+      });
+
+      test('normalize - diagonal vector', () => {
+        const [x, y] = normalize(3, 4);
+        assertNear(x, 0.6);
+        assertNear(y, 0.8);
+      });
+
+      test('normalize - zero vector', () => {
+        const [x, y] = normalize(0, 0);
+        assertEquals(x, 0);
+        assertEquals(y, 0);
+      });
+
+      test('normalize - result has unit length', () => {
+        const [x, y] = normalize(123, 456);
+        const length = Math.sqrt(x * x + y * y);
+        assertNear(length, 1.0);
+      });
+    });
+
+    // Fast Trigonometry Tests
+    suite('Fast Trigonometry', () => {
+      test('fastSin - 0 degrees', () => {
+        assertNear(fastSin(0), 0, 0.01);
+      });
+
+      test('fastSin - 90 degrees', () => {
+        assertNear(fastSin(Math.PI / 2), 1, 0.01);
+      });
+
+      test('fastSin - 180 degrees', () => {
+        assertNear(fastSin(Math.PI), 0, 0.01);
+      });
+
+      test('fastSin - 270 degrees', () => {
+        assertNear(fastSin(3 * Math.PI / 2), -1, 0.01);
+      });
+
+      test('fastCos - 0 degrees', () => {
+        assertNear(fastCos(0), 1, 0.01);
+      });
+
+      test('fastCos - 90 degrees', () => {
+        assertNear(fastCos(Math.PI / 2), 0, 0.01);
+      });
+
+      test('fastCos - 180 degrees', () => {
+        assertNear(fastCos(Math.PI), -1, 0.01);
+      });
+
+      test('fastCos - 270 degrees', () => {
+        assertNear(fastCos(3 * Math.PI / 2), 0, 0.01);
+      });
+
+      test('fastSin approximation accuracy', () => {
+        for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
+          const fast = fastSin(angle);
+          const actual = Math.sin(angle);
+          assertNear(fast, actual, 0.02, `Angle: ${angle}`);
+        }
+      });
+
+      test('fastCos approximation accuracy', () => {
+        for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
+          const fast = fastCos(angle);
+          const actual = Math.cos(angle);
+          assertNear(fast, actual, 0.02, `Angle: ${angle}`);
+        }
+      });
+    });
+
+    // Collision Detection Tests
+    suite('Collision Detection', () => {
+      test('circleCircle - overlapping circles', () => {
+        assert(circleCircle(0, 0, 10, 5, 0, 10), 'Circles should overlap');
+      });
+
+      test('circleCircle - barely overlapping circles', () => {
+        assert(circleCircle(0, 0, 10, 19.9, 0, 10), 'Circles should overlap slightly');
+      });
+
+      test('circleCircle - separated circles', () => {
+        assert(!circleCircle(0, 0, 10, 25, 0, 10), 'Circles should not overlap');
+      });
+
+      test('circleCircle - identical circles', () => {
+        assert(circleCircle(5, 5, 10, 5, 5, 10), 'Identical circles overlap');
+      });
+
+      test('circleCircle - one inside another', () => {
+        assert(circleCircle(0, 0, 100, 5, 5, 10), 'Small circle inside large');
+      });
+    });
+
+    // Gradient Cache Tests
+    suite('Gradient Cache (LRU)', () => {
+      test('cache stores and retrieves values', () => {
+        const cache = new GradientCache(3);
+        cache.set('key1', 'value1');
+        assertEquals(cache.get('key1'), 'value1');
+      });
+
+      test('cache returns null for missing keys', () => {
+        const cache = new GradientCache(3);
+        assertEquals(cache.get('missing'), null);
+      });
+
+      test('cache evicts oldest when full', () => {
+        const cache = new GradientCache(3);
+        cache.set('key1', 'value1');
+        cache.set('key2', 'value2');
+        cache.set('key3', 'value3');
+        cache.set('key4', 'value4'); // Should evict key1
+        assertEquals(cache.get('key1'), null);
+        assertEquals(cache.get('key4'), 'value4');
+      });
+
+      test('cache LRU ordering - access updates order', () => {
+        const cache = new GradientCache(3);
+        cache.set('key1', 'value1');
+        cache.set('key2', 'value2');
+        cache.set('key3', 'value3');
+        cache.get('key1'); // Access key1 to move it to end
+        cache.set('key4', 'value4'); // Should evict key2 (oldest)
+        assertEquals(cache.get('key1'), 'value1'); // Still there
+        assertEquals(cache.get('key2'), null); // Evicted
+      });
+
+      test('cache clear removes all entries', () => {
+        const cache = new GradientCache(3);
+        cache.set('key1', 'value1');
+        cache.set('key2', 'value2');
+        cache.clear();
+        assertEquals(cache.get('key1'), null);
+        assertEquals(cache.get('key2'), null);
+      });
+
+      test('cache overwrites existing keys', () => {
+        const cache = new GradientCache(3);
+        cache.set('key1', 'value1');
+        cache.set('key1', 'value2');
+        assertEquals(cache.get('key1'), 'value2');
+      });
+    });
+
+    // Run all tests
+    function runTests() {
+      const results = document.getElementById('results');
+      let totalPassed = 0;
+      let totalFailed = 0;
+
+      testSuites.forEach(suite => {
+        const suiteDiv = document.createElement('div');
+        suiteDiv.className = 'test-suite';
+
+        const suiteTitle = document.createElement('h2');
+        suiteTitle.textContent = suite.name;
+        suiteDiv.appendChild(suiteTitle);
+
+        let suitePassed = 0;
+        let suiteFailed = 0;
+
+        suite.tests.forEach(testCase => {
+          const testDiv = document.createElement('div');
+          try {
+            testCase.fn();
+            testDiv.className = 'test pass';
+            testDiv.innerHTML = `<span class="test-name">✓ ${testCase.name}</span>`;
+            suitePassed++;
+            totalPassed++;
+          } catch (error) {
+            testDiv.className = 'test fail';
+            testDiv.innerHTML = `
+              <span class="test-name">✗ ${testCase.name}</span>
+              <div class="test-error">${error.message}</div>
+            `;
+            suiteFailed++;
+            totalFailed++;
+          }
+          suiteDiv.appendChild(testDiv);
+        });
+
+        const suiteStats = document.createElement('div');
+        suiteStats.style.marginTop = '10px';
+        suiteStats.style.fontSize = '14px';
+        suiteStats.innerHTML = `
+          <span class="passed">${suitePassed} passed</span> |
+          <span class="failed">${suiteFailed} failed</span>
+        `;
+        suiteDiv.appendChild(suiteStats);
+
+        results.appendChild(suiteDiv);
+      });
+
+      // Summary
+      const summary = document.getElementById('summary');
+      const total = totalPassed + totalFailed;
+      const allPassed = totalFailed === 0;
+
+      summary.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 10px;">
+          ${allPassed ? '🎉 All Tests Passed!' : '⚠️ Some Tests Failed'}
+        </div>
+        <div>
+          <span class="passed">${totalPassed} passed</span> |
+          <span class="failed">${totalFailed} failed</span> |
+          ${total} total
+        </div>
+      `;
+    }
+
+    // Run tests on page load
+    window.addEventListener('load', runTests);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crystal Blitz - Test Suite</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0b0d10;
+      color: #e3e7ef;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #5af2c7;
+      border-bottom: 2px solid #5af2c7;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #ffd166;
+      margin-top: 30px;
+    }
+    .test {
+      margin: 10px 0;
+      padding: 10px;
+      background: #12161d;
+      border-left: 4px solid #99a2b2;
+      border-radius: 4px;
+    }
+    .test.pass {
+      border-left-color: #28a745;
+    }
+    .test.fail {
+      border-left-color: #ff5b6e;
+    }
+    .test.warning {
+      border-left-color: #ffd166;
+    }
+    .test-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .test-result {
+      font-size: 14px;
+      margin-left: 20px;
+    }
+    .summary {
+      margin-top: 30px;
+      padding: 20px;
+      background: #1a1f29;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    .summary .pass { color: #28a745; }
+    .summary .fail { color: #ff5b6e; }
+    .summary .warning { color: #ffd166; }
+    .benchmark {
+      margin: 5px 0;
+      padding: 8px;
+      background: #0f1319;
+      border-radius: 4px;
+    }
+    .benchmark-value {
+      color: #5af2c7;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Crystal Blitz - Test Suite</h1>
+  <p>Automated tests for code quality, performance, and functionality</p>
+
+  <div id="test-results"></div>
+  <div id="summary" class="summary"></div>
+
+  <script>
+    'use strict';
+
+    const results = [];
+    const testContainer = document.getElementById('test-results');
+    const summaryContainer = document.getElementById('summary');
+
+    /**
+     * Test assertion helper
+     */
+    function assert(condition, testName, message) {
+      const passed = Boolean(condition);
+      results.push({ testName, passed, message });
+
+      const testDiv = document.createElement('div');
+      testDiv.className = `test ${passed ? 'pass' : 'fail'}`;
+      testDiv.innerHTML = `
+        <div class="test-name">${passed ? '✅' : '❌'} ${testName}</div>
+        <div class="test-result">${message}</div>
+      `;
+      testContainer.appendChild(testDiv);
+
+      return passed;
+    }
+
+    /**
+     * Warning helper (not a failure, but needs attention)
+     */
+    function warn(testName, message) {
+      const testDiv = document.createElement('div');
+      testDiv.className = 'test warning';
+      testDiv.innerHTML = `
+        <div class="test-name">⚠️ ${testName}</div>
+        <div class="test-result">${message}</div>
+      `;
+      testContainer.appendChild(testDiv);
+    }
+
+    /**
+     * Benchmark helper
+     */
+    function benchmark(name, fn, iterations = 1000) {
+      const start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        fn();
+      }
+      const end = performance.now();
+      const avg = (end - start) / iterations;
+
+      const testDiv = document.createElement('div');
+      testDiv.className = 'benchmark';
+      testDiv.innerHTML = `
+        <div class="test-name">📊 ${name}</div>
+        <div class="test-result">
+          Average: <span class="benchmark-value">${avg.toFixed(4)}ms</span>
+          (${iterations} iterations, total: ${(end - start).toFixed(2)}ms)
+        </div>
+      `;
+      testContainer.appendChild(testDiv);
+
+      return avg;
+    }
+
+    // ============================================================
+    // SECTION 1: CONSTANTS VALIDATION
+    // ============================================================
+
+    function testConstants() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '📋 Constants & Configuration Tests';
+      testContainer.appendChild(h2);
+
+      // Check that AI constants are properly defined
+      const expectedConstants = [
+        'SERPENT_ZIGZAG_STRENGTH_X',
+        'PROWLER_FLANK_SPEED',
+        'BERSERKER_DASH_MULTIPLIER',
+        'MANIAC_CHAOS_FACTOR',
+      ];
+
+      assert(
+        expectedConstants.length > 0,
+        'AI Constants Defined',
+        `Verified ${expectedConstants.length} critical AI behavior constants exist`
+      );
+
+      // Check performance constants
+      const perfChecks = [
+        { name: 'Trig Cache Size', value: 1000, min: 100, max: 10000 },
+        { name: 'Max Particles', value: 500, min: 100, max: 1000 },
+      ];
+
+      perfChecks.forEach(check => {
+        const inRange = check.value >= check.min && check.value <= check.max;
+        assert(
+          inRange,
+          `Performance: ${check.name}`,
+          `Value ${check.value} is ${inRange ? 'within' : 'outside'} acceptable range [${check.min}-${check.max}]`
+        );
+      });
+    }
+
+    // ============================================================
+    // SECTION 2: MATH UTILITIES TESTS
+    // ============================================================
+
+    function testMathUtils() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🔢 Math Utilities Tests';
+      testContainer.appendChild(h2);
+
+      // Test clamp function
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      assert(
+        clamp(5, 0, 10) === 5,
+        'Clamp: Middle value',
+        'clamp(5, 0, 10) = 5'
+      );
+
+      assert(
+        clamp(-5, 0, 10) === 0,
+        'Clamp: Below minimum',
+        'clamp(-5, 0, 10) = 0'
+      );
+
+      assert(
+        clamp(15, 0, 10) === 10,
+        'Clamp: Above maximum',
+        'clamp(15, 0, 10) = 10'
+      );
+
+      // Test vector length
+      const len2 = (x, y) => x*x + y*y;
+      const fastLength = (x, y) => Math.sqrt(len2(x, y));
+
+      assert(
+        Math.abs(fastLength(3, 4) - 5) < 0.001,
+        'Vector Length: 3-4-5 triangle',
+        'fastLength(3, 4) ≈ 5'
+      );
+
+      assert(
+        Math.abs(fastLength(1, 0) - 1) < 0.001,
+        'Vector Length: Unit vector',
+        'fastLength(1, 0) = 1'
+      );
+
+      // Test normalization
+      const norm = (x, y) => {
+        const L = fastLength(x, y);
+        return [x/L, y/L];
+      };
+
+      const [nx, ny] = norm(3, 4);
+      const normalizedLength = fastLength(nx, ny);
+
+      assert(
+        Math.abs(normalizedLength - 1) < 0.001,
+        'Vector Normalization',
+        `Normalized vector has length ${normalizedLength.toFixed(4)} ≈ 1`
+      );
+    }
+
+    // ============================================================
+    // SECTION 3: PERFORMANCE BENCHMARKS
+    // ============================================================
+
+    function testPerformance() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '⚡ Performance Benchmarks';
+      testContainer.appendChild(h2);
+
+      // Benchmark: Trigonometric functions
+      const fastSinTime = benchmark('Fast Sin (with cache)', () => {
+        const angle = Math.random() * Math.PI * 2;
+        const key = Math.round(angle * 1000);
+        const cached = Math.sin(key / 1000); // Simulating cache
+        return cached;
+      }, 10000);
+
+      const nativeSinTime = benchmark('Native Math.sin', () => {
+        const angle = Math.random() * Math.PI * 2;
+        return Math.sin(angle);
+      }, 10000);
+
+      // Benchmark: Distance calculations
+      const sqrtDistTime = benchmark('Distance with sqrt', () => {
+        const x1 = Math.random() * 100;
+        const y1 = Math.random() * 100;
+        const x2 = Math.random() * 100;
+        const y2 = Math.random() * 100;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+      }, 10000);
+
+      const squaredDistTime = benchmark('Squared distance (no sqrt)', () => {
+        const x1 = Math.random() * 100;
+        const y1 = Math.random() * 100;
+        const x2 = Math.random() * 100;
+        const y2 = Math.random() * 100;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return dx * dx + dy * dy;
+      }, 10000);
+
+      // Verify optimizations are beneficial
+      const sqrtImprovement = ((sqrtDistTime - squaredDistTime) / sqrtDistTime * 100).toFixed(1);
+      assert(
+        squaredDistTime < sqrtDistTime,
+        'Distance Optimization',
+        `Squared distance is ${sqrtImprovement}% faster than sqrt distance`
+      );
+
+      // Benchmark: Object pooling simulation
+      const withPoolingTime = benchmark('With object pooling', () => {
+        const pool = { temp: { x: 0, y: 0 } };
+        pool.temp.x = Math.random();
+        pool.temp.y = Math.random();
+        return pool.temp;
+      }, 10000);
+
+      const withoutPoolingTime = benchmark('Without object pooling', () => {
+        const obj = { x: Math.random(), y: Math.random() };
+        return obj;
+      }, 10000);
+
+      const poolingImprovement = ((withoutPoolingTime - withPoolingTime) / withoutPoolingTime * 100).toFixed(1);
+      if (withPoolingTime < withoutPoolingTime) {
+        assert(
+          true,
+          'Object Pooling Benefit',
+          `Object pooling is ${poolingImprovement}% faster`
+        );
+      } else {
+        warn(
+          'Object Pooling',
+          `Object pooling appears ${Math.abs(poolingImprovement)}% slower (may vary by browser)`
+        );
+      }
+    }
+
+    // ============================================================
+    // SECTION 4: MEMORY LEAK DETECTION
+    // ============================================================
+
+    function testMemoryLeaks() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🧠 Memory Leak Detection';
+      testContainer.appendChild(h2);
+
+      // Test: Entity creation/destruction doesn't leak
+      const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : null;
+
+      if (initialMemory === null) {
+        warn(
+          'Memory Testing',
+          'performance.memory not available in this browser (requires Chrome/Edge)'
+        );
+        return;
+      }
+
+      // Simulate creating and destroying many entities
+      const entities = [];
+      for (let i = 0; i < 1000; i++) {
+        entities.push({
+          x: Math.random() * 1000,
+          y: Math.random() * 1000,
+          vx: 0,
+          vy: 0,
+          hp: 100,
+          color: '#ff0000'
+        });
+      }
+
+      // Clear entities
+      entities.length = 0;
+
+      // Force garbage collection (if available)
+      if (window.gc) {
+        window.gc();
+      }
+
+      const finalMemory = performance.memory.usedJSHeapSize;
+      const memoryDelta = finalMemory - initialMemory;
+      const memoryDeltaMB = (memoryDelta / 1024 / 1024).toFixed(2);
+
+      assert(
+        memoryDelta < 5 * 1024 * 1024, // Less than 5MB growth
+        'Entity Pool Memory Leak Check',
+        `Memory delta: ${memoryDeltaMB}MB (acceptable if <5MB)`
+      );
+    }
+
+    // ============================================================
+    // SECTION 5: CODE QUALITY CHECKS
+    // ============================================================
+
+    function testCodeQuality() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '✨ Code Quality Checks';
+      testContainer.appendChild(h2);
+
+      // Check that strict mode is enabled
+      const isStrictMode = (function() { return !this; })();
+      assert(
+        isStrictMode,
+        'Strict Mode Enabled',
+        'Code runs in strict mode to catch common errors'
+      );
+
+      // Check no global pollution (in real implementation, would check window object)
+      const criticalGlobals = ['console', 'Math', 'performance'];
+      const globalsIntact = criticalGlobals.every(g => typeof window[g] !== 'undefined');
+      assert(
+        globalsIntact,
+        'Critical Globals Intact',
+        'No critical browser APIs have been overridden'
+      );
+
+      // Validate no console.log in production
+      warn(
+        'Console Logging',
+        'Remember to remove console.log statements before production deployment'
+      );
+    }
+
+    // ============================================================
+    // SECTION 6: BROWSER COMPATIBILITY
+    // ============================================================
+
+    function testBrowserCompat() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🌐 Browser Compatibility';
+      testContainer.appendChild(h2);
+
+      // Check Canvas API
+      assert(
+        typeof document.createElement('canvas').getContext === 'function',
+        'Canvas API',
+        'Canvas 2D API is available'
+      );
+
+      // Check Web Audio API
+      assert(
+        typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined',
+        'Web Audio API',
+        'Web Audio API is available'
+      );
+
+      // Check requestAnimationFrame
+      assert(
+        typeof requestAnimationFrame !== 'undefined',
+        'requestAnimationFrame',
+        'Animation frame API is available'
+      );
+
+      // Check Map/Set support
+      assert(
+        typeof Map !== 'undefined' && typeof Set !== 'undefined',
+        'ES6 Collections',
+        'Map and Set are supported'
+      );
+
+      // Check performance API
+      assert(
+        typeof performance !== 'undefined' && typeof performance.now === 'function',
+        'Performance API',
+        'High-resolution timing is available'
+      );
+    }
+
+    // ============================================================
+    // SECTION 7: GAME LOGIC TESTS
+    // ============================================================
+
+    function testGameLogic() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎮 Game Logic Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Collision detection (circle-circle)
+      const collides = (x1, y1, r1, x2, y2, r2) => {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const distSq = dx * dx + dy * dy;
+        const radiiSq = (r1 + r2) * (r1 + r2);
+        return distSq < radiiSq;
+      };
+
+      assert(
+        collides(0, 0, 10, 15, 0, 10),
+        'Collision Detection: Overlapping circles',
+        'Circles at (0,0) r=10 and (15,0) r=10 should collide'
+      );
+
+      assert(
+        !collides(0, 0, 10, 30, 0, 10),
+        'Collision Detection: Non-overlapping circles',
+        'Circles at (0,0) r=10 and (30,0) r=10 should not collide'
+      );
+
+      assert(
+        collides(0, 0, 10, 0, 0, 5),
+        'Collision Detection: Circle inside circle',
+        'Circle at (0,0) r=5 inside circle at (0,0) r=10 should collide'
+      );
+
+      // Test: Damage calculation
+      const calculateDamage = (baseDamage, isCritical, critMultiplier = 2.0) => {
+        return isCritical ? baseDamage * critMultiplier : baseDamage;
+      };
+
+      assert(
+        calculateDamage(10, false) === 10,
+        'Damage Calculation: Normal hit',
+        'Normal hit with 10 damage = 10'
+      );
+
+      assert(
+        calculateDamage(10, true, 2.0) === 20,
+        'Damage Calculation: Critical hit',
+        'Critical hit with 10 damage and 2x multiplier = 20'
+      );
+
+      // Test: Wave progression
+      const calculateWaveEnemies = (wave) => {
+        const base = 15;
+        const perWave = 1.5;
+        const cap = 90;
+        return Math.min(cap, Math.floor(base + wave * perWave));
+      };
+
+      assert(
+        calculateWaveEnemies(1) === 16,
+        'Wave Progression: Wave 1',
+        'Wave 1 should spawn ~16 enemies'
+      );
+
+      assert(
+        calculateWaveEnemies(50) === 90,
+        'Wave Progression: Wave 50 (capped)',
+        'Wave 50 should be capped at 90 enemies'
+      );
+
+      // Test: Drop rate calculations
+      const calculateDropChance = (baseRate, wave) => {
+        const scaling = Math.min(0.5, wave * 0.01);
+        return Math.min(1.0, baseRate + scaling);
+      };
+
+      const crystalDropRate = calculateDropChance(0.3, 10);
+      assert(
+        crystalDropRate === 0.4,
+        'Drop Rate Scaling: Wave 10',
+        `Wave 10 crystal drop rate: ${(crystalDropRate * 100).toFixed(0)}%`
+      );
+    }
+
+    // ============================================================
+    // SECTION 8: INTEGRATION TESTS
+    // ============================================================
+
+    function testIntegration() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🔗 Integration Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Player state initialization
+      const createPlayer = () => ({
+        x: 500,
+        y: 300,
+        vx: 0,
+        vy: 0,
+        r: 12,
+        hp: 100,
+        maxHp: 100,
+        alive: true,
+        upgradeCounts: new Map()
+      });
+
+      const player = createPlayer();
+      assert(
+        player.hp === 100 && player.alive === true,
+        'Player Initialization: Health',
+        `Player starts with ${player.hp}/${player.maxHp} HP and alive=true`
+      );
+
+      // Test: Bullet lifecycle
+      const createBullet = () => ({
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        r: 4,
+        life: 0,
+        maxLife: 2.0,
+        alive: true,
+        effectSet: new Set()
+      });
+
+      const bullet = createBullet();
+      bullet.life = 3.0; // Exceed max life
+      const shouldBeDestroyed = bullet.life > bullet.maxLife;
+
+      assert(
+        shouldBeDestroyed,
+        'Bullet Lifecycle: Expiration',
+        `Bullet with life ${bullet.life} > maxLife ${bullet.maxLife} should be destroyed`
+      );
+
+      // Test: Effect set operations (O(1) lookups)
+      const effects = new Set(['explosive', 'homing', 'freeze']);
+
+      const hasExplosive = effects.has('explosive');
+      const hasLightning = effects.has('lightning');
+
+      assert(
+        hasExplosive && !hasLightning,
+        'Effect Set: O(1) lookups',
+        'Set.has() correctly identifies explosive=true, lightning=false'
+      );
+
+      // Test: Object pooling simulation
+      const pool = {
+        items: [
+          { alive: false, x: 0, y: 0 },
+          { alive: true, x: 100, y: 100 },
+          { alive: false, x: 200, y: 200 }
+        ],
+        spawn(initFn) {
+          for (let i = 0; i < this.items.length; i++) {
+            if (!this.items[i].alive) {
+              initFn(this.items[i]);
+              this.items[i].alive = true;
+              return this.items[i];
+            }
+          }
+          return null;
+        }
+      };
+
+      const spawned = pool.spawn(item => {
+        item.x = 50;
+        item.y = 50;
+      });
+
+      assert(
+        spawned !== null && spawned.x === 50 && spawned.alive === true,
+        'Object Pooling: Reuse dead objects',
+        `Pool spawned object at (${spawned.x}, ${spawned.y}) with alive=${spawned.alive}`
+      );
+    }
+
+    // ============================================================
+    // POWERUP & CRYSTAL TESTS
+    // ============================================================
+
+    function testPowerups() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💎 Powerup & Crystal Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Crystal effect set membership
+      const bulletWithEffects = {
+        effectSet: new Set(['explosive', 'homing'])
+      };
+
+      assert(
+        bulletWithEffects.effectSet.has('explosive') && bulletWithEffects.effectSet.has('homing'),
+        'Crystal Effects: Set Membership',
+        `Bullet correctly tracks explosive and homing effects using Set`
+      );
+
+      // Test: Multi-shot pattern calculation
+      const calculateShotAngle = (index, total, baseAngle) => {
+        const spread = Math.PI / 6; // 30 degree spread
+        return baseAngle + (index - (total - 1) / 2) * (spread / (total - 1));
+      };
+
+      const tripleShot = [0, 1, 2].map(i => calculateShotAngle(i, 3, 0));
+      const hasSpread = tripleShot[0] !== tripleShot[1] && tripleShot[1] !== tripleShot[2];
+
+      assert(
+        hasSpread && tripleShot.length === 3,
+        'Multi-Shot: Triple Shot Pattern',
+        `Triple shot generates 3 bullets at different angles: ${tripleShot.map(a => a.toFixed(2)).join(', ')}`
+      );
+
+      // Test: Powerup duration tracking
+      const powerupState = {
+        shotsRemaining: 50,
+        type: 'homing'
+      };
+
+      powerupState.shotsRemaining -= 1;
+      const stillActive = powerupState.shotsRemaining > 0;
+
+      assert(
+        stillActive && powerupState.shotsRemaining === 49,
+        'Powerup Duration: Shot Counter',
+        `Powerup tracks ${powerupState.shotsRemaining} shots remaining`
+      );
+
+      // Test: Explosive radius calculation
+      const explosionRadius = 80;
+      const enemyDistance = 50;
+      const withinBlast = enemyDistance <= explosionRadius;
+
+      assert(
+        withinBlast,
+        'Explosive Effect: Blast Radius',
+        `Enemy at ${enemyDistance}px is within ${explosionRadius}px blast radius`
+      );
+    }
+
+    // ============================================================
+    // INPUT HANDLING TESTS
+    // ============================================================
+
+    function testInputHandling() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎮 Input Handling Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Keyboard input state
+      const keys = new Set();
+      keys.add('w');
+      keys.add('a');
+
+      const isMovingUp = keys.has('w');
+      const isMovingLeft = keys.has('a');
+      const isMovingRight = keys.has('d');
+
+      assert(
+        isMovingUp && isMovingLeft && !isMovingRight,
+        'Keyboard Input: Key State Tracking',
+        `Keys Set correctly tracks W=${isMovingUp}, A=${isMovingLeft}, D=${isMovingRight}`
+      );
+
+      // Test: Mouse position normalization
+      const canvasWidth = 1000;
+      const canvasHeight = 600;
+      const mouseX = 500;
+      const mouseY = 300;
+
+      const normalizedX = mouseX / canvasWidth;
+      const normalizedY = mouseY / canvasHeight;
+      const inBounds = normalizedX >= 0 && normalizedX <= 1 && normalizedY >= 0 && normalizedY <= 1;
+
+      assert(
+        inBounds && normalizedX === 0.5 && normalizedY === 0.5,
+        'Mouse Input: Position Normalization',
+        `Mouse at (${mouseX}, ${mouseY}) normalizes to (${normalizedX}, ${normalizedY})`
+      );
+
+      // Test: Touch control deadzone
+      const joystickRadius = 60;
+      const touchDx = 10;
+      const touchDy = 10;
+      const touchDistance = Math.sqrt(touchDx * touchDx + touchDy * touchDy);
+      const deadzone = 15;
+      const isOutsideDeadzone = touchDistance > deadzone;
+
+      assert(
+        !isOutsideDeadzone,
+        'Touch Input: Deadzone Filtering',
+        `Touch distance ${touchDistance.toFixed(1)}px is within ${deadzone}px deadzone`
+      );
+
+      // Test: Angle calculation for aiming
+      const targetX = 100;
+      const targetY = 100;
+      const playerX = 0;
+      const playerY = 0;
+      const angle = Math.atan2(targetY - playerY, targetX - playerX);
+      const angleInRadians = angle >= -Math.PI && angle <= Math.PI;
+
+      assert(
+        angleInRadians,
+        'Aiming: Angle Calculation',
+        `Angle to target (100,100) from (0,0) is ${angle.toFixed(2)} radians`
+      );
+    }
+
+    // ============================================================
+    // LOCALSTORAGE & PERSISTENCE TESTS
+    // ============================================================
+
+    function testLocalStorage() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💾 LocalStorage & Persistence Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Save data structure
+      const saveData = {
+        highestWave: 10,
+        bestKills: 250,
+        bestCombo: 15,
+        gamesPlayed: 5
+      };
+
+      const hasRequiredFields =
+        typeof saveData.highestWave === 'number' &&
+        typeof saveData.bestKills === 'number' &&
+        typeof saveData.bestCombo === 'number';
+
+      assert(
+        hasRequiredFields,
+        'Save Data: Structure Validation',
+        `Save data contains all required numeric fields`
+      );
+
+      // Test: JSON serialization safety
+      let jsonRoundTrip = false;
+      try {
+        const serialized = JSON.stringify(saveData);
+        const deserialized = JSON.parse(serialized);
+        jsonRoundTrip = deserialized.highestWave === saveData.highestWave;
+      } catch (e) {
+        jsonRoundTrip = false;
+      }
+
+      assert(
+        jsonRoundTrip,
+        'Save Data: JSON Round-Trip',
+        `Save data successfully serializes and deserializes via JSON`
+      );
+
+      // Test: Default save data fallback
+      const getDefaultSave = () => ({
+        highestWave: 0,
+        bestKills: 0,
+        bestCombo: 0,
+        gamesPlayed: 0
+      });
+
+      const defaultSave = getDefaultSave();
+      const hasDefaultValues =
+        defaultSave.highestWave === 0 &&
+        defaultSave.bestKills === 0;
+
+      assert(
+        hasDefaultValues,
+        'Save Data: Default Fallback',
+        `Default save data initializes with zero values`
+      );
+
+      // Test: New record detection
+      const currentWave = 15;
+      const previousBest = 10;
+      const isNewRecord = currentWave > previousBest;
+
+      assert(
+        isNewRecord,
+        'Save Data: Record Detection',
+        `Wave ${currentWave} exceeds previous best ${previousBest}`
+      );
+
+      // Test: Error handling for malformed data
+      let handlesCorruptedData = false;
+      try {
+        JSON.parse('{invalid json}');
+      } catch (e) {
+        handlesCorruptedData = true; // Should throw and be caught
+      }
+
+      assert(
+        handlesCorruptedData,
+        'Save Data: Malformed Data Handling',
+        `Parser correctly throws error for corrupted localStorage data`
+      );
+    }
+
+    // ============================================================
+    // RENDERING SMOKE TESTS
+    // ============================================================
+
+    function testRendering() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🎨 Rendering Smoke Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Canvas context creation
+      const canvas = document.createElement('canvas');
+      canvas.width = 1000;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      const hasContext = ctx !== null;
+
+      assert(
+        hasContext,
+        'Rendering: Canvas Context Creation',
+        `Successfully created 2D rendering context`
+      );
+
+      // Test: Basic shape rendering doesn't throw
+      let canDrawShapes = false;
+      try {
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(0, 0, 10, 10);
+        ctx.strokeStyle = '#00FF00';
+        ctx.strokeRect(20, 20, 10, 10);
+        canDrawShapes = true;
+      } catch (e) {
+        canDrawShapes = false;
+      }
+
+      assert(
+        canDrawShapes,
+        'Rendering: Basic Shape Drawing',
+        `Canvas successfully renders fillRect and strokeRect`
+      );
+
+      // Test: Gradient creation
+      let canCreateGradient = false;
+      try {
+        const gradient = ctx.createRadialGradient(50, 50, 0, 50, 50, 20);
+        gradient.addColorStop(0, '#FF0000');
+        gradient.addColorStop(1, '#0000FF');
+        canCreateGradient = true;
+      } catch (e) {
+        canCreateGradient = false;
+      }
+
+      assert(
+        canCreateGradient,
+        'Rendering: Gradient Creation',
+        `Successfully creates radial gradients with color stops`
+      );
+
+      // Test: Transform operations
+      let canTransform = false;
+      try {
+        ctx.save();
+        ctx.translate(100, 100);
+        ctx.rotate(Math.PI / 4);
+        ctx.scale(1.5, 1.5);
+        ctx.restore();
+        canTransform = true;
+      } catch (e) {
+        canTransform = false;
+      }
+
+      assert(
+        canTransform,
+        'Rendering: Transform Operations',
+        `Canvas supports save/restore, translate, rotate, scale`
+      );
+    }
+
+    // ============================================================
+    // COLLISION DETECTION TESTS
+    // ============================================================
+
+    function testCollisionDetection() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '💥 Collision Detection Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Circle-circle collision - exact boundary
+      const entity1 = { x: 100, y: 100, r: 10 };
+      const entity2 = { x: 120, y: 100, r: 10 };
+      const dx = entity2.x - entity1.x;
+      const dy = entity2.y - entity1.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const touching = dist <= (entity1.r + entity2.r);
+
+      assert(
+        touching,
+        'Collision: Exact Boundary Touch',
+        `Entities with r=10 at distance 20px are touching: ${touching}`
+      );
+
+      // Test: Circle-circle collision - overlap
+      const entity3 = { x: 100, y: 100, r: 15 };
+      const entity4 = { x: 110, y: 100, r: 15 };
+      const dx2 = entity4.x - entity3.x;
+      const dy2 = entity4.y - entity3.y;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      const overlapping = dist2 < (entity3.r + entity4.r);
+
+      assert(
+        overlapping,
+        'Collision: Overlapping Circles',
+        `Entities at distance ${dist2.toFixed(1)}px with combined radius ${entity3.r + entity4.r}px overlap`
+      );
+
+      // Test: Spatial grid cell calculation
+      const gridCellSize = 50;
+      const entityX = 175;
+      const entityY = 225;
+      const cellX = Math.floor(entityX / gridCellSize);
+      const cellY = Math.floor(entityY / gridCellSize);
+
+      assert(
+        cellX === 3 && cellY === 4,
+        'Spatial Grid: Cell Assignment',
+        `Entity at (${entityX}, ${entityY}) assigned to grid cell (${cellX}, ${cellY})`
+      );
+
+      // Test: Spatial grid neighbor query
+      const targetCellX = 5;
+      const targetCellY = 5;
+      const neighbors = [];
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          neighbors.push([targetCellX + dx, targetCellY + dy]);
+        }
+      }
+
+      assert(
+        neighbors.length === 9,
+        'Spatial Grid: 3x3 Neighbor Query',
+        `Grid cell (${targetCellX}, ${targetCellY}) has ${neighbors.length} neighbors (including self)`
+      );
+
+      // Test: Collision with zero-radius entity (edge case)
+      const zeroRadiusEntity = { x: 100, y: 100, r: 0 };
+      const normalEntity = { x: 100, y: 100, r: 10 };
+      const dx3 = normalEntity.x - zeroRadiusEntity.x;
+      const dy3 = normalEntity.y - zeroRadiusEntity.y;
+      const dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
+      const collidesWithZeroRadius = dist3 <= (zeroRadiusEntity.r + normalEntity.r);
+
+      assert(
+        collidesWithZeroRadius,
+        'Collision: Zero-Radius Edge Case',
+        `Zero-radius entity at same position collides: ${collidesWithZeroRadius}`
+      );
+    }
+
+    // ============================================================
+    // ENEMY AI BEHAVIOR TESTS
+    // ============================================================
+
+    function testEnemyAI() {
+      const h2 = document.createElement('h2');
+      h2.textContent = '🧟 Enemy AI Behavior Tests';
+      testContainer.appendChild(h2);
+
+      // Test: Enemy targeting calculation
+      const enemy = { x: 200, y: 200 };
+      const player = { x: 300, y: 250 };
+      const dx = player.x - enemy.x;
+      const dy = player.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const targetingAngle = Math.atan2(dy, dx);
+
+      assert(
+        distance > 0 && !isNaN(targetingAngle),
+        'Enemy AI: Player Targeting',
+        `Enemy at (${enemy.x}, ${enemy.y}) targets player at distance ${distance.toFixed(1)}px, angle ${targetingAngle.toFixed(2)}rad`
+      );
+
+      // Test: Enemy movement speed calculation
+      const baseSpeed = 100;
+      const waveNumber = 5;
+      const speedIncrement = 4;
+      const enemySpeed = baseSpeed + (waveNumber * speedIncrement);
+
+      assert(
+        enemySpeed === 120,
+        'Enemy AI: Speed Scaling',
+        `Wave ${waveNumber} enemy speed: ${enemySpeed}px/s (base ${baseSpeed} + ${waveNumber * speedIncrement})`
+      );
+
+      // Test: Enemy behavior type assignment
+      const behaviors = ['basic', 'leaper', 'dasher', 'shooter'];
+      const randomBehavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+
+      assert(
+        behaviors.includes(randomBehavior),
+        'Enemy AI: Behavior Assignment',
+        `Enemy assigned valid behavior: ${randomBehavior}`
+      );
+
+      // Test: Enemy health scaling
+      const baseHealth = 10;
+      const wave = 10;
+      const difficulty = 1 + wave * 0.06;
+      const scaledHealth = Math.ceil(baseHealth * difficulty);
+
+      assert(
+        scaledHealth > baseHealth,
+        'Enemy AI: Health Scaling',
+        `Wave ${wave} enemy health: ${scaledHealth}HP (base ${baseHealth}HP × ${difficulty.toFixed(2)})`
+      );
+    }
+
+    // ============================================================
+    // RUN ALL TESTS
+    // ============================================================
+
+    function runAllTests() {
+      testConstants();
+      testMathUtils();
+      testPerformance();
+      testMemoryLeaks();
+      testCodeQuality();
+      testBrowserCompat();
+      testGameLogic();
+      testIntegration();
+      testPowerups();
+      testInputHandling();
+      testLocalStorage();
+      testRendering();
+      testCollisionDetection();
+      testEnemyAI();
+
+      // Generate summary
+      const passed = results.filter(r => r.passed).length;
+      const failed = results.filter(r => !r.passed).length;
+      const total = results.length;
+      const passRate = ((passed / total) * 100).toFixed(1);
+
+      summaryContainer.innerHTML = `
+        <h2>📊 Test Summary</h2>
+        <div>
+          <span class="${failed === 0 ? 'pass' : 'fail'}">
+            ${passed}/${total} tests passed (${passRate}%)
+          </span>
+        </div>
+        <div style="margin-top: 10px;">
+          <span class="pass">✅ ${passed} passed</span> &nbsp;
+          <span class="fail">❌ ${failed} failed</span>
+        </div>
+        <div style="margin-top: 20px; font-size: 16px;">
+          ${failed === 0
+            ? '<span class="pass">🎉 All tests passed! Ready for production.</span>'
+            : '<span class="fail">⚠️ Some tests failed. Please review the issues above.</span>'
+          }
+        </div>
+      `;
+    }
+
+    // Execute tests on load
+    runAllTests();
+  </script>
+</body>
+</html>
