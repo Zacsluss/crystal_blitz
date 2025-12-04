@@ -192,7 +192,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ### System Architecture
 
-Crystal Blitz uses a **fixed-timestep game loop with spatial partitioning** to achieve consistent 60 FPS performance with 200+ concurrent entities:
+Crystal Blitz uses a **fixed-timestep game loop with spatial partitioning** to achieve consistent 60 FPS performance with 200+ concurrent entities.
 
 ```mermaid
 graph TB

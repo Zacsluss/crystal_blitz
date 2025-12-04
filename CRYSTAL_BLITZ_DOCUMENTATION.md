@@ -29,7 +29,7 @@
 - **Visual Systems**: Footstep tracking, hexagonal floor pattern, enhanced blood effects
 
 ### Technology Stack
-- **Language**: Vanilla JavaScript (ES6+)
+- **Language**: Vanilla JavaScript (ES6+, no TypeScript)
 - **Rendering**: HTML5 Canvas 2D API
 - **Audio**: Web Audio API (procedural sound generation)
 - **Build**: None required (single HTML file)

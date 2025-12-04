@@ -42,7 +42,7 @@ yarn-error.log*
 .env.local
 .env.*.local
 
-# Node (if ever added)
+# Node dependencies
 node_modules/
 package-lock.json
 yarn.lock
@@ -61,5 +61,3 @@ e2e/
 playwright-report/
 test-results/
 package.json
-package-lock.json
-node_modules/

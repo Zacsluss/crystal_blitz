@@ -238,7 +238,7 @@ Run `tests.html` and ensure all 48 tests pass:
 - Spatial grid (8 tests)
 - Powerups (4 tests)
 - Rendering (4 tests)
-- Save/load (5 tests)
+- Save/load (4 tests)
 
 ### Browser Compatibility
 Test in at least 2 browsers:
