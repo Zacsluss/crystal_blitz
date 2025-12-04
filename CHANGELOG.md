@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.95.0] - 2025-01-20
 
 ### Added
-- Crystal visual overhaul with unique shapes for each type
+- Crystal visual overhaul with unique shapes for each type:
   - 8-pointed star for Homing crystals with golden aura
   - Lightning bolt shape for Lightning crystals
   - Snowflake for Freeze crystals

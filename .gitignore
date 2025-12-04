@@ -47,7 +47,7 @@ node_modules/
 package-lock.json
 yarn.lock
 
-# Build outputs (if ever added)
+# Build outputs (if added in future)
 dist/
 build/
 out/

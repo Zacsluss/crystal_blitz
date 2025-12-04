@@ -1,4 +1,4 @@
-# Crystal Blitz - Architecture Documentation
+# Crystal Blitz — Architecture Documentation
 
 ## Table of Contents
 1. [System Overview](#system-overview)

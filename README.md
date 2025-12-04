@@ -34,7 +34,7 @@
 
 ## 👋 Hey, I'm Zac
 
-I manage enterprise platforms by day (3,000+ users, 22 countries) and build unusually fun projects by night. This is a **60 FPS arena shooter in a single 347KB HTML file**—zero dependencies, works offline forever.
+I manage enterprise platforms by day (3,000+ users, 22 countries) and build unusually fun projects by night. This is a **60 FPS arena shooter in a single 347KB HTML file** — zero dependencies, works offline forever.
 
 **What makes this different:**
 

@@ -31,7 +31,7 @@ This project welcomes contributions from everyone. Please be respectful and cons
 
 ## Development Setup
 
-Crystal Blitz is a **single-file HTML5 game** with zero dependencies. No build process required!
+Crystal Blitz is a **single-file HTML5 game** with zero dependencies — no build process required!
 
 ### Running Locally
 
