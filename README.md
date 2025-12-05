@@ -1709,7 +1709,7 @@ Want to make this game yours? Takes ~5 minutes:
 
 <div align="center">
 
-By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect** at Computershare, managing multi-million-dollar Salesforce ecosystems and enterprise integrations across 20+ countries. By night, I build projects like this — exploring computational physics, algorithm optimization, and performance engineering.
+By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect**, managing multi-million-dollar Salesforce ecosystems and enterprise integrations across 20+ countries. By night, I build projects like this — exploring computational physics, algorithm optimization, and performance engineering.
 
 **Always learning, always building.**
 
