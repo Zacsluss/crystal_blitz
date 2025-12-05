@@ -14,7 +14,7 @@
 <p align="center">
   <a href="https://zacsluss.github.io/crystal_blitz/"><img src="https://img.shields.io/badge/🎮_PLAY-GAME-2e8b57?style=for-the-badge&labelColor=000000&logo=vercel&logoColor=white" alt="Play Game"/></a>
   <a href="https://github.com/Zacsluss/crystal_blitz/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/⬇️_DOWNLOAD-PROJECT-d97706?style=for-the-badge&labelColor=000000&logo=github&logoColor=white" alt="Download"/></a>
-  <a href="#-quick-start"><img src="https://img.shields.io/badge/📖_VIEW-DOCS-3b82f6?style=for-the-badge&labelColor=000000&logo=readthedocs&logoColor=white" alt="Documentation"/></a>
+  <a href="#quick-start"><img src="https://img.shields.io/badge/📖_VIEW-DOCS-3b82f6?style=for-the-badge&labelColor=000000&logo=readthedocs&logoColor=white" alt="Documentation"/></a>
 </p>
 
 <!-- GitHub Stats Badges -->
@@ -454,6 +454,8 @@ Formula: 1 + Math.floor(wave / 5)
 </details>
 
 ---
+
+<a name="quick-start"></a>
 
 <details>
 <summary><b>🚀 Quick Start</b></summary>
