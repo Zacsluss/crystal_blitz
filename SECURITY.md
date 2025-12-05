@@ -92,7 +92,7 @@ Please don't:
 - Download directly from [official GitHub repository](https://github.com/Zacsluss/crystal_blitz)
 - Verify file integrity if security is critical
 - Open only in modern, updated browsers
-- Use official GitHub Pages deployment: https://zacsluss.github.io/crystal_blitz/
+- Host on a trusted static file server
 
 ### Hosting Your Own Copy
 If you want to host Crystal Blitz yourself:

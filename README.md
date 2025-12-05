@@ -12,7 +12,7 @@
 
 <!-- Main Action Buttons -->
 <p align="center">
-  <a href="https://zacsluss.github.io/crystal_blitz/"><img src="https://img.shields.io/badge/🎮_PLAY-GAME-2e8b57?style=for-the-badge&labelColor=000000&logo=vercel&logoColor=white" alt="Play Game"/></a>
+  <a href="#"><img src="https://img.shields.io/badge/🎮_PLAY-GAME-2e8b57?style=for-the-badge&labelColor=000000&logo=vercel&logoColor=white" alt="Play Game"/></a>
   <a href="https://github.com/Zacsluss/crystal_blitz/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/⬇️_DOWNLOAD-PROJECT-d97706?style=for-the-badge&labelColor=000000&logo=github&logoColor=white" alt="Download"/></a>
   <a href="#-quick-start"><img src="https://img.shields.io/badge/📖_VIEW-DOCS-3b82f6?style=for-the-badge&labelColor=000000&logo=readthedocs&logoColor=white" alt="Documentation"/></a>
 </p>
@@ -632,73 +632,11 @@ git add .
 git commit -m "Deploy Crystal Blitz"
 git push origin main
 
-# 2️⃣ Enable GitHub Pages
-# GitHub → Repo Settings → Pages → Source: main branch → Save
-
-# 3️⃣ Auto-deploys to:
-# https://yourusername.github.io/crystal_blitz/
+# 2️⃣ Repository ready for hosting
+# Can be deployed to any static hosting service
 ```
 
-**Custom Domain (Optional):**
-```bash
-# Add CNAME file
-echo "yourdomain.com" > CNAME
-git add CNAME && git commit -m "Add custom domain" && git push
 
-# Configure DNS:
-# CNAME record: yourdomain.com → yourusername.github.io
-```
-
-<details>
-<summary><b>🔽 Other deployment options (Netlify, Vercel, Self-Hosted)</b></summary>
-
-<br/>
-
-#### Netlify (Drag & Drop)
-
-1. Go to [Netlify Drop](https://app.netlify.com/drop)
-2. Drag `index.html` onto the page
-3. Done! Get instant HTTPS URL
-
-**CLI Deployment:**
-```bash
-npm install -g netlify-cli
-netlify deploy --prod --dir .
-```
-
-#### Vercel (CLI)
-
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-#### Self-Hosted (Any Static Server)
-
-```bash
-# Nginx
-sudo cp index.html /var/www/html/
-
-# Apache
-sudo cp index.html /var/www/html/
-
-# Caddy
-caddy file-server --root . --listen :8080
-
-# Python (development)
-python -m http.server 8080
-```
-
-#### Production Checklist
-
-- [ ] Test on target browsers (Chrome, Firefox, Safari, Edge)
-- [ ] Enable HTTPS (required for full mobile features)
-- [ ] Add CSP headers (see [SECURITY.md](SECURITY.md))
-- [ ] Verify offline functionality (disconnect network, reload)
-- [ ] Optimize assets (already optimized - 347KB gzipped to 93KB)
-- [ ] Test mobile performance (iPhone 8+, Pixel 3+)
-
-</details>
 
 </details>
 
@@ -1773,9 +1711,6 @@ By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect**
 
 **Always learning, always building.**
 
-<a href="https://zacsluss.github.io/portfolio/">
-  <img src="https://img.shields.io/badge/Portfolio-zacsluss.github.io-2e7d5a?style=for-the-badge&logo=vercel&logoColor=white"/>
-</a>
 <a href="https://github.com/Zacsluss">
   <img src="https://img.shields.io/badge/GitHub-@Zacsluss-181717?style=for-the-badge&logo=github&logoColor=white"/>
 </a>
@@ -1784,9 +1719,6 @@ By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect**
 </a>
 <a href="mailto:zacharyjsluss@gmail.com">
   <img src="https://img.shields.io/badge/Email-zacharyjsluss@gmail.com-b91c1c?style=for-the-badge&logo=gmail&logoColor=white"/>
-</a>
-<a href="https://zacsluss.github.io/portfolio/resume.pdf">
-  <img src="https://img.shields.io/badge/Resume-Download_PDF-7c3aed?style=for-the-badge&logo=adobeacrobatreader&logoColor=white"/>
 </a>
 
 <br/>
