@@ -20,7 +20,7 @@ List the specific changes made in this PR:
 -
 
 ## Testing Performed
-Describe the testing you've done:
+Describe the testing you have done:
 - [ ] Tested in Chrome
 - [ ] Tested in Firefox
 - [ ] Tested in Safari

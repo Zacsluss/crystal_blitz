@@ -145,7 +145,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 </div>
 
 <details>
-<summary><b>🔽 Full dependency breakdown</b></summary>
+<summary><b>🔽 Full Dependency Breakdown</b></summary>
 
 <br/>
 

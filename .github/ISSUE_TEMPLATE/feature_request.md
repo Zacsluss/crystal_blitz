@@ -18,7 +18,7 @@ Describe how you envision this feature working. Be as detailed as you like.
 ## Alternative Solutions
 Are there alternative approaches that could achieve the same goal?
 
-## Implementation Considerations (optional)
+## Implementation Considerations (Optional)
 If you have thoughts on how this could be implemented technically:
 - [ ] Would this affect game performance?
 - [ ] Would this require new visual assets?

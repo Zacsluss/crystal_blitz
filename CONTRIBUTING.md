@@ -121,7 +121,7 @@ for (let i = 0; i < arr.length; i++) {
   if (arr[i].alive) { /* ... */ }
 }
 
-// ❌ BAD: Creates iterator object (GC pressure)
+// ❌ AVOID: Creates iterator object (GC pressure)
 for (const item of arr) {
   if (item.alive) { /* ... */ }
 }

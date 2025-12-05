@@ -1,4 +1,4 @@
-# Crystal Blitz - Complete Technical Documentation
+# Crystal Blitz — Complete Technical Documentation
 
 ## Table of Contents
 1. [Overview](#overview)

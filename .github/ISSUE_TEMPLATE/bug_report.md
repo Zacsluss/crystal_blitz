@@ -25,9 +25,9 @@ A clear and concise description of what actually happened.
 If applicable, add screenshots to help explain your problem.
 
 ## Environment
-- **Browser**: [e.g., Chrome 120, Firefox 121, Safari 17]
-- **OS**: [e.g., Windows 11, macOS 14, Ubuntu 22.04]
-- **Device**: [e.g., Desktop, iPhone 14, Samsung Galaxy S23]
+- **Browser**: [e.g. Chrome 120, Firefox 121, Safari 17]
+- **OS**: [e.g. Windows 11, macOS 14, Ubuntu 22.04]
+- **Device**: [e.g. Desktop, iPhone 14, Samsung Galaxy S23]
 - **Screen Resolution**: [e.g., 1920x1080, 2560x1440]
 
 ## Game State (if applicable)
