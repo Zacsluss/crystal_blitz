@@ -1707,10 +1707,21 @@ Want to make this game yours? Takes ~5 minutes:
 
 <div align="center">
 
-By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect** at Computershare, managing multi-million-dollar Salesforce ecosystems and enterprise integrations across 20+ countries. By night, I build projects like this.
+By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect** at Computershare, managing multi-million-dollar Salesforce ecosystems and enterprise integrations across 20+ countries. By night, I build projects like this — exploring computational physics, algorithm optimization, and performance engineering.
 
 **Always learning, always building.**
 
+</div>
+
+---
+
+## 🔗 Let's Connect
+
+<div align="center">
+
+<a href="https://zacsluss.github.io/portfolio_zarvis/">
+  <img src="https://img.shields.io/badge/Portfolio-zacsluss.github.io-2e7d5a?style=for-the-badge&logo=vercel&logoColor=white"/>
+</a>
 <a href="https://github.com/Zacsluss">
   <img src="https://img.shields.io/badge/GitHub-@Zacsluss-181717?style=for-the-badge&logo=github&logoColor=white"/>
 </a>
@@ -1720,15 +1731,14 @@ By day, I work as a **Principal CRM & Enterprise Platforms Solutions Architect**
 <a href="mailto:zacharyjsluss@gmail.com">
   <img src="https://img.shields.io/badge/Email-zacharyjsluss@gmail.com-b91c1c?style=for-the-badge&logo=gmail&logoColor=white"/>
 </a>
+<a href="https://zacsluss.github.io/portfolio_zarvis/resume.pdf">
+  <img src="https://img.shields.io/badge/Resume-Download_PDF-7c3aed?style=for-the-badge&logo=adobeacrobatreader&logoColor=white"/>
+</a>
 
 <br/>
 <br/>
 
 **Found this helpful?** Give it a ⭐ to show support!
-
-**Want to contribute?** See [contributing guidelines](#-license--contributing) above.
-
-**Need help?** [Open an issue](https://github.com/Zacsluss/crystal_blitz/issues) or email me.
 
 </div>
 
