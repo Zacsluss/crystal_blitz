@@ -587,7 +587,7 @@ Web Audio API (Procedural Generation)
 
 ## Credits
 
-**Architecture Designed by**: Claude Code + Developer
+**Architecture**: Custom design
 **Game Engine**: Custom HTML5 Canvas
 **Framework**: None (vanilla JS)
 **Target Platform**: Modern browsers (ES6+)
