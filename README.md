@@ -43,7 +43,7 @@ I manage enterprise platforms by day (3,000+ users, 22 countries) and build unus
 - **Zero garbage collection** - Pre-allocated memory, no runtime allocation
 - **Works forever** - Download once, play in 10 years (no npm, no build tools, no external dependencies)
 
-Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
+Built with vanilla JavaScript, Canvas API, and procedural audio synthesis. • Works completely offline 
 
 <div align="center">
 
