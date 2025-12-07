@@ -72,7 +72,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ---
 
-<a name="what-this-does"></a>
+<h2 id="what-this-does"></h2>
 
 <details>
 <summary><b>⚡ What This Does</b></summary>
@@ -101,7 +101,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ---
 
-<a name="tech-stack"></a>
+<h2 id="tech-stack"></h2>
 
 <details open>
 <summary><b>🛠️ Tech Stack</b></summary>
@@ -189,7 +189,7 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ---
 
-<a name="how-it-works-architecture"></a>
+<h2 id="how-it-works-architecture"></h2>
 
 <details open>
 <summary><b>🏗️ How It Works - Architecture</b></summary>
@@ -461,7 +461,7 @@ Formula: 1 + Math.floor(wave / 5)
 
 ---
 
-<a name="quick-start"></a>
+<h2 id="quick-start"></h2>
 
 <details>
 <summary><b>🚀 Quick Start</b></summary>
@@ -652,7 +652,7 @@ git push origin main
 
 ---
 
-<a name="technical-deep-dive"></a>
+<h2 id="technical-deep-dive"></h2>
 
 <details>
 <summary><b>🔧 Technical Deep Dive</b></summary>
@@ -1643,7 +1643,7 @@ debugMode = true
 
 ---
 
-<a name="license-contributing"></a>
+<h2 id="license-contributing"></h2>
 
 <details>
 <summary><b>📄 License & Contributing</b></summary>
@@ -1712,7 +1712,7 @@ Want to make this game yours? Takes ~5 minutes:
 
 ---
 
-<a name="about-connect"></a>
+<h2 id="about-connect"></h2>
 
 <details open>
 <summary><b>📬 About & Connect</b></summary>
