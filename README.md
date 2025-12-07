@@ -61,9 +61,9 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 <br/>
 
 - [⚡ What This Does](#-what-this-does)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ How It Works - Architecture](#️-how-it-works---architecture)
-- [🚀 Quick Start](#-quick-start)
+- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
+- [🏗️ How It Works - Architecture](#%EF%B8%8F-how-it-works---architecture)
+- [🚀 Quick Start](#quick-start)
 - [🔧 Technical Deep Dive](#-technical-deep-dive)
 - [📄 License & Contributing](#-license--contributing)
 - [📬 About & Connect](#-about--connect)
