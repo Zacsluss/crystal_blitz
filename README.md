@@ -60,22 +60,22 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 <br/>
 
-- [⚡ What This Does](#what-this-does)
-- [🛠️ Tech Stack](#tech-stack)
-- [🏗️ How It Works - Architecture](#how-it-works-architecture)
-- [🚀 Quick Start](#quick-start)
-- [🔧 Technical Deep Dive](#technical-deep-dive)
-- [📄 License & Contributing](#license-contributing)
-- [📬 About & Connect](#about-connect)
+- [⚡ What This Does](#-what-this-does)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🏗️ How It Works - Architecture](#️-how-it-works---architecture)
+- [🚀 Quick Start](#-quick-start)
+- [🔧 Technical Deep Dive](#-technical-deep-dive)
+- [📄 License & Contributing](#-license--contributing)
+- [📬 About & Connect](#-about--connect)
 
 </details>
 
 ---
 
-<h2 id="what-this-does"></h2>
+## ⚡ What This Does
 
 <details>
-<summary><b>⚡ What This Does</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -101,10 +101,10 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ---
 
-<h2 id="tech-stack"></h2>
+## 🛠️ Tech Stack
 
 <details open>
-<summary><b>🛠️ Tech Stack</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -189,10 +189,10 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 ---
 
-<h2 id="how-it-works-architecture"></h2>
+## 🏗️ How It Works - Architecture
 
 <details open>
-<summary><b>🏗️ How It Works - Architecture</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -461,10 +461,10 @@ Formula: 1 + Math.floor(wave / 5)
 
 ---
 
-<h2 id="quick-start"></h2>
+## 🚀 Quick Start
 
 <details>
-<summary><b>🚀 Quick Start</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -652,10 +652,10 @@ git push origin main
 
 ---
 
-<h2 id="technical-deep-dive"></h2>
+## 🔧 Technical Deep Dive
 
 <details>
-<summary><b>🔧 Technical Deep Dive</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -1643,10 +1643,10 @@ debugMode = true
 
 ---
 
-<h2 id="license-contributing"></h2>
+## 📄 License & Contributing
 
 <details>
-<summary><b>📄 License & Contributing</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
@@ -1712,10 +1712,10 @@ Want to make this game yours? Takes ~5 minutes:
 
 ---
 
-<h2 id="about-connect"></h2>
+## 📬 About & Connect
 
 <details open>
-<summary><b>📬 About & Connect</b></summary>
+<summary><i>Click to expand section</i></summary>
 
 <br/>
 
