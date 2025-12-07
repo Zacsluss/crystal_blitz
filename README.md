@@ -60,17 +60,19 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 
 <br/>
 
-- [⚡ What This Does](#-what-this-does)
-- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
-- [🏗️ How It Works - Architecture](#%EF%B8%8F-how-it-works---architecture)
+- [⚡ What This Does](#what-this-does)
+- [🛠️ Tech Stack](#tech-stack)
+- [🏗️ How It Works - Architecture](#how-it-works-architecture)
 - [🚀 Quick Start](#quick-start)
-- [🔧 Technical Deep Dive](#-technical-deep-dive)
-- [📄 License & Contributing](#-license--contributing)
-- [📬 About & Connect](#-about--connect)
+- [🔧 Technical Deep Dive](#technical-deep-dive)
+- [📄 License & Contributing](#license-contributing)
+- [📬 About & Connect](#about-connect)
 
 </details>
 
 ---
+
+<a name="what-this-does"></a>
 
 <details>
 <summary><b>⚡ What This Does</b></summary>
@@ -98,6 +100,8 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 </details>
 
 ---
+
+<a name="tech-stack"></a>
 
 <details open>
 <summary><b>🛠️ Tech Stack</b></summary>
@@ -184,6 +188,8 @@ Built with vanilla JavaScript, Canvas API, and procedural audio synthesis.
 </details>
 
 ---
+
+<a name="how-it-works-architecture"></a>
 
 <details open>
 <summary><b>🏗️ How It Works - Architecture</b></summary>
@@ -645,6 +651,8 @@ git push origin main
 </details>
 
 ---
+
+<a name="technical-deep-dive"></a>
 
 <details>
 <summary><b>🔧 Technical Deep Dive</b></summary>
@@ -1635,6 +1643,8 @@ debugMode = true
 
 ---
 
+<a name="license-contributing"></a>
+
 <details>
 <summary><b>📄 License & Contributing</b></summary>
 
@@ -1701,6 +1711,8 @@ Want to make this game yours? Takes ~5 minutes:
 </details>
 
 ---
+
+<a name="about-connect"></a>
 
 <details open>
 <summary><b>📬 About & Connect</b></summary>
